@@ -1,0 +1,47 @@
+## Interface: 100100
+## Title: Cooldown Sync
+## Notes: Priest, Paladin, Evoker CD Sync Helper
+## Author: rljohn
+## OptionalDeps: _DebugLog
+## SavedVariables: CooldownSyncConfig
+## SavedVariablesPerCharacter: CooldownSyncPerCharacterConfig
+## IconTexture: 135939
+## AddonCompartmentFunc: CooldownSync_OnAddonCompartmentClick
+
+embeds.xml
+
+# Load First
+config.lua
+logging.lua
+
+# Core Files
+classes.lua
+communication.lua
+config_panels.lua
+events.lua
+helper.lua
+localisation.lua
+messages.lua
+module.lua
+widgets.lua
+
+# Class Modules
+Modules/buddy.lua
+Modules/cooldowns.lua
+Modules/dps.lua
+Modules/deathknight.lua
+Modules/demonhunter.lua
+Modules/druid.lua
+Modules/evoker.lua
+Modules/hunter.lua
+Modules/mage.lua
+Modules/monk.lua
+Modules/paladin.lua
+Modules/priest.lua
+Modules/rogue.lua
+Modules/shaman.lua
+Modules/warlock.lua
+Modules/warrior.lua
+
+# Load last
+main.lua
