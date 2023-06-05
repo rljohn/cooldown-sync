@@ -240,6 +240,16 @@ function opt:SpaceStripper(str)
 	return string.gsub(str, "[^%S\n]+", "")
 end
 
+function opt:TimeRemainingString(time_remaining)
+	if (time_remaining > 60) then
+		local minutes = math.floor(time_remaining / 60)
+  		local remainingSeconds = time_remaining % 60
+  		return string.format("%d:%02d", minutes, remainingSeconds)
+	else
+		return string.format("%d", time_remaining)
+	end
+end
+
 -- auras
 
 function opt:GetAuraDuration(spell_id, unit_id)

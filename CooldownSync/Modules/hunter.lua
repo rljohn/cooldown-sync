@@ -1,6 +1,6 @@
 local opt = CooldownSyncConfig
 
 function opt:AddHunterModule()
-    module = opt:BuildDpsModule("hunter")
+    module = opt:BuildClassModule("hunter")
     return module
 end

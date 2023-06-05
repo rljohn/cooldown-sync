@@ -10,6 +10,7 @@ function opt:BuildModule(id)
     module.init = function()
         pbPrintf("Module (%s) initialized", id)
     end
+    module.post_init = nil
     module.update = nil
     module.talents_changed = nil
     module.combat_start = nil
@@ -45,6 +46,14 @@ function opt:ModuleEvent_OnInit()
     for key, module in pairs(opt.modules) do
         if (module.init) then
             module:init()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnPostInit()
+    for key, module in pairs(opt.modules) do
+        if (module.post_init) then
+            module:post_init()
         end
     end
 end
@@ -89,18 +98,18 @@ function opt:ModuleEvent_PartyChanged()
     end
 end
 
-function opt:ModuleEvent_OnAuraGained(spell_id)
+function opt:ModuleEvent_OnAuraGained(spell_id, guid, name)
     for key, module in pairs(opt.modules) do
         if (module.aura_gained) then
-            module:aura_gained( spell_id)
+            module:aura_gained(spell_id, guid, name)
         end
     end
 end
 
-function opt:ModuleEvent_OnAuraLost(spell_id)
+function opt:ModuleEvent_OnAuraLost(spell_id, guid, name)
     for key, module in pairs(opt.modules) do
         if (module.aura_lost) then
-            module:aura_lost(spell_id)
+            module:aura_lost(spell_id, guid, name)
         end
     end
 end

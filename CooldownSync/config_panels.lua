@@ -1,5 +1,5 @@
 local opt = CooldownSyncConfig
-local ADDON_VERSION = "1.3"
+local ADDON_VERSION = "<VERSION>"
 
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 

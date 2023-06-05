@@ -5,6 +5,12 @@ opt.CooldownIcons = {}
 local Glower = LibStub("LibCustomGlow-1.0")
 local LGF = LibStub("LibGetFrame-1.0")
 
+function opt:InitGlowLibrary()
+    if (LGF) then
+		LGF.GetUnitFrame("player")
+	end
+end
+
 function opt:ResetCooldownIcons()
     for key, icon in pairs(self.CooldownIcons) do
         icon:Reset()
@@ -57,19 +63,31 @@ function opt:CreateCooldownIcon(parent, spell_id)
     end
 
     function panel.Begin(self)
+
         panel.active = true
         panel.timer:Show()
+
         self:EndCooldown()
+
+        if (Glower) then
+            Glower.PixelGlow_Start ( self.spell, nil, nil, nil, nil, nil, 1, 1)
+            self.glowing = true
+        end
     end
 
     function panel.End(self)
         panel.active = false
-        panel.timer:End()
+        panel.timer:Hide()
+
+        if (self.glowing) then
+            Glower.PixelGlow_Stop(self.spell)
+            self.glowing = false
+        end
     end
 
     function panel.SetAura(self, time_remaining)
-        local text = string.format("%d", time_remaining)
-        self.panel.timer:SetText(text)
+        local text = opt:TimeRemainingString(time_remaining)
+        self.timer:SetText(text)
     end
 
     function panel.SetCooldown(self, start, duration, percent)

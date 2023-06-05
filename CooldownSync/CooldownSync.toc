@@ -27,8 +27,8 @@ widgets.lua
 
 # Class Modules
 Modules/buddy.lua
+Modules/class.lua
 Modules/cooldowns.lua
-Modules/dps.lua
 Modules/deathknight.lua
 Modules/demonhunter.lua
 Modules/druid.lua

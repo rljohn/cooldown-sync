@@ -67,6 +67,7 @@ function opt:OnLogin()
 
 	-- init
 	opt:BuildLogModule("logging")
+	opt:InitGlowLibrary()
 	
 	-- check name, realm
 	opt.PlayerName = UnitName("player")
@@ -106,6 +107,7 @@ function opt:OnLogin()
 	
 	-- request initial sync
 	C_Timer.After(1, function()
+		opt:ModuleEvent_OnPostInit()
 	end)
 	
 	-- minimap

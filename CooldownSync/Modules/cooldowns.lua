@@ -112,6 +112,15 @@ function opt:AddCooldownModule()
         self.abilities[spell_id] = ability
     end
 
+    function module.CheckAuras(self)
+        for spell_id, ability in pairs(self.abilities) do
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+            if (aura) then
+                opt:ModuleEvent_OnAuraGained(spell_id, opt.PlayerGUID, opt.PlayerName)
+            end
+        end
+    end
+
     function module.GetAbility(self, spell_id)
         return self.abilities[spell_id]
     end
@@ -127,6 +136,7 @@ function opt:AddCooldownModule()
     end
 
     -- override module defaults
+    module.post_init = CDSync_PostInit
     module.aura_gained = CDSync_OnAuraGained
     module.aura_lost = CDSync_OnAuraLost
     module.spell_cast = CDSync_OnSpellCast

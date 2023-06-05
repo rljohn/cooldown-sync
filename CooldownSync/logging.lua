@@ -64,16 +64,16 @@ function opt:BuildLogModule(name)
         pbPrintf("OnCombatEnd")
     end
 
-    function module.aura_gained (self, spell_id)
-        pbPrintf("OnAuraGained: %d", spell_id)
+    function module.aura_gained (self, spell_id, guid, name)
+        pbPrintf("OnAuraGained: %d (%s, %s)", spell_id, guid, name)
     end
 
-    function module.aura_lost (self, spell_id)
-        pbPrintf("OnAuraLost: %d", spell_id)
+    function module.aura_lost (self, spell_id, guid, name)
+        pbPrintf("OnAuraLost: %d", spell_id, guid, name)
     end
 
     function module.cooldowns_updated (self)
-        pbPrintf("OnCooldownsUpdated")
+        --pbPrintf("OnCooldownsUpdated")
     end
 
     function module.cooldown_start(self, spell_id, start, duration, time_remaining, percent)
