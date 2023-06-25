@@ -24,7 +24,9 @@ opt.PlayerSpec = 0
 		
 -- character environment data
 opt.env = {}
+opt.globals = {}
 opt.env.DB = {}
+opt.env.Buddies = {}
 
 -- ui frames
 opt.ui = {}
@@ -51,6 +53,8 @@ function opt:LoadMissingValues()
 
 	-- options
 	SetDefaultValue('DB', {})
+	SetDefaultValue('Buddies', {})
+	SetDefaultValue('RaidBuddies', {})
 	SetDefaultValue('ShowMinimapIcon', true)
 	SetDefaultValue('ShowBackground', true)
 	SetDefaultValue('ShowTitle', true)
@@ -86,10 +90,17 @@ function opt:OnLogin()
 	opt.InRaid = IsInRaid()
 	self:OnPlayerFocusChanged()
 
-	-- load settings
+	-- load per-character settings
 	if (CooldownSyncPerCharacterConfig) then
 		opt.env = CooldownSyncPerCharacterConfig
 	end
+
+	-- load global settings
+	if (CooldownSyncGlobalConfig) then
+		opt.globals = CooldownSyncGlobalConfig
+	end
+
+	-- resolve any missing values
 	self:LoadMissingValues()
 	
 	-- talents

@@ -41,7 +41,7 @@ function opt:AddBuddyModule()
     end
 
     -- returns a buddy to the pool
-    function module.FreeBuddy(self, uddy)
+    function module.FreeBuddy(self, buddy)
         -- find first free space in pool
         for i = 1, #self.buddy_pool do
             if (not self.buddy_pool[i]) then
@@ -52,14 +52,16 @@ function opt:AddBuddyModule()
     end
 
     -- retrieve a buddy based on player GUID
-    function module.FindBuddy(self, guid)
+    function module.FindBuddy(self, name)
         for i = 1, #self.buddy_pool do
             if (self.buddy_pool[i]) then
-                if (self.buddy_pool[i].guid == guid) then
+                if (self.buddy_pool[i].name == name) then
                     return self.buddy_pool[i]
                 end
             end
         end
+
+        return nil
     end
 
     -- override the initialization function
@@ -70,4 +72,57 @@ function opt:AddBuddyModule()
         end
     end
 
+    -- register a buddy
+    function module.RegisterBuddy(self, name)
+
+        -- early out if already exists
+        local b = module:FindBuddy(name)
+        if (b) then
+            return
+        end
+
+        local setting = {}
+        setting.enabled = false
+
+        -- add to settings
+        if (opt.InRaid) then
+            if (not opt:TableContainsKey(opt.env.RaidBuddies, name)) then
+                opt.env.RaidBuddies[name] = setting
+                opt:ModuleEvent_BuddyAdded(name)
+            end
+        else
+            if (not opt:TableContainsKey(opt.env.Buddies, name)) then
+                opt.env.Buddies[name] = setting
+                opt:ModuleEvent_BuddyAdded(name)
+            end
+        end
+    end
+
+    -- unregister buddy
+    function module.RemoveBuddy(self, name)
+
+        -- remove from settings
+        if (opt.InRaid) then
+            if (opt.env.RaidBuddies[name] ~= nil) then
+                opt.env.RaidBuddies[name] = nil
+            end
+        else
+            if (opt.env.Buddies[name] ~= nil) then
+                opt.env.Buddies[name] = nil
+            end
+        end
+
+        -- remove buddy
+        local b = module:FindBuddy(name)
+        if (b) then
+            module:FreeBuddy(name)
+            opt:ModuleEvent_BuddyRemoved(name)
+        end
+    end
+
+    -- clear buddy registrations
+    function module.ClearBuddies(self)
+        opt.env.Buddies = {}
+        opt.env.RaidBuddies = {}
+    end
 end

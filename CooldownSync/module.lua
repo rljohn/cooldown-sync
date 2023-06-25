@@ -24,6 +24,10 @@ function opt:BuildModule(id)
     module.spell_cast = nil
     module.other_spell_cast = nil
     module.party_changed = nil
+    module.buddy_added = nil
+    module.buddy_removed = nil
+    module.buddy_available = nil
+    module.buddy_unavailable = nil
 
     -- register module
     self:AddModule(id, module)
@@ -157,6 +161,38 @@ function opt:ModuleEvent_OnCooldownEnd(spell_id)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_end) then
             module:cooldown_end(spell_id)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyAdded(name)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_added) then
+            module:buddy_added(name)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyRemoved(name)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_removed) then
+            module:buddy_removed(spell_id)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyAvailable(name)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_available) then
+            module:buddy_available(spell_id)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyUnavailable(name)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_unavailable) then
+            module:buddy_unavailable(spell_id)
         end
     end
 end

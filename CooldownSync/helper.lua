@@ -267,3 +267,19 @@ function opt:GetAuraDuration(spell_id, unit_id)
 	
 	return result
 end
+
+-- tables
+
+function opt:TableContainsValue(t, v)
+	for _, value in pairs(t) do
+		if (value == v) then
+			return true
+		end
+	end
+
+	return false
+end
+
+function opt:TableContainsKey(t, k)
+	return t[k] ~= nil
+end

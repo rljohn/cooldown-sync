@@ -3,7 +3,7 @@
 ## Notes: Priest, Paladin, Evoker CD Sync Helper
 ## Author: rljohn
 ## OptionalDeps: _DebugLog
-## SavedVariables: CooldownSyncConfig
+## SavedVariables: CooldownSyncGlobalConfig
 ## SavedVariablesPerCharacter: CooldownSyncPerCharacterConfig
 ## IconTexture: 135939
 ## AddonCompartmentFunc: CooldownSync_OnAddonCompartmentClick

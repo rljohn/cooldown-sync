@@ -6,14 +6,54 @@ function opt:PrintHelp()
 	print('|cffFFF569Cooldown Sync|r Commands:')
 end
 
-SLASH_CooldownSync1 = '/CooldownSync';
+SLASH_CooldownSync1 = '/cds';
 function SlashCmdList.CooldownSync(msg, editbox)
-	if (msg == "reset") then
-		opt:ResetAll()
-		opt:LoadMissingValues()
-	else
-		opt:Config()
+
+	local args = {}
+	for word in msg:gmatch("%S+") do
+		table.insert(args, word)
 	end
+
+	if args == nil then
+		opt:Config()
+		return
+	end
+
+	local count = #args
+
+	-- 1 param actions
+	if (count == 1) then
+		if (args[1] == "reset") then
+			opt:ResetAll()
+			opt:LoadMissingValues()
+			return
+		elseif (args[1] == "clear") then
+			local buddy = opt:GetModule("buddy")
+			buddy:ClearBuddies()
+			return
+		end
+	-- 2 param actions
+	elseif (count == 2) then
+		if (args[1] == "add") then
+			local buddy = opt:GetModule("buddy")
+			buddy:RegisterBuddy(args[2])
+			return
+		elseif (args[1] == "remove") then
+			local buddy = opt:GetModule("buddy")
+			buddy:RemoveBuddy(args[2])
+			return
+		elseif (args[1] == "dump") then
+			if (args[2] == "env") then
+				pbDump(opt.env)
+			elseif (args[2] == "global") then
+				pbDump(opt.globals)
+			end
+			return
+		end
+	end
+
+	-- if all else fails, load config
+	opt:Config()
 end
 
 -- events
