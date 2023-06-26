@@ -28,6 +28,7 @@ function opt:BuildModule(id)
     module.buddy_removed = nil
     module.buddy_available = nil
     module.buddy_unavailable = nil
+    module.inspect_ready = nil
 
     -- register module
     self:AddModule(id, module)
@@ -181,18 +182,34 @@ function opt:ModuleEvent_BuddyRemoved(name)
     end
 end
 
-function opt:ModuleEvent_BuddyAvailable(name)
+function opt:ModuleEvent_BuddyAvailable(buddy)
     for key, module in pairs(opt.modules) do
         if (module.buddy_available) then
-            module:buddy_available(spell_id)
+            module:buddy_available(buddy)
         end
     end
 end
 
-function opt:ModuleEvent_BuddyUnavailable(name)
+function opt:ModuleEvent_BuddyUnavailable(buddy)
     for key, module in pairs(opt.modules) do
         if (module.buddy_unavailable) then
-            module:buddy_unavailable(spell_id)
+            module:buddy_unavailable(buddy)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddySpecChanged(buddy)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_spec_changed) then
+            module:buddy_spec_changed(buddy)
+        end
+    end
+end
+
+function opt:ModuleEvent_InspectReady(guid)
+    for key, module in pairs(opt.modules) do
+        if (module.inspect_ready) then
+            module:inspect_ready(guid)
         end
     end
 end

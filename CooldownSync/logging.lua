@@ -96,8 +96,16 @@ function opt:BuildLogModule(name)
         -- cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
     end
 
-    function module.party_changed ()
+    function module.party_changed(self)
         cdPrintf("OnPartyChanged")
+    end
+
+    function module.inspect_ready(self, guid)
+        cdPrintf("OnInspectReady: %s", guid)
+    end
+
+    function module.buddy_spec_changed(self, buddy)
+        cdPrintf("OnBuddySpecChanged: %s - %s", buddy.name, buddy.spec_name)
     end
 
 end

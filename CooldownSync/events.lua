@@ -76,6 +76,7 @@ opt:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 opt:RegisterEvent("TRAIT_CONFIG_UPDATED")
 opt:RegisterEvent("PLAYER_FOCUS_CHANGED")
 opt:RegisterEvent("PLAYER_DEAD")
+opt:RegisterEvent("INSPECT_READY")
 
 -- Events
 
@@ -141,8 +142,18 @@ function opt:OnLeaveCombat()
 	opt:ForceUiUpdate()
 end
 
+function opt:OnPartyChanged()
+	opt.InGroup = IsInGroup() or IsInRaid()
+	opt.InRaid = IsInRaid()
+	opt:ModuleEvent_PartyChanged()
+end
+
 function opt:OnCooldownsUpdated()
 	opt:ModuleEvent_OnCooldownsUpdated()
+end
+
+function opt:OnInspectReady(guid)
+	opt:ModuleEvent_InspectReady(guid)
 end
 
 -- Event Handlers
@@ -173,6 +184,9 @@ local function CooldownSync_EventHandler(self, event, ...)
 		opt:OnPlayerFocusChanged()
 	elseif (event == "PLAYER_DEAD") then
 		opt:OnPlayerDied()
+	elseif (event == "INSPECT_READY") then
+		local guid = ...
+		opt:OnInspectReady(guid)
 	end
 end
 opt:SetScript("OnEvent", CooldownSync_EventHandler)

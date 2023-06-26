@@ -1,5 +1,6 @@
 local opt = CooldownSyncConfig
 
+local COUNT = 10
 function opt:AddBuddyModule()
 
     module = self:BuildModule('buddy')
@@ -31,9 +32,8 @@ function opt:AddBuddyModule()
         if self.buddy_pool == nil then return nil end
 
          -- find first available buddy in pool
-        for i = 1, #self.buddy_pool do
+        for i = 1, COUNT do
             if (self.buddy_pool[i]) then
-                cdDiagf("Allocating buddy at index: %d", i)
                 buddy = self.buddy_pool[i]
                 self.buddy_pool[i] = nil
                 buddy.Reset()
@@ -47,7 +47,7 @@ function opt:AddBuddyModule()
     -- returns a buddy to the pool
     function module.FreeBuddy(self, buddy)
         -- find first free space in pool
-        for i = 1, #self.buddy_pool do
+        for i = 1, COUNT do
             if (not self.buddy_pool[i]) then
                 cdDiagf("Freeing buddy at index: %d", i)
                 self.buddy_pool[i] = buddy
@@ -56,11 +56,24 @@ function opt:AddBuddyModule()
         end
     end
 
-    -- retrieve a buddy based on player name
-    function module.FindBuddy(self, name)
+    -- retrieve a buddy based on player name (lowercase)
+    function module.FindBuddy(self, id)
         for i = 1, #self.active_buddies do
             if (self.active_buddies[i]) then
-                if (self.active_buddies[i].name == name) then
+                if (self.active_buddies[i].id == id) then
+                    return self.active_buddies[i]
+                end
+            end
+        end
+
+        return nil
+    end
+
+    -- retrieve a buddy based on guid
+    function module.FindBuddyByGuid(self, guid)
+        for i = 1, #self.active_buddies do
+            if (self.active_buddies[i]) then
+                if (self.active_buddies[i].guid == guid) then
                     return self.active_buddies[i]
                 end
             end
@@ -83,7 +96,7 @@ function opt:AddBuddyModule()
     function module.init (self)
         -- fill the pool
         for i=1,10 do
-            self.buddy_pool[i] = self.CreateBuddy()
+            self.buddy_pool[i] = self:CreateBuddy()
         end
     end
 
@@ -128,10 +141,11 @@ function opt:AddBuddyModule()
         end
 
         -- remove buddy
-        local b = self:FindBuddy(name)
+        id = strlower(name)
+        local b = self:FindBuddy(id)
         if (b) then
-            module:FreeBuddy(name)
-            opt:ModuleEvent_BuddyRemoved(name)
+            module:FreeBuddy(id)
+            opt:ModuleEvent_BuddyRemoved(b)
         end
     end
 
@@ -145,49 +159,88 @@ function opt:AddBuddyModule()
     function module.RefreshBuddies(self)
 
         local list
-
         if IsInRaid() then 
             list = opt.env.RaidBuddies 
         else
             list = opt.env.Buddies
         end
 
+        -- wipe out any buddies no longer in the list
+        for idx, buddy in pairs(self.active_buddies) do
+            local found = false
+            for key, value in pairs(list) do
+                if buddy.id = key then
+                    found = true
+                end
+            end
+            if not found then
+                opt:ModuleEvent_BuddyUnavailable(buddy)
+                self.active_buddies[idx] = nil
+                self:FreeBuddy(buddy)
+            end
+        end
+
+        -- refresh any buddies in the list
         for key, value in pairs(list) do
             --if (value.enabled) then
-                self.RefreshBuddy(self, key)
+                self:RefreshBuddy(key)
             --end
-            
         end
     end
 
     function module.RefreshBuddy(self, key)
 
-        local b = self:FindBuddy(key)
-        if b then return end
+        local id = strlower(key)
+        local b = self:FindBuddy(id)
+        if b then 
+            return 
+        end
 
-        local info = opt:GetUnitInfo(key)
-        if not info then return end
+        local info = opt:GetUnitInfo(id)
+        if not info then
+            return 
+        end
 
-        b = self:AllocateBuddy(key)
-        if not b then return end
-        cdPrintf("Allocated buddy: %s", key)
-        table.insert(self.active_buddies, b)
+        buddy = self:AllocateBuddy()
+        if not buddy then
+            return 
+        end
 
-        cdPrintf("Refreshing buddy: %s", key)
+        table.insert(self.active_buddies, buddy)
+
         name, realm = UnitName(info.unit_id)
-        b.name = name
-        b.realm = opt:SpaceStripper(realm)
-        b.name_and_realm = opt:SpaceStripper(GetUnitName(info.unit_id))
-        b.guid = info.guid
-        b.class = info.class
-        b.online = info.online
-        b.dead = info.dead
+        buddy.id = strlower(name)
+        buddy.unit_id = info.unit_id
+        buddy.name = name
+        buddy.realm = opt:SpaceStripper(realm)
+        buddy.name_and_realm = opt:SpaceStripper(GetUnitName(info.unit_id))
+        buddy.guid = info.guid
+        buddy.class = info.class
+        buddy.online = info.online
+        buddy.dead = info.dead
         NotifyInspect(info.unit_id)
 
+        opt:ModuleEvent_BuddyAvailable(buddy)
     end
         
     function module.update(self)
-        self.RefreshBuddies(self)
+        self:RefreshBuddies()
+    end
+
+    function module.party_changed(self)
+        self:RefreshBuddies()
+    end
+
+    function module.inspect_ready(self, guid)
+        local buddy = self:FindBuddyByGuid(guid)
+        if buddy then
+            buddy.spec = GetInspectSpecialization(buddy.unit_id)
+
+            local spec_info = opt:GetClassInfoBySpec(buddy.spec)
+            buddy.spec_name = spec_info.spec
+
+            opt:ModuleEvent_BuddySpecChanged(buddy)
+        end
     end
 
 end

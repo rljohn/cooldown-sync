@@ -327,6 +327,48 @@ DPSBuddyEstimates = {
 	[375087] 	= { 120, 14 }, -- Dragonrage
 }
 
+local classSpecs = {
+	[71] = {id = 1, class = "Warrior", spec = "Arms"},
+	[72] = {id = 1, class = "Warrior", spec = "Fury"},
+	[73] = {id = 1, class = "Warrior", spec = "Protection"},
+	[65] = {id = 2, class = "Paladin", spec = "Holy"},
+	[66] = {id = 2, class = "Paladin", spec = "Protection"},
+	[70] = {id = 2, class = "Paladin", spec = "Retribution"},
+	[253] = {id = 3, class = "Hunter", spec = "Beast Mastery"},
+	[254] = {id = 3, class = "Hunter", spec = "Marksmanship"},
+	[255] = {id = 3, class = "Hunter", spec = "Survival"},
+	[259] = {id = 4, class = "Rogue", spec = "Assassination"},
+	[260] = {id = 4, class = "Rogue", spec = "Outlaw"},
+	[261] = {id = 4, class = "Rogue", spec = "Subtlety"},
+	[256] = {id = 5, class = "Priest", spec = "Discipline"},
+	[257] = {id = 5, class = "Priest", spec = "Holy"},
+	[258] = {id = 5, class = "Priest", spec = "Shadow"},
+	[250] = {id = 6, class = "Death Knight", spec = "Blood"},
+	[251] = {id = 6, class = "Death Knight", spec = "Frost"},
+	[252] = {id = 6, class = "Death Knight", spec = "Unholy"},
+	[262] = {id = 7, class = "Shaman", spec = "Elemental"},
+	[263] = {id = 7, class = "Shaman", spec = "Enhancement"},
+	[264] = {id = 7, class = "Shaman", spec = "Restoration"},
+	[62] = {id = 8, class = "Mage", spec = "Arcane"},
+	[63] = {id = 8, class = "Mage", spec = "Fire"},
+	[64] = {id = 8, class = "Mage", spec = "Frost"},
+	[265] = {id = 9, class = "Warlock", spec = "Affliction"},
+	[266] = {id = 9, class = "Warlock", spec = "Demonology"},
+	[267] = {id = 9, class = "Warlock", spec = "Destruction"},
+	[268] = {id = 10, class = "Monk", spec = "Brewmaster"},
+	[270] = {id = 10, class = "Monk", spec = "Mistweaver"},
+	[269] = {id = 10, class = "Monk", spec = "Windwalker"},
+	[102] = {id = 11, class = "Druid", spec = "Balance"},
+	[103] = {id = 11, class = "Druid", spec = "Feral"},
+	[104] = {id = 11, class = "Druid", spec = "Guardian"},
+	[105] = {id = 11, class = "Druid", spec = "Restoration"},
+	[577] = {id = 12, class = "Demon Hunter", spec = "Havoc"},
+	[581] = {id = 12, class = "Demon Hunter", spec = "Vengeance"},
+	[1467] = {id = 13, class = "Evoker", spec = "Devastation"},
+	[1468] = {id = 13, class = "Evoker", spec = "Preservation"},
+	[1473] = {id = 13, class = "Evoker", spec = "Augmentation"}
+  }
+
 function opt:GetClassInfo(class_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
 	return CooldownSyncClassList[class_id]
@@ -336,4 +378,8 @@ function opt:GetSpecInfo(class_id, spec_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
 	if (CooldownSyncClassList[class_id][spec_id] == nil) then return nil end
 	return CooldownSyncClassList[class_id][spec_id]
+end
+
+function opt:GetClassInfoBySpec(spec_id)
+	return classSpecs[spec_id]
 end
