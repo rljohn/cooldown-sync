@@ -283,3 +283,52 @@ end
 function opt:TableContainsKey(t, k)
 	return t[k] ~= nil
 end
+
+-- players
+
+-- Player Lookup
+
+function opt:GetUnitInfo(n) 
+
+	if (n == nil or n == "") then return nil end
+	n = strlower(n)
+
+	-- check raid members, party members
+	
+	if (IsInRaid()) then
+		for i = 1, MAX_RAID_MEMBERS do
+			name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i)
+			if (name) then
+				name = strlower(name)
+				local unitId = "raid" .. i
+				if (name == n) then
+					local info
+					info.unit_id = unitId
+					info.name = name
+					info.class = class
+					info.online = online
+					info.dead = isDead
+					return info
+				end
+			end
+		end
+	elseif (IsInGroup()) then
+		for i = 1, 4 do
+			local unitId = "party" .. i
+			local name = GetUnitName(unitId, true)
+			if (name) then
+				if (strlower(name) == n) then
+					local info
+					info.unit_id = unitId
+					info.name = name
+					info.class = UnitClass(unitId)
+					info.online = UnitIsConnected(unitId)
+					info.dead = UnitIsDead(unitId)
+					return info
+				end
+			end
+		end
+	end
+	
+	return nil
+end

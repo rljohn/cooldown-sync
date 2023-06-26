@@ -4,6 +4,7 @@ function opt:AddBuddyModule()
 
     module = self:BuildModule('buddy')
     module.buddy_pool = {}
+    module.active_buddies = {}
 
     -- create a buddy
     function module.CreateBuddy(self)
@@ -62,6 +63,16 @@ function opt:AddBuddyModule()
         end
 
         return nil
+    end
+
+    -- resets all buddy info
+    function module.Reset(self)
+
+        while #self.active_buddies > 0 do
+            b = table.remove(self.active_buddies)
+            FreeBuddy(self, b)
+        end
+
     end
 
     -- override the initialization function
@@ -125,4 +136,31 @@ function opt:AddBuddyModule()
         opt.env.Buddies = {}
         opt.env.RaidBuddies = {}
     end
+
+    -- update buddy status
+    function module.UpdateBuddies(self)
+
+        local list
+        if IsInRaid() then 
+            list = opt.env.RaidBuddies 
+        else
+            list = opt.env.Buddies
+        end
+
+        for key, value in pairs(list) do
+            local b = FindBuddy(self, key)
+            if (b) then
+
+            else
+
+            end
+        end
+    end
+
+        
+    function module.update(self)
+        self.UpdateBuddies(self)
+    end
+
+
 end
