@@ -124,7 +124,7 @@ function opt:OnLogin()
 	-- minimap
 	self:CreateMinimapIcon()
 
-	pbDiagf("Intialized")
+	cdDiagf("Intialized")
 	opt.Initialized = true
 	self:ForceUiUpdate()
 end

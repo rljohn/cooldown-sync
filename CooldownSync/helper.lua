@@ -293,6 +293,21 @@ function opt:GetUnitInfo(n)
 	if (n == nil or n == "") then return nil end
 	n = strlower(n)
 
+	-- is it a local player
+	
+	local localPlayer = strlower(opt.PlayerName)
+	if (localPlayer == n) then
+		local unitId = "player"
+		local info = {}
+		info.unit_id = unitId
+		info.guid = UnitGUID(unitId)
+		info.name = name
+		info.class = UnitClass(unitId)
+		info.online = UnitIsConnected(unitId)
+		info.dead = UnitIsDead(unitId)
+		return info
+	end
+
 	-- check raid members, party members
 	
 	if (IsInRaid()) then
@@ -302,8 +317,9 @@ function opt:GetUnitInfo(n)
 				name = strlower(name)
 				local unitId = "raid" .. i
 				if (name == n) then
-					local info
+					local info = {}
 					info.unit_id = unitId
+					info.guid = UnitGUID(unitId)
 					info.name = name
 					info.class = class
 					info.online = online
@@ -318,8 +334,9 @@ function opt:GetUnitInfo(n)
 			local name = GetUnitName(unitId, true)
 			if (name) then
 				if (strlower(name) == n) then
-					local info
+					local info = {}
 					info.unit_id = unitId
+					info.guid = UnitGUID(unitId)
 					info.name = name
 					info.class = UnitClass(unitId)
 					info.online = UnitIsConnected(unitId)

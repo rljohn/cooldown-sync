@@ -47,7 +47,7 @@ end
 function opt:HandleMessage(message)
 
 	if (message.id == nil) then 
-		pbDiagf("Invalid Message")
+		cdDiagf("Invalid Message")
 		return 
 	end
 

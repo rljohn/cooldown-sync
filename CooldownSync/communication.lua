@@ -21,8 +21,8 @@ function opt:SendMessage(data, target, realm)
 	end
 	
 	if (data == nil or data.id == nil) then 
-		pbPrintf("Can not send message, invalid data")
-		pbDump(data)
+		cdPrintf("Can not send message, invalid data")
+		cdDump(data)
 		return 
 	end
 	
@@ -45,11 +45,11 @@ function opt:SendMessage(data, target, realm)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
 	
 	if (not realm or realm == "" or realm == opt.PlayerRealm) then
-		pbDiagf("Sending whisper message '%s' to '%s'", opt:PrintMessageId(data.id), target)
+		cdDiagf("Sending whisper message '%s' to '%s'", opt:PrintMessageId(data.id), target)
 		pbDump(data)
     	AceComm:SendCommMessage("CooldownSync", encoded, "WHISPER", target)
 	else
-		pbDiagf("Sending raid message '%s' to '%s'", opt:PrintMessageId(data.id), target)
+		cdDiagf("Sending raid message '%s' to '%s'", opt:PrintMessageId(data.id), target)
 		pbDump(data)
 		AceComm:SendCommMessage("CooldownSync", encoded, "RAID", nil)
 	end
@@ -69,7 +69,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
     if not success then return end
 
 	if (data == nil or data.id == nil) then 
-		pbDiagf("Discarding message, invalid data")
+		cdDiagf("Discarding message, invalid data")
 		pbDump(data)
 		return
 	end
@@ -77,7 +77,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	-- messages on raid channel must be discarded if they are not for me
 	if (not data.target or 
         (data.target ~= "all" and data.target ~= opt.PlayerName and data.target ~= opt.PlayerNameRealm)) then
-		pbDiagf("Discarding '%s' message, not for me", opt:PrintMessageId(data.id))
+		cdDiagf("Discarding '%s' message, not for me", opt:PrintMessageId(data.id))
 		pbDump(data)
 		return
 	end
@@ -85,7 +85,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	-- replace the name with the sender, which will have the server name built in if necessary
 	data.name = sender
 
-	pbDiagf("Handling message '%s' from '%s'", opt:PrintMessageId(data.id), sender)
+	cdDiagf("Handling message '%s' from '%s'", opt:PrintMessageId(data.id), sender)
 	pbDump(data)
 	opt:HandleMessage(data)
 end

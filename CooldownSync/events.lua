@@ -31,6 +31,10 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			local buddy = opt:GetModule("buddy")
 			buddy:ClearBuddies()
 			return
+		elseif (args[1] == "update") then
+			local buddy = opt:GetModule("buddy")
+			buddy:UpdateBuddies()
+			return
 		end
 	-- 2 param actions
 	elseif (count == 2) then
@@ -43,10 +47,14 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			buddy:RemoveBuddy(args[2])
 			return
 		elseif (args[1] == "dump") then
+			cdDiagf("Dumping: %s", args[2])
 			if (args[2] == "env") then
-				pbDump(opt.env)
+				cdDump(opt.env)
 			elseif (args[2] == "global") then
-				pbDump(opt.globals)
+				cdDump(opt.globals)
+			elseif (args[2] == "buddy") then
+				local buddy = opt:GetModule("buddy")
+				cdDump(buddy) 
 			end
 			return
 		end

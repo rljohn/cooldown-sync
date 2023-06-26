@@ -8,7 +8,7 @@ function opt:BuildModule(id)
     module = {}
     module.name = id
     module.init = function()
-        pbPrintf("Module (%s) initialized", id)
+        cdPrintf("Module (%s) initialized", id)
     end
     module.post_init = nil
     module.update = nil
