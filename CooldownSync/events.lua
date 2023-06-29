@@ -93,11 +93,11 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "SPELL_AURA_APPLIED") then
+		local spell_id = select(12,...)
 		if (destGUID == opt.PlayerGUID) then
-			local spell_id = select(12,...)
 			opt:ModuleEvent_OnAuraGained(spell_id, destGUID, destName)
 		end
-
+			opt:ModuleEvent_OnOtherAuraGained(spell_id, destGUID, destName)
 		return
 	end
 	

@@ -302,7 +302,7 @@ function opt:GetUnitInfo(n)
 		info.unit_id = unitId
 		info.guid = UnitGUID(unitId)
 		info.name = name
-		info.class = UnitClass(unitId)
+		info.class, _, info.class_id = UnitClass(unitId)
 		info.online = UnitIsConnected(unitId)
 		info.dead = UnitIsDead(unitId)
 		return info
@@ -321,7 +321,7 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class = class
+					info.class, _, info.class_id = UnitClass(unitId)
 					info.online = online
 					info.dead = isDead
 					return info
@@ -338,7 +338,7 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class = UnitClass(unitId)
+					info.class, _, info.class_id = UnitClass(unitId)
 					info.online = UnitIsConnected(unitId)
 					info.dead = UnitIsDead(unitId)
 					return info

@@ -21,6 +21,7 @@ function opt:AddBuddyModule()
             buddy.spec = 0
             buddy.online = false
             buddy.dead = false
+            buddy.abilities = {}
         end
     
         buddy.Reset()
@@ -169,7 +170,7 @@ function opt:AddBuddyModule()
         for idx, buddy in pairs(self.active_buddies) do
             local found = false
             for key, value in pairs(list) do
-                if buddy.id = key then
+                if buddy.id == key then
                     found = true
                 end
             end
@@ -216,6 +217,7 @@ function opt:AddBuddyModule()
         buddy.name_and_realm = opt:SpaceStripper(GetUnitName(info.unit_id))
         buddy.guid = info.guid
         buddy.class = info.class
+        buddy.class_id = info.class_id
         buddy.online = info.online
         buddy.dead = info.dead
         NotifyInspect(info.unit_id)

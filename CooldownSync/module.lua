@@ -111,6 +111,14 @@ function opt:ModuleEvent_OnAuraGained(spell_id, guid, name)
     end
 end
 
+function opt:ModuleEvent_OnOtherAuraGained(spell_id, guid, name)
+    for key, module in pairs(opt.modules) do
+        if (module.other_aura_gained) then
+            module:other_aura_gained(spell_id, guid, name)
+        end
+    end
+end
+
 function opt:ModuleEvent_OnAuraLost(spell_id, guid, name)
     for key, module in pairs(opt.modules) do
         if (module.aura_lost) then
