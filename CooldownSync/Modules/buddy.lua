@@ -228,18 +228,18 @@ function opt:AddBuddyModule()
         if b then
 
             if (b.unit_id ~= info.unit_id) then
-                cdDiagf("Buddy %s: online %s->%s", b.id, b.unit_id, info.unit_id)
+                cdDiagf("Buddy %s: unitid %s -> %s", b.id, b.unit_id, info.unit_id)
                 opt:ModuleEvent_BuddyUnitIdChanged(b, info.unit_id)
                 b.unit_id = info.unit_id
             end
 
             if (b.dead ~= info.dead) then
-                cdDiagf("Buddy %s: dead %d->%d", b.id, b.dead, info.dead)
-                b.online = info.online
+                cdDiagf("Buddy %s: dead %d -> %d", b.id, b.dead, info.dead)
+                b.dead = info.dead
             end
 
             if (b.online ~= info.online) then
-                cdDiagf("Buddy %s: online %d->%d", b.id, b.online, info.online)
+                cdDiagf("Buddy %s: online %d -> %d", b.id, b.online, info.online)
                 b.online = info.online
             end
 

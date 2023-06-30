@@ -1,56 +1,5 @@
 local opt = CooldownSyncConfig
 
-local function CDSync_OnTalentsChanged(self, spec_id)
-    self:ResetCooldowns()
-end
-
-local function CDSync_UpdateAbility(self, spell_id, ability)
-    if ability.active and ability.icon then
-        local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
-        if aura then
-            local time_remaining = aura.expirationTime - GetTime()
-        
-            if (time_remaining < 0) then
-                time_remaining = 0
-            end
-            
-            ability.icon:SetAura(time_remaining)
-        end
-    end
-end
-
-local function CDSync_OnAuraGained(self, spell_id)
-    local ability = self.cooldowns:GetAbility(spell_id)
-    if (ability and ability.icon) then
-        ability.icon:Begin()
-        CDSync_UpdateAbility(self, spell_id, ability)
-    end
-end
-
-local function CDSync_OnAuraLost(self, spell_id)
-    local ability = self.cooldowns:GetAbility(spell_id)
-    if (ability and ability.icon) then
-        ability.icon:End()
-    end
-end
-
-local function CDSync_UpdateAuras(self)
-    for spell_id, ability in pairs(self.cooldowns.abilities) do
-        CDSync_UpdateAbility(self, spell_id, ability)
-    end
-end
-
-local function CDSync_Update(self)
-    CDSync_UpdateAuras(self)
-end
-
-local function CDSync_OnCooldownUpdated(self, spell_id, start, duration, time_remaining, percent)
-    local ability = self.cooldowns:GetAbility(spell_id)
-    if (ability and ability.icon) then
-        ability.icon:SetCooldown(start, duration, percent)
-    end
-end
-
 function opt:BuildClassModule(name)
     
     module = self:BuildModule(name)
@@ -62,14 +11,59 @@ function opt:BuildClassModule(name)
     module.icon_spacing = opt.env.IconSize + 8
 
     -- events
-    module.talents_changed = CDSync_OnTalentsChanged
-    module.cooldown_update = CDSync_OnCooldownUpdated
-    module.aura_gained = CDSync_OnAuraGained
-    module.aura_lost = CDSync_OnAuraLost
-    module.update = CDSync_Update
+    function module:talents_changed()
+        self:ResetCooldowns()
+    end
+
+    function module:cooldown_update(spell_id, start, duration, time_remaining, percent)
+        local ability = self.cooldowns:GetAbility(spell_id)
+        if (ability and ability.icon) then
+            ability.icon:SetCooldown(start, duration, percent)
+        end
+    end
+
+    function module:aura_gained(spell_id)
+        local ability = self.cooldowns:GetAbility(spell_id)
+        if (ability and ability.icon) then
+            ability.icon:Begin()
+            self:UpdateAbility(spell_id, ability)
+        end
+    end
+
+    function module:aura_lost(spell_id)
+        local ability = self.cooldowns:GetAbility(spell_id)
+        if (ability and ability.icon) then
+            ability.icon:End()
+        end
+    end
+
+    function module:UpdateAbility(spell_id, ability)
+        if ability.active and ability.icon then
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+            if aura then
+                local time_remaining = aura.expirationTime - GetTime()
+            
+                if (time_remaining < 0) then
+                    time_remaining = 0
+                end
+                
+                ability.icon:SetAura(time_remaining)
+            end
+        end
+    end
+
+    function module:UpdateAuras()
+        for spell_id, ability in pairs(self.cooldowns.abilities) do
+            self:UpdateAbility(spell_id, ability)
+        end
+    end
+
+    function module:update()
+        self:UpdateAuras()
+    end
 
     -- setup abilities
-    function module.SetupAbilities(self)
+    function module:SetupAbilities()
 
         -- create icons for each ability
         local abilities = opt:GetSpecInfo(opt.PlayerClass, opt.PlayerSpec)
@@ -87,7 +81,7 @@ function opt:BuildClassModule(name)
     end
 
     -- reset
-    function module.ResetCooldowns(self)
+    function module:ResetCooldowns()
         self.icon_offset_x = 8
         self.icon_offset_y = -8
         self.cooldowns:Reset()
@@ -95,7 +89,7 @@ function opt:BuildClassModule(name)
         self:SetupAbilities()
     end
     
-    module.SetupAbilities()
+    module:SetupAbilities()
     return module
 end
 
