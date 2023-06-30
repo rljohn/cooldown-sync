@@ -19,6 +19,7 @@ function opt:CreateMainFrame()
 	
 	-- background
 	
+---@diagnostic disable-next-line: param-type-mismatch
 	main:SetBackdrop(
 	{
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -77,7 +78,7 @@ function opt:UnlockMainFrame()
 	main:SetMovable(true)
 	
 	main:SetScript ("OnDragStart", function() 
-		main:StartMoving() 
+		main:StartMoving()
 	end)
 	
 	main:SetScript ("OnDragStop", function() 

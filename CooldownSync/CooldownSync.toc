@@ -25,10 +25,13 @@ messages.lua
 module.lua
 widgets.lua
 
-# Class Modules
+# Core Modules
 Modules/buddy.lua
 Modules/class.lua
 Modules/cooldowns.lua
+Modules/inspect.lua
+
+# Class Modules
 Modules/deathknight.lua
 Modules/demonhunter.lua
 Modules/druid.lua

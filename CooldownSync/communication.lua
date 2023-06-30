@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 local opt = CooldownSyncConfig
 
 -- communication
@@ -20,10 +21,10 @@ function opt:SendMessage(data, target, realm)
 		return 
 	end
 	
-	if (data == nil or data.id == nil) then 
+	if (data == nil or data.id == nil) then
 		cdPrintf("Can not send message, invalid data")
 		cdDump(data)
-		return 
+		return
 	end
 	
 	-- append our realm
@@ -46,11 +47,11 @@ function opt:SendMessage(data, target, realm)
 	
 	if (not realm or realm == "" or realm == opt.PlayerRealm) then
 		cdDiagf("Sending whisper message '%s' to '%s'", opt:PrintMessageId(data.id), target)
-		pbDump(data)
+		cdDump(data)
     	AceComm:SendCommMessage("CooldownSync", encoded, "WHISPER", target)
 	else
 		cdDiagf("Sending raid message '%s' to '%s'", opt:PrintMessageId(data.id), target)
-		pbDump(data)
+		cdDump(data)
 		AceComm:SendCommMessage("CooldownSync", encoded, "RAID", nil)
 	end
 end
@@ -70,7 +71,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 
 	if (data == nil or data.id == nil) then 
 		cdDiagf("Discarding message, invalid data")
-		pbDump(data)
+		cdDump(data)
 		return
 	end
 
@@ -78,7 +79,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	if (not data.target or 
         (data.target ~= "all" and data.target ~= opt.PlayerName and data.target ~= opt.PlayerNameRealm)) then
 		cdDiagf("Discarding '%s' message, not for me", opt:PrintMessageId(data.id))
-		pbDump(data)
+		cdDump(data)
 		return
 	end
 
@@ -86,6 +87,6 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	data.name = sender
 
 	cdDiagf("Handling message '%s' from '%s'", opt:PrintMessageId(data.id), sender)
-	pbDump(data)
+	cdDump(data)
 	opt:HandleMessage(data)
 end

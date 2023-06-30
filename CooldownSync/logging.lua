@@ -50,70 +50,72 @@ end
 function opt:BuildLogModule(name)
     module = self:BuildModule(name)
 
-    module.init = nil
-    module.update = nil
-
-    function module.talents_changed(self)
+    function module:talents_changed(self)
         cdPrintf("OnTalentsChanged")
     end
-    function module.combat_start(self)
+
+    function module:combat_start()
         cdPrintf("OnCombatStart")
     end
 
-    function module.combat_end(self)
+    function module:combat_end()
         cdPrintf("OnCombatEnd")
     end
 
-    function module.aura_gained (self, spell_id, guid, name)
+    function module:aura_gained (spell_id, guid, name)
         cdPrintf("OnAuraGained: %d (%s, %s)", spell_id, guid, name)
     end
 
-    function module.aura_lost (self, spell_id, guid, name)
+    function module:aura_lost (spell_id, guid, name)
         cdPrintf("OnAuraLost: %d", spell_id, guid, name)
     end
 
-    function module.cooldowns_updated (self)
+    function module:cooldowns_updated()
         --cdPrintf("OnCooldownsUpdated")
     end
 
-    function module.cooldown_start(self, spell_id, start, duration, time_remaining, percent)
+    function module:cooldown_start(spell_id, start, duration, time_remaining, percent)
         cdPrintf("OnCooldownStart: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
-    function module.cooldown_update(self, spell_id, start, duration, time_remaining, percent)
+    function module:cooldown_update(spell_id, start, duration, time_remaining, percent)
         --cdPrintf("OnCooldownUpdate: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
-    function module.cooldown_end(self, spell_id)
+    function module:cooldown_end(spell_id)
         cdPrintf("OnCooldownEnd")
     end
 
-    function module.spell_cast(self, spell_id, target_guid, target_name)
+    function module:spell_cast(spell_id, target_guid, target_name)
         cdPrintf("OnSpellCast: %d to %s (%s)", spell_id, target_name, target_guid)
     end
 
-    function module.other_spell_cast(self, spell_id, source_guid, source_name, target_guid, target_name)
+    function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
         -- cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
     end
 
-    function module.party_changed(self)
+    function module:party_changed(self)
         cdPrintf("OnPartyChanged")
     end
 
-    function module.inspect_ready(self, guid)
+    function module:inspect_ready(guid)
         cdPrintf("OnInspectReady: %s", guid)
     end
 
-    function module.buddy_available(self, buddy)
-        cdPrintf("OnBuddyAvailable: %s", buddy.name)
+    function module:buddy_available(buddy)
+        cdPrintf("OnBuddyAvailable: %s", buddy.id)
     end
 
-    function module.buddy_unavailable(self, buddy)
-        cdPrintf("OnBuddyUnavailable: %s", buddy.name)
+    function module:buddy_unavailable(buddy)
+        cdPrintf("OnBuddyUnavailable: %s", buddy.id)
     end
 
-    function module.buddy_spec_changed(self, buddy)
-        cdPrintf("OnBuddySpecChanged: %s - %s", buddy.name, buddy.spec_name)
+    function module:buddy_spec_changed(buddy)
+        cdPrintf("OnBuddySpecChanged: %s - %s", buddy.id, buddy.spec_name)
+    end
+
+    function module:unit_id_changed(buddy, unit_id)
+        cdPrintf("OnUnitIdChanged: %s - %s", buddy.id, unit_id)
     end
 
 end

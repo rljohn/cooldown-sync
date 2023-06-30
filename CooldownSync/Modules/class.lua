@@ -57,7 +57,6 @@ function opt:BuildClassModule(name)
     module.cooldowns = self:GetModule("cooldowns")
     
     -- build cooldown icons
-    module.padding = 8
     module.icon_offset_x = 8
     module.icon_offset_y = -8
     module.icon_spacing = opt.env.IconSize + 8
@@ -68,21 +67,12 @@ function opt:BuildClassModule(name)
     module.aura_gained = CDSync_OnAuraGained
     module.aura_lost = CDSync_OnAuraLost
     module.update = CDSync_Update
-    
-    -- buddy auras
-    module.buddy_widgets = {}
 
     -- setup abilities
     function module.SetupAbilities(self)
 
         -- create icons for each ability
         local abilities = opt:GetSpecInfo(opt.PlayerClass, opt.PlayerSpec)
-
-        local header = opt.main:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-        header:SetPoint('TOPLEFT', opt.main, 'TOPLEFT', module.icon_offset_x, module.icon_offset_y)
-        header:SetText(opt.PlayerName)
-        module.icon_offset_y = module.icon_offset_y - 16
-        module.other_buddies_start = module.icon_offset_y - opt.env.IconSize
 
         -- create ability icons
         for index, ability in opt:pairsByKeys ( abilities ) do
@@ -101,59 +91,8 @@ function opt:BuildClassModule(name)
         self.icon_offset_x = 8
         self.icon_offset_y = -8
         self.cooldowns:Reset()
-
-        -- todo - only player icons
         opt:ResetCooldownIcons()
-
         self:SetupAbilities()
-    end
-
-    function module.buddy_available(self, buddy)
-
-        local display = {}
-        display.header = opt.main:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-        display.header:SetPoint('TOPLEFT', opt.main, 'TOPLEFT', module.padding_x, module.padding_y)
-        display.header:SetText(buddy.name)
-
-        display.cooldowns = {}
-        self.buddy_widgets[buddy.guid] = display
-    end
-
-    function module.buddy_unavailable(self, buddy)
-        if not buddy_widgets[buddy.guid] then return end
-
-        local display = buddy_widgets[buddy.guid]
-        for spell_id, icon in pairs(display.cooldowns) do
-            icon:Reset()
-        end
-
-        buddy_widgets[buddy.guid] = nil
-    end
-
-    function module.buddy_spec_changed(self, buddy)
-        
-        local display = self.buddy_widgets[buddy.guid]
-        if not display then return end
-        
-        if display.cooldowns then
-            for spell_id, icon in pairs(display.cooldowns) do
-                icon:Reset()
-            end
-        end
-
-        cdPrintf("getting specic info for %s,%s", buddy.class_id, buddy.spec)
-
-        local abilities = opt:GetSpecInfo(buddy.class_id, buddy.spec)
-        if not abilities then end
-
-        -- create ability icons
-        for index, ability in opt:pairsByKeys ( abilities ) do
-            local spell_id = ability[1]
-            module.cooldowns:TrackAbility(spell_id)
-            local icon = opt:AddAbilityCooldownIcon(module, spell_id)
-            module.cooldowns:AddIcon(spell_id, icon)
-        end
-
     end
     
     module.SetupAbilities()

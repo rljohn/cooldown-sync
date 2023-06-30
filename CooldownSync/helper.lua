@@ -11,6 +11,8 @@ function opt:CreatePanel(parent, name, width, height)
 	panel:SetSize(width, height)
 	
 	local bg = CreateFrame('Frame', nil, panel, "BackdropTemplate")
+
+---@diagnostic disable-next-line: param-type-mismatch
 	bg:SetBackdrop({
         bgFile = 'interface/buttons/white8x8',
         edgeFile = 'Interface/Tooltips/UI-Tooltip-border',
@@ -18,8 +20,12 @@ function opt:CreatePanel(parent, name, width, height)
 		insets = { left = 4, right = 4, top = 4, bottom = 4 }
 	})
 	
+---@diagnostic disable-next-line: param-type-mismatch
 	bg:SetBackdropColor(.1,.1,.1,.3)
+
+---@diagnostic disable-next-line: param-type-mismatch
 	bg:SetBackdropBorderColor(1, 1, 1)
+
 	bg:SetPoint('TOPLEFT', panel, -10, 10)
 	bg:SetPoint('BOTTOMRIGHT', panel, 30, -10)
 	bg:SetFrameStrata("MEDIUM")
@@ -107,6 +113,7 @@ function opt:CreateCheckBox(parent, name)
 	check.label.check = check
 	check:SetChecked(opt.env[name])
 
+---@diagnostic disable-next-line: undefined-field
 	check.label:SetScript('OnMouseDown', function(self, button, ...)
 		if (button == 'LeftButton' and self.check:IsEnabled()) then
 			self.check:Click()
@@ -209,6 +216,7 @@ function opt:GetTalentNodeForSpell(spell_id)
 		local configId = C_ClassTalents.GetActiveConfigID();
 		for _, nodeId in ipairs(nodes) do
 			local nodeInfo = LibTalentTree:GetLibNodeInfo(treeId, nodeId);
+---@diagnostic disable-next-line: param-type-mismatch
 			local entryInfo = C_Traits.GetEntryInfo(configId, nodeInfo.entryIDs[1]);
 
 			local definitionId = entryInfo.definitionID
@@ -270,6 +278,14 @@ end
 
 -- tables
 
+function opt:GetTableSize(t)
+	local count = 0
+	for _ in pairs(t) do
+	  count = count + 1
+	end
+	return count
+  end
+
 function opt:TableContainsValue(t, v)
 	for _, value in pairs(t) do
 		if (value == v) then
@@ -302,7 +318,7 @@ function opt:GetUnitInfo(n)
 		info.unit_id = unitId
 		info.guid = UnitGUID(unitId)
 		info.name = name
-		info.class, _, info.class_id = UnitClass(unitId)
+		info.class = UnitClass(unitId)
 		info.online = UnitIsConnected(unitId)
 		info.dead = UnitIsDead(unitId)
 		return info
@@ -321,7 +337,7 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class, _, info.class_id = UnitClass(unitId)
+					info.class = class
 					info.online = online
 					info.dead = isDead
 					return info
@@ -338,7 +354,7 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class, _, info.class_id = UnitClass(unitId)
+					info.class = UnitClass(unitId)
 					info.online = UnitIsConnected(unitId)
 					info.dead = UnitIsDead(unitId)
 					return info

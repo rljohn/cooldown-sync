@@ -4,6 +4,7 @@ local folder,ns = ...
 
 local frame_name = 'CooldownSyncConfig'
 local opt = CreateFrame('FRAME',frame_name,InterfaceOptionsFramePanelContainer)
+opt = CooldownSyncConfig
 opt.Initialized = false
 opt.name = 'Cooldown Sync'
 opt.ShouldResetFrames = false
@@ -181,13 +182,16 @@ function opt:CreateMinimapIcon()
 			opt:Config()
 		end,
 		OnTooltipShow = function(tooltip)
+---@diagnostic disable-next-line: undefined-field
 			if not tooltip or not tooltip.AddLine then return end
+---@diagnostic disable-next-line: undefined-field
 			tooltip:AddLine("CooldownSync")
 		end,
 		
 		})
 		
 		opt.ui.MinimapIcon = LibStub("LibDBIcon-1.0", true)
+---@diagnostic disable-next-line: param-type-mismatch
 		opt.ui.MinimapIcon:Register("CooldownSync", miniButton, opt.env.DB)
 		opt:MinimapUpdate()
 end
@@ -208,11 +212,11 @@ end
 -- UI callbacks
 
 function opt:Lock()
-	self:LockMainFrame()
+	opt:LockMainFrame()
 end
 
 function opt:Unlock()
-	self:UnlockMainFrame()
+	opt:UnlockMainFrame()
 end
 
 function opt:Config()

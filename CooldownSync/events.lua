@@ -20,6 +20,7 @@ function SlashCmdList.CooldownSync(msg, editbox)
 	end
 
 	local count = #args
+	local buddy = opt:GetModule("buddy")
 
 	-- 1 param actions
 	if (count == 1) then
@@ -28,22 +29,21 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			opt:LoadMissingValues()
 			return
 		elseif (args[1] == "clear") then
-			local buddy = opt:GetModule("buddy")
 			buddy:ClearBuddies()
 			return
+		elseif (args[1] == "refresh") then
+			buddy:RefreshBuddies()
+			return
 		elseif (args[1] == "update") then
-			local buddy = opt:GetModule("buddy")
 			buddy:UpdateBuddies()
 			return
 		end
 	-- 2 param actions
 	elseif (count == 2) then
 		if (args[1] == "add") then
-			local buddy = opt:GetModule("buddy")
 			buddy:RegisterBuddy(args[2])
 			return
 		elseif (args[1] == "remove") then
-			local buddy = opt:GetModule("buddy")
 			buddy:RemoveBuddy(args[2])
 			return
 		elseif (args[1] == "dump") then
@@ -53,7 +53,6 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			elseif (args[2] == "global") then
 				cdDump(opt.globals)
 			elseif (args[2] == "buddy") then
-				local buddy = opt:GetModule("buddy")
 				cdDump(buddy) 
 			end
 			return
@@ -93,11 +92,11 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "SPELL_AURA_APPLIED") then
-		local spell_id = select(12,...)
 		if (destGUID == opt.PlayerGUID) then
+			local spell_id = select(12,...)
 			opt:ModuleEvent_OnAuraGained(spell_id, destGUID, destName)
 		end
-			opt:ModuleEvent_OnOtherAuraGained(spell_id, destGUID, destName)
+
 		return
 	end
 	
@@ -142,7 +141,7 @@ function opt:OnLeaveCombat()
 	opt:ForceUiUpdate()
 end
 
-function opt:OnPartyChanged()
+function opt:OnGroupChanged()
 	opt.InGroup = IsInGroup() or IsInRaid()
 	opt.InRaid = IsInRaid()
 	opt:ModuleEvent_PartyChanged()

@@ -136,7 +136,6 @@ function opt:AddCooldownModule()
     end
 
     -- override module defaults
-    module.post_init = CDSync_PostInit
     module.aura_gained = CDSync_OnAuraGained
     module.aura_lost = CDSync_OnAuraLost
     module.spell_cast = CDSync_OnSpellCast

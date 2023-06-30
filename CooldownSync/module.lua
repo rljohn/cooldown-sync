@@ -111,14 +111,6 @@ function opt:ModuleEvent_OnAuraGained(spell_id, guid, name)
     end
 end
 
-function opt:ModuleEvent_OnOtherAuraGained(spell_id, guid, name)
-    for key, module in pairs(opt.modules) do
-        if (module.other_aura_gained) then
-            module:other_aura_gained(spell_id, guid, name)
-        end
-    end
-end
-
 function opt:ModuleEvent_OnAuraLost(spell_id, guid, name)
     for key, module in pairs(opt.modules) do
         if (module.aura_lost) then
@@ -185,7 +177,7 @@ end
 function opt:ModuleEvent_BuddyRemoved(name)
     for key, module in pairs(opt.modules) do
         if (module.buddy_removed) then
-            module:buddy_removed(spell_id)
+            module:buddy_removed(name)
         end
     end
 end
@@ -218,6 +210,22 @@ function opt:ModuleEvent_InspectReady(guid)
     for key, module in pairs(opt.modules) do
         if (module.inspect_ready) then
             module:inspect_ready(guid)
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyUnitIdChanged(buddy, unit_id)
+    for key, module in pairs(opt.modules) do
+        if (module.unit_id_changed) then
+            module:unit_id_changed(buddy, unit_id)
+        end
+    end
+end
+
+function opt:ModuleEvent_InspectSpecialization(guid, spec)
+    for key, module in pairs(opt.modules) do
+        if (module.inspect_specialization) then
+            module:inspect_specialization(guid, spec)
         end
     end
 end
@@ -258,8 +266,9 @@ end
 function opt:CreateModules()
 
     -- all classes implement buddy module
-    buddy = self:AddBuddyModule()
-    cooldowns = self:AddCooldownModule()
+    self:AddInspectModule()
+    self:AddBuddyModule()
+    self:AddCooldownModule()
 
     self:BuildClassModules(opt.PlayerClass)
 end
