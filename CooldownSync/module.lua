@@ -265,10 +265,11 @@ end
 
 function opt:CreateModules()
 
-    -- all classes implement buddy module
+    -- all classes
     self:AddInspectModule()
     self:AddBuddyModule()
     self:AddCooldownModule()
 
+    -- my class
     self:BuildClassModules(opt.PlayerClass)
 end

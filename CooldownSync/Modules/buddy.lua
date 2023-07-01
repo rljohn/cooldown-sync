@@ -19,7 +19,8 @@ function opt:AddBuddyModule()
             buddy.realm = nil
             buddy.name_and_realm = nil
             buddy.guid = nil
-            buddy.class = 0
+            buddy.class = nil
+            buddy.class_id = 0
             buddy.spec = 0
             buddy.spec_name = nil
             buddy.online = false
@@ -235,7 +236,12 @@ function opt:AddBuddyModule()
             return
         end
 
-        -- update existing buddy info and ealry out
+        _, info.race = UnitRace(info.unit_id)
+        info.class_name, info.class_filename, info.class_id = UnitClass(info.unit_id)
+		info.online = UnitIsConnected(info.unit_id)
+		info.dead = UnitIsDead(info.unit_id)
+
+        -- update existing buddy info and early out
         if b then
 
             if (b.unit_id ~= info.unit_id) then
@@ -245,12 +251,12 @@ function opt:AddBuddyModule()
             end
 
             if (b.dead ~= info.dead) then
-                cdDiagf("Buddy %s: dead %d -> %d", b.id, b.dead, info.dead)
+                cdDiagf("Buddy %s: dead %s -> %s", b.id, tostring(b.dead), tostring(info.dead))
                 b.dead = info.dead
             end
 
             if (b.online ~= info.online) then
-                cdDiagf("Buddy %s: online %d -> %d", b.id, b.online, info.online)
+                cdDiagf("Buddy %s: online %s -> %s", b.id, tostring(b.online), tostring(info.online))
                 b.online = info.online
             end
 
@@ -272,9 +278,11 @@ function opt:AddBuddyModule()
         buddy.name_and_realm = opt:SpaceStripper(GetUnitName(info.unit_id, true))
         buddy.id = strlower(buddy.name_and_realm)
         buddy.guid = info.guid
-        buddy.class = info.class
+        buddy.class = info.class_id
+        buddy.class_name = info.class_name
         buddy.online = info.online
         buddy.dead = info.dead
+        _, buddy.race = info.race
         buddy.spec = 0
         buddy.spec_name = "Unknown"
 

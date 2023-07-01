@@ -130,13 +130,16 @@ CooldownSyncClassList = {
 	-- Mage
 	[8] = {
 		[62] = { -- Arcane
-			[1] = { 365350 } -- Arcane Surge
+			[1] = { 365350 }, -- Arcane Surge
+			[2] = { 382440 } -- Shifting Power
 		},
 		[63] = { -- Fire
-			[1] = { 190319 } -- Combustion
+			[1] = { 190319 }, -- Combustion
+			[2] = { 382440 } -- Shifting Power
 		},
 		[64] = { -- Frost
-			[1] = { 12472 } -- Icy Veins
+			[1] = { 12472 }, -- Icy Veins
+			[2] = { 382440 } -- Shifting Power
 		},
 	},
 	
@@ -148,6 +151,7 @@ CooldownSyncClassList = {
 		[266] = { -- Demonology
 			[1] = { 265187 }, -- Summon Demonic Tyrant (pet)
 			[2] = { 267217 }, -- Nether Portal
+			[3] = { 111898 }, -- Grimoire: Felguard
 		},
 		[267] = { -- Destruction
 			[1] = { 1122 }, -- Summon Infernal (pet)
@@ -203,6 +207,10 @@ CooldownSyncClassList = {
 		},
 		[1468] = { -- Preservation
 		},
+		[1473] = { -- Augmentation
+			[1] = { 395152, }, -- Ebon Might
+			[2] = { 406732 	}, -- Spatial Paradox
+		},
 	}
 }
 
@@ -221,11 +229,14 @@ DPSBuddySpellActiveTime = {
 	[123904]	= 24, -- Windwalker Monk, Invoke Xuen
 	[1122]		= 30, -- Destruction Warlock, Summon Infernal
 	[265187]	= 15, -- Demonology Warlock, Summon Demonic Tryant
+	[111898]	= 17, -- Demonology Warlock, Grimoire: Felguard
 	[205180]	= 30, -- Affliction Warlock, Summon Darkglare
 	[376079]	= 8,  -- Warrior, Spear of Bastion
 	[167105]	= 13, -- Warrior, Colossus Smash
 	[360194]	= 20, -- Rogue, Deathmark
 	[385627]	= 14, -- Rogue, Kingsbane
+	[42650]		= 30, -- Death Knight, Armoy of the Dead
+	[49206]		= 30, -- Death Knight, Summon Gargoyle
 
 	-- Warlock Summons
 	-- Hunter Spear Attack
@@ -369,6 +380,11 @@ local classSpecs = {
 	[1473] = {id = 13, class = "Evoker", spec = "Augmentation"}
   }
 
+local racialAbilities = {
+	["Orc"] = { 20572, 120, 15 },
+	["Troll"] = { 26297, 180, 12 }
+}
+
 function opt:GetClassInfo(class_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
 	return CooldownSyncClassList[class_id]
@@ -382,4 +398,8 @@ end
 
 function opt:GetClassInfoBySpec(spec_id)
 	return classSpecs[spec_id]
+end
+
+function opt:GetRacialAbility(race)
+	return racialAbilities[race]
 end

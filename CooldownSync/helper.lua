@@ -34,6 +34,17 @@ function opt:CreatePanel(parent, name, width, height)
 	return panel
 end
 
+function opt:CreateAbilityRow(parent, name, width, height, player)
+	local panel = CreateFrame("Frame", name, parent)
+	panel:SetSize(width, height)
+
+	panel.header = panel:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
+	panel.header:SetText(player)
+	panel.header:SetPoint('TOPLEFT', panel, 'TOPLEFT', 0, 0)
+
+	return panel
+end
+
 -- Tooltips
 
 function opt:OnTooltipEnter(self)
@@ -278,6 +289,24 @@ end
 
 -- tables
 
+function opt:pairsByKeys (t, f)
+	local a = {}
+  
+	for n in pairs(t) do table.insert(a, n) end
+  
+	table.sort(a, f)
+	local i = 0      -- iterator variable
+	local iter = function ()   -- iterator function
+	  i = i + 1
+	  if a[i] == nil then 
+		  return nil
+	  else 
+		  return a[i], t[a[i]]
+	  end
+	end
+	return iter
+  end
+
 function opt:GetTableSize(t)
 	local count = 0
 	for _ in pairs(t) do
@@ -318,10 +347,20 @@ function opt:GetUnitInfo(n)
 		info.unit_id = unitId
 		info.guid = UnitGUID(unitId)
 		info.name = name
-		info.class = UnitClass(unitId)
-		info.online = UnitIsConnected(unitId)
-		info.dead = UnitIsDead(unitId)
 		return info
+	end
+
+	local focus = UnitName("focus")
+	if (focus) then
+		local focusPlayer = strlower(focus)
+		if (focusPlayer == n) then
+			local unitId = "focus"
+			local info = {}
+			info.unit_id = unitId
+			info.guid = UnitGUID(unitId)
+			info.name = name
+			return info
+		end
 	end
 
 	-- check raid members, party members
@@ -337,9 +376,6 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class = class
-					info.online = online
-					info.dead = isDead
 					return info
 				end
 			end
@@ -354,9 +390,6 @@ function opt:GetUnitInfo(n)
 					info.unit_id = unitId
 					info.guid = UnitGUID(unitId)
 					info.name = name
-					info.class = UnitClass(unitId)
-					info.online = UnitIsConnected(unitId)
-					info.dead = UnitIsDead(unitId)
 					return info
 				end
 			end

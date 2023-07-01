@@ -9,7 +9,7 @@ function opt:CreateMainFrame()
 	main = CreateFrame('FRAME', 'CooldownSync', UIParent, "BackdropTemplate")
 	main:SetFrameStrata("BACKGROUND")
 	main:SetWidth(300)
-	main:SetHeight(200)
+	main:SetHeight(220)
 	
 	if (opt.env.FrameX > 0 and opt.env.FrameY > 0) then
 		main:SetPoint("TOPLEFT","UIParent","BOTTOMLEFT",opt.env.FrameX,opt.env.FrameY)

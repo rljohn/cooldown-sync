@@ -59,7 +59,7 @@ local function CDSync_OnCooldownsUpdated(self)
                 local endTime = start + duration
                 local cd_remaining = endTime - GetTime()
 
-                local percent = opt:CalculateCoolodwnPercent(duration, cd_remaining)
+                local percent = opt:CalculateCooldownPercent(duration, cd_remaining)
                 self.abilities[spell_id].cd_duration = duration
                 self.abilities[spell_id].time_remaining = cd_remaining
                 self.abilities[spell_id].cd_progress = percent
@@ -92,7 +92,7 @@ local function CDSync_OnOtherSpellCast(self, spell_id, source_guid, source_name,
 
 end
 
-function opt:CalculateCoolodwnPercent(duration, time_remaining)
+function opt:CalculateCooldownPercent(duration, time_remaining)
     if duration == 0 then
         return 1.0
     end

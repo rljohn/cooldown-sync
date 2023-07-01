@@ -60,7 +60,7 @@ function opt:LoadMissingValues()
 	SetDefaultValue('ShowBackground', true)
 	SetDefaultValue('ShowTitle', true)
 	SetDefaultValue('LockButton', false)
-	SetDefaultValue('IconSize', 48)
+	SetDefaultValue('IconSize', 32)
 	SetDefaultValue('FrameX', -1)
 	SetDefaultValue('FrameY', -1)
 	
@@ -80,6 +80,7 @@ function opt:OnLogin()
 	opt.PlayerGUID = UnitGUID("player")
 	opt.PlayerNameRealm = string.format("%s-%s", opt.PlayerName, opt.PlayerRealm)
 	opt.PlayerLevel = UnitLevel("player")
+	_, opt.PlayerRace = UnitRace("player")
 
 	-- check class info
 	local localizedClass, englishClass, classIndex = UnitClass("player");

@@ -6,6 +6,7 @@ function opt:PrintHelp()
 	print('|cffFFF569Cooldown Sync|r Commands:')
 end
 
+local buddy = nil
 SLASH_CooldownSync1 = '/cds';
 function SlashCmdList.CooldownSync(msg, editbox)
 
@@ -20,7 +21,9 @@ function SlashCmdList.CooldownSync(msg, editbox)
 	end
 
 	local count = #args
-	local buddy = opt:GetModule("buddy")
+	if not buddy then
+		buddy = opt:GetModule("buddy")
+	end
 
 	-- 1 param actions
 	if (count == 1) then

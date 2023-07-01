@@ -4,11 +4,32 @@ function opt:BuildClassModule(name)
     
     module = self:BuildModule(name)
     module.cooldowns = self:GetModule("cooldowns")
+    module.buddy = self:GetModule("buddy")
     
+    module.player = nil
+    module.buddy_rows = {}
+
+    local frame_margin_x = 8
+    local frame_margin_y = -8
+    local frame_spacing_y = -8
+
     -- build cooldown icons
-    module.icon_offset_x = 8
-    module.icon_offset_y = -8
     module.icon_spacing = opt.env.IconSize + 8
+
+    -- ui
+
+    function module:align_bars()
+        if not self.player then return end
+
+        local previous = opt.main
+        module.player:SetPoint('TOPLEFT', previous, 'TOPLEFT', frame_margin_x, frame_margin_y)
+        previous = module.player
+
+        for key, row in pairs(self.buddy_rows) do
+            row:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, frame_spacing_y)
+            previous = row
+        end
+    end
 
     -- events
     function module:talents_changed()
@@ -62,40 +83,97 @@ function opt:BuildClassModule(name)
         self:UpdateAuras()
     end
 
-    -- setup abilities
-    function module:SetupAbilities()
+    function module:CreateAbilityRow(name)
+        local row = opt:CreateAbilityRow(opt.main, nil, 400, 64, name)
+        row.icon_offset_x = 0
+        row.icon_offset_y = -16
+        row.icon_spacing = module.icon_spacing
+        return row
+    end
+
+    function module:SetupAbilityRow(row, class, spec, race, player)
 
         -- create icons for each ability
-        local abilities = opt:GetSpecInfo(opt.PlayerClass, opt.PlayerSpec)
+        local abilities = opt:GetSpecInfo(class, spec)
+            if abilities then
 
-        -- create ability icons
-        for index, ability in opt:pairsByKeys ( abilities ) do
-            local spell_id = ability[1]
+            -- create ability icons
+            for index, ability in opt:pairsByKeys ( abilities ) do
+                local spell_id = ability[1]
+                if player then
+                    module.cooldowns:TrackAbility(spell_id)
+                end
+                local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
+                if player then
+                    module.cooldowns:AddIcon(spell_id, icon)
+                end
+            end
+        end
+
+        -- racial
+        local racial = opt:GetRacialAbility(race)
+        if racial then
+            local spell_id = racial[1]
             module.cooldowns:TrackAbility(spell_id)
-            local icon = opt:AddAbilityCooldownIcon(module, spell_id)
+
+            local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
             module.cooldowns:AddIcon(spell_id, icon)
         end
 
+        return row
+
+    end
+
+    -- setup abilities
+    function module:SetupAbilities()
+
+        local row = self:CreateAbilityRow(opt.PlayerName)
+        self:SetupAbilityRow(row, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
+
+        self.player = row
+        self:align_bars()
+
         -- check initial aura state
-        module.cooldowns:CheckAuras()
+        self.cooldowns:CheckAuras()
     end
 
     -- reset
     function module:ResetCooldowns()
-        self.icon_offset_x = 8
-        self.icon_offset_y = -8
         self.cooldowns:Reset()
         opt:ResetCooldownIcons()
         self:SetupAbilities()
+    end
+
+    -- buddy settings
+    function module:buddy_available(buddy)
+        local row = self:CreateAbilityRow(buddy.name)
+        self.buddy_rows[buddy.id] = row
+        self:align_bars()
+    end
+    
+    function module:buddy_unavailable(buddy)
+        self.buddy_rows[buddy.id] = nil
+        self:align_bars()
+    end
+
+    function module:buddy_spec_changed(buddy)
+
+        local row = self.buddy_rows[buddy.id]
+        if row then
+            cdDump(buddy)
+            self:SetupAbilityRow(row, buddy.class, buddy.spec, buddy.race, false)
+        end
+
+        self:align_bars()
     end
     
     module:SetupAbilities()
     return module
 end
 
-function opt:AddAbilityCooldownIcon(module, spell_id)
-    local icon = opt:CreateCooldownIcon(opt.main, spell_id)
-    icon:SetPoint('TOPLEFT', opt.main, 'TOPLEFT', module.icon_offset_x, module.icon_offset_y)
-    module.icon_offset_x = module.icon_offset_x + module.icon_spacing
+function opt:AddAbilityCooldownIcon(parent, module, spell_id)
+    local icon = opt:CreateCooldownIcon(parent, spell_id)
+    icon:SetPoint('TOPLEFT', parent, 'TOPLEFT', parent.icon_offset_x, parent.icon_offset_y)
+    parent.icon_offset_x = parent.icon_offset_x + parent.icon_spacing
     return icon
 end
