@@ -102,6 +102,18 @@ function opt:BuildLogModule(name)
         cdPrintf("OnInspectReady: %s", guid)
     end
 
+    function module:buddy_added(n)
+        cdPrintf("OnBuddyRegistered: %s", n)
+    end
+
+    function module:buddy_removed(n)
+        cdPrintf("OnBuddyUnregistered: %s", n)
+    end
+
+    function module:buddy_available(buddy)
+        cdPrintf("OnBuddyAvailable: %s", buddy.id)
+    end
+
     function module:buddy_available(buddy)
         cdPrintf("OnBuddyAvailable: %s", buddy.id)
     end

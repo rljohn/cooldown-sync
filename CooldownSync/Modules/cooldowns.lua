@@ -106,13 +106,13 @@ function opt:AddCooldownModule()
     module = self:BuildModule("cooldowns")
     module.abilities = {}
 
-    function module.TrackAbility (self, spell_id)
-        ability = {}
+    function module:TrackAbility (spell_id)
+        local ability = {}
         ability.id = spell_id
         self.abilities[spell_id] = ability
     end
 
-    function module.CheckAuras(self)
+    function module:CheckAuras()
         for spell_id, ability in pairs(self.abilities) do
             local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
             if (aura) then
@@ -121,17 +121,17 @@ function opt:AddCooldownModule()
         end
     end
 
-    function module.GetAbility(self, spell_id)
+    function module:GetAbility(spell_id)
         return self.abilities[spell_id]
     end
 
-    function module.AddIcon(self, spell_id, icon)
+    function module:AddIcon(spell_id, icon)
         if self.abilities[spell_id] then
             self.abilities[spell_id].icon = icon
         end
     end
 
-    function module.Reset (self)
+    function module:Reset()
         self.abilities = {}
     end
 

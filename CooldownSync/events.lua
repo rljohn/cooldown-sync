@@ -26,7 +26,6 @@ function SlashCmdList.CooldownSync(msg, editbox)
 	if (count == 1) then
 		if (args[1] == "reset") then
 			opt:ResetAll()
-			opt:LoadMissingValues()
 			return
 		elseif (args[1] == "clear") then
 			buddy:ClearBuddies()

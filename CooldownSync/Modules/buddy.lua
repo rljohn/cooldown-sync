@@ -13,12 +13,15 @@ function opt:AddBuddyModule()
         local buddy = {}
         
         function buddy:Reset()
+            buddy.id = nil
+            buddy.unit_id = nil
             buddy.name = nil
             buddy.realm = nil
             buddy.name_and_realm = nil
             buddy.guid = nil
             buddy.class = 0
             buddy.spec = 0
+            buddy.spec_name = nil
             buddy.online = false
             buddy.dead = false
         end
@@ -51,7 +54,7 @@ function opt:AddBuddyModule()
             if (not self.buddy_pool[i]) then
                 cdDiagf("Freeing buddy at index: %d", i)
                 self.buddy_pool[i] = buddy
-                buddy.Reset()
+                self.buddy_pool[i]:Reset()
             end
         end
     end
@@ -104,9 +107,12 @@ function opt:AddBuddyModule()
     -- register a buddy
     function module:RegisterBuddy(name)
 
+        cdDiagf("Registering buddy: %s", name)
+
         -- early out if already exists
         local b = self:FindBuddy(name)
         if (b) then
+            cdDiagf("Already registered")
             return
         end
 
@@ -118,11 +124,13 @@ function opt:AddBuddyModule()
             if (not opt:TableContainsKey(opt.env.RaidBuddies, name)) then
                 opt.env.RaidBuddies[name] = setting
                 opt:ModuleEvent_BuddyAdded(name)
+                self:RefreshBuddies()
             end
         else
             if (not opt:TableContainsKey(opt.env.Buddies, name)) then
                 opt.env.Buddies[name] = setting
                 opt:ModuleEvent_BuddyAdded(name)
+                self:RefreshBuddies()
             end
         end
     end
@@ -130,7 +138,7 @@ function opt:AddBuddyModule()
     -- unregister buddy
     function module:RemoveBuddy(name)
 
-        cdDiagf("Remove buddy: %s", name)
+        cdDiagf("Unregister buddy: %s", name)
 
         -- remove from settings
         if (opt.InRaid) then
@@ -149,13 +157,16 @@ function opt:AddBuddyModule()
         if (b) then
             self:OnBuddyUnavailable(b)
             opt:ModuleEvent_BuddyRemoved(b)
+            self:RefreshBuddies()
         end
     end
 
     -- clear buddy registrations
     function module:ClearBuddies()
+        cdDiagf("Clearing buddies...")
         opt.env.Buddies = {}
         opt.env.RaidBuddies = {}
+        self:RefreshBuddies()
     end
 
     function module:RemoveActiveBuddy(buddy)
