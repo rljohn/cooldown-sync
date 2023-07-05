@@ -52,6 +52,14 @@ function opt:BuildLogModule(name)
         cdPrintf("OnAuraLost: %d", spell_id, guid, name)
     end
 
+    function module:other_aura_gained (spell_id, guid, name)
+        --cdPrintf("OnOtherAuraGained: %d (%s, %s)", spell_id, guid, name)
+    end
+
+    function module:other_aura_lost (spell_id, guid, name)
+        --cdPrintf("OnOtherAuraLost: %d (%s, %s)", spell_id, guid, name)
+    end
+
     function module:cooldowns_updated()
         --cdPrintf("OnCooldownsUpdated")
     end
@@ -60,12 +68,12 @@ function opt:BuildLogModule(name)
         cdPrintf("OnCooldownStart: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
-    function module:cooldown_update(spell_id, start, duration, time_remaining, percent)
+    function module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
         --cdPrintf("OnCooldownUpdate: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
-    function module:cooldown_end(spell_id)
-        cdPrintf("OnCooldownEnd")
+    function module:cooldown_end(guid, spell_id)
+        cdPrintf("OnCooldownEnd: %s (%d)", guid, spell_id)
     end
 
     function module:spell_cast(spell_id, target_guid, target_name)

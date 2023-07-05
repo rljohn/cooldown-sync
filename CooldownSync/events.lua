@@ -94,11 +94,12 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "SPELL_AURA_APPLIED") then
+		local spell_id = select(12,...)
 		if (destGUID == opt.PlayerGUID) then
-			local spell_id = select(12,...)
 			opt:ModuleEvent_OnAuraGained(spell_id, destGUID, destName)
+		else
+			opt:ModuleEvent_OnOtherAuraGained(spell_id, destGUID, destName)
 		end
-
 		return
 	end
 	
@@ -107,9 +108,11 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "SPELL_AURA_REMOVED") then
+		local spell_id = select(12,...)
 		if (destGUID == opt.PlayerGUID) then
-			local spell_id = select(12,...)
 			opt:ModuleEvent_OnAuraLost(spell_id, destGUID, destName)
+		else
+			opt:ModuleEvent_OnOtherAuraLost(spell_id, destGUID, destName)
 		end
 		return
 	end
@@ -119,11 +122,10 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "SPELL_CAST_SUCCESS") then
+		local spell_id = select(12,...)
 		if (sourceGUID == opt.PlayerGUID) then
-			local spell_id = select(12,...)
 			opt:ModuleEvent_OnSpellCast(spell_id, destGUID, destName)
 		else
-			local spell_id = select(12,...)
 			opt:ModuleEvent_OnOtherSpellCast(spell_id, sourceGUID, sourceName, destGUID, destName)
 		end
 		return

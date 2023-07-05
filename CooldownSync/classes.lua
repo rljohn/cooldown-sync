@@ -110,6 +110,7 @@ CooldownSyncClassList = {
 			[3] = { 315443 }, -- Abomination Limb
 			[4] = { 47568 },  -- Empower Rune Weapon
 			[5] = { 207289 }, -- Unholy Assault
+			[6] = { 48707 }
 		},
 	},
 	

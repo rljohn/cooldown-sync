@@ -18,6 +18,10 @@ function opt:BuildClassModule(name)
 
     -- ui
 
+    function module:init()
+        self:SetupAbilities()
+    end
+
     function module:align_bars()
         if not self.player then return end
 
@@ -36,8 +40,8 @@ function opt:BuildClassModule(name)
         self:ResetCooldowns()
     end
 
-    function module:cooldown_update(spell_id, start, duration, time_remaining, percent)
-        local ability = self.cooldowns:GetAbility(spell_id)
+    function module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
+        local ability = self.cooldowns:GetAbility(guid, spell_id)
         if (ability and ability.icon) then
             ability.icon:SetCooldown(start, duration, percent)
         end
@@ -58,6 +62,14 @@ function opt:BuildClassModule(name)
         end
     end
 
+    function module:other_aura_gained (spell_id, guid, n)
+        local buddy = self.buddy:FindBuddyByGuid(guid)
+        if not buddy then return end
+    end
+
+    function module:other_aura_lost (spell_id, guid, n)
+    end
+
     function module:UpdateAbility(spell_id, ability)
         if ability.active and ability.icon then
             local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
@@ -73,25 +85,19 @@ function opt:BuildClassModule(name)
         end
     end
 
-    function module:UpdateAuras()
-        for spell_id, ability in pairs(self.cooldowns.abilities) do
-            self:UpdateAbility(spell_id, ability)
-        end
-    end
-
     function module:update()
-        self:UpdateAuras()
+        self.cooldowns:UpdatePlayerAuras()
     end
 
-    function module:CreateAbilityRow(name)
-        local row = opt:CreateAbilityRow(opt.main, nil, 400, 64, name)
+    function module:CreateAbilityRow(n)
+        local row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
         row.icon_offset_x = 0
         row.icon_offset_y = -16
         row.icon_spacing = module.icon_spacing
         return row
     end
 
-    function module:SetupAbilityRow(row, class, spec, race, player)
+    function module:SetupAbilityRow(row, guid, class, spec, race, player)
 
         -- create icons for each ability
         local abilities = opt:GetSpecInfo(class, spec)
@@ -100,13 +106,10 @@ function opt:BuildClassModule(name)
             -- create ability icons
             for index, ability in opt:pairsByKeys ( abilities ) do
                 local spell_id = ability[1]
-                if player then
-                    module.cooldowns:TrackAbility(spell_id)
-                end
+
+                module.cooldowns:TrackAbility(guid, spell_id)
                 local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
-                if player then
-                    module.cooldowns:AddIcon(spell_id, icon)
-                end
+                module.cooldowns:AddIcon(guid, spell_id, icon)
             end
         end
 
@@ -114,10 +117,10 @@ function opt:BuildClassModule(name)
         local racial = opt:GetRacialAbility(race)
         if racial then
             local spell_id = racial[1]
-            module.cooldowns:TrackAbility(spell_id)
+            module.cooldowns:TrackAbility(guid, spell_id)
 
             local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
-            module.cooldowns:AddIcon(spell_id, icon)
+            module.cooldowns:AddIcon(guid, spell_id, icon)
         end
 
         return row
@@ -128,13 +131,14 @@ function opt:BuildClassModule(name)
     function module:SetupAbilities()
 
         local row = self:CreateAbilityRow(opt.PlayerName)
-        self:SetupAbilityRow(row, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
+        self:SetupAbilityRow(row, opt.PlayerGUID, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
 
         self.player = row
         self:align_bars()
 
         -- check initial aura state
-        self.cooldowns:CheckAuras()
+        self.cooldowns:CheckPlayerAuras()
+        self.cooldowns:cooldowns_updated()
     end
 
     -- reset
@@ -161,13 +165,12 @@ function opt:BuildClassModule(name)
         local row = self.buddy_rows[buddy.id]
         if row then
             cdDump(buddy)
-            self:SetupAbilityRow(row, buddy.class, buddy.spec, buddy.race, false)
+            self:SetupAbilityRow(row, buddy.guid, buddy.class, buddy.spec, buddy.race, false)
         end
 
         self:align_bars()
     end
     
-    module:SetupAbilities()
     return module
 end
 

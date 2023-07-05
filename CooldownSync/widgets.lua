@@ -85,12 +85,12 @@ function opt:CreateCooldownIcon(parent, spell_id)
         end
     end
 
-    function panel.SetAura(self, time_remaining)
+    function panel:SetAura(time_remaining)
         local text = opt:TimeRemainingString(time_remaining)
         self.timer:SetText(text)
     end
 
-    function panel.SetCooldown(self, start, duration, percent)
+    function panel:SetCooldown(start, duration, percent)
         if (not panel.active) then
             self.current = percent * 100
             self.cooldown_icon:SetCooldown(start, duration)

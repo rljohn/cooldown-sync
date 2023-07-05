@@ -119,6 +119,22 @@ function opt:ModuleEvent_OnAuraLost(spell_id, guid, name)
     end
 end
 
+function opt:ModuleEvent_OnOtherAuraGained(spell_id, guid, name)
+    for key, module in pairs(opt.modules) do
+        if (module.other_aura_gained) then
+            module:other_aura_gained(spell_id, guid, name)
+        end
+    end
+end
+
+function opt:ModuleEvent_OnOtherAuraLost(spell_id, guid, name)
+    for key, module in pairs(opt.modules) do
+        if (module.other_aura_lost) then
+            module:other_aura_lost(spell_id, guid, name)
+        end
+    end
+end
+
 function opt:ModuleEvent_OnSpellCast(spell_id, target_guid, target_name)
     for key, module in pairs(opt.modules) do
         if (module.spell_cast) then
@@ -150,18 +166,18 @@ function opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, time_remaini
     end
 end
 
-function opt:ModuleEvent_OnCooldownUpdate(spell_id, start, duration, time_remaining, percent)
+function opt:ModuleEvent_OnCooldownUpdate(guid, spell_id, start, duration, time_remaining, percent)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_update) then
-            module:cooldown_update(spell_id, start, duration, time_remaining, percent)
+            module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
         end
     end
 end
 
-function opt:ModuleEvent_OnCooldownEnd(spell_id)
+function opt:ModuleEvent_OnCooldownEnd(guid, spell_id)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_end) then
-            module:cooldown_end(spell_id)
+            module:cooldown_end(guid, spell_id)
         end
     end
 end
