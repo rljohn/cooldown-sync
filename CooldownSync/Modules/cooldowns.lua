@@ -67,6 +67,13 @@ function opt:AddCooldownModule()
         ability.cd_duration = 0
         ability.time_remaining = 0
         ability.cd_progress = 1.0
+
+        -- ability estimates
+        local estimate = opt:GetAuraEstimate(spell_id)
+        if (estimate) then
+            ability.estimate_duration = estimate
+        end
+
         cds.abilities[spell_id] = ability
     end
 
@@ -83,27 +90,6 @@ function opt:AddCooldownModule()
             local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
             if (aura) then
                 opt:ModuleEvent_OnAuraGained(spell_id, opt.PlayerGUID, opt.PlayerName)
-            end
-        end
-    end
-
-    -- refresh aura timings
-    function module:UpdatePlayerAuras()
-        local cds = self:FindCooldowns(opt.PlayerGUID)
-        if not cds then return end
-
-        for spell_id, ability in pairs(cds.abilities) do
-            if ability.active and ability.icon then
-                local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
-                if aura then
-                    local time_remaining = aura.expirationTime - GetTime()
-                
-                    if (time_remaining < 0) then
-                        time_remaining = 0
-                    end
-                    
-                    ability.icon:SetAura(time_remaining)
-                end
             end
         end
     end
@@ -127,31 +113,24 @@ function opt:AddCooldownModule()
         self.cooldowns = {}
     end
 
-    -- lookup the player by guid, set matching cooldown's active state
-    function module:SetAuraActive(guid, spell_id, active)
-        local ability = self:GetAbility(guid, spell_id)
-        if not ability then return end
-        ability.active = active
-    end
-
     -- local player gained aura event
     function module:aura_gained(spell_id)
-        self:SetAuraActive(opt.PlayerGUID, spell_id, true)
+        --self:SetAuraActive(opt.PlayerGUID, spell_id, true)
     end
 
     -- other player gained aura event
     function module:other_aura_gained(guid, spell_id)
-        self:SetAuraActive(guid, spell_id, true)
+        --self:SetAuraActive(guid, spell_id, true)
     end
 
     -- player lost aura event
     function module:aura_lost(spell_id)
-        self:SetAuraActive(opt.PlayerGUID, spell_id, false)
+        --self:SetAuraActive(opt.PlayerGUID, spell_id, false)
     end
 
     -- other player lost aura event
     function module:other_aura_lost(guid, spell_id)
-        self:SetAuraActive(guid, spell_id, false)
+        --self:SetAuraActive(guid, spell_id, false)
     end
 
     function module:cooldowns_updated()

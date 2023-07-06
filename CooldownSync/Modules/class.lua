@@ -19,6 +19,7 @@ function opt:BuildClassModule(name)
     -- ui
 
     function module:init()
+        cdPrintf("Module (%s) initialized", self.name)
         self:SetupAbilities()
     end
 
@@ -47,46 +48,150 @@ function opt:BuildClassModule(name)
         end
     end
 
-    function module:aura_gained(spell_id)
-        local ability = self.cooldowns:GetAbility(spell_id)
-        if (ability and ability.icon) then
+    ------------------
+    -- ACTIVE STATE
+    ------------------
+
+    function module:SetAbilityActive(ability, spell_id)
+        ability.start_time = GetTime()
+        ability.active = true
+        if (ability.icon) then
             ability.icon:Begin()
-            self:UpdateAbility(spell_id, ability)
         end
     end
 
-    function module:aura_lost(spell_id)
-        local ability = self.cooldowns:GetAbility(spell_id)
-        if (ability and ability.icon) then
+    function module:ClearAbilityActive(ability)
+
+        ability.start_time = 0
+        ability.active = false
+
+        if (ability.icon) then
             ability.icon:End()
+        end
+    end
+
+    ------------------
+    -- SPELL CAST
+    ------------------
+
+    function module:spell_cast(spell_id, target_guid, target_name)
+        local ability = self.cooldowns:GetAbility(opt.PlayerGUID, spell_id)
+        if not ability then return end
+        if ability.active then return end
+
+        -- begin an estimate for this spell
+        if ability.estimate_duration then
+            self:SetAbilityActive(ability)
+            self:UpdatePlayerAbility(spell_id, ability)
+        end
+    end
+
+    ------------------
+    -- AURA GAINED
+    ------------------
+
+    function module:HandleAuraGained(guid, spell_id)
+        local ability = self.cooldowns:GetAbility(guid, spell_id)
+        if not ability then return nil end
+        if ability.active then return nil end
+
+        -- trigger the active state
+        self:SetAbilityActive(ability)
+        return ability
+    end
+
+    function module:aura_gained(spell_id)
+        local ability = self:HandleAuraGained(opt.PlayerGUID, spell_id)
+        if ability then
+            self:UpdatePlayerAbility(spell_id, ability)
         end
     end
 
     function module:other_aura_gained (spell_id, guid, n)
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then return end
+
+        local ability = self:HandleAuraGained(opt.PlayerGUID, spell_id)
+        if ability then
+            self:UpdateOtherPlayerAbility(ability)
+        end
+    end
+
+    ------------------
+    -- AURA LOST
+    ------------------
+
+    function module:HandleAuraLost(guid, spell_id)
+        local ability = self.cooldowns:GetAbility(guid, spell_id)
+        if not ability then return end
+        if not ability.active then return end
+
+        if not ability.estimate_duration then
+            self:ClearAbilityActive(ability)
+        end
+    end
+
+    function module:aura_lost(spell_id)
+        self:HandleAuraLost(opt.PlayerGUID, spell_id)
     end
 
     function module:other_aura_lost (spell_id, guid, n)
+        local buddy = self.buddy:FindBuddyByGuid(guid)
+        if not buddy then return end
+
+        self:HandleAuraLost(guid, spell_id)
     end
 
-    function module:UpdateAbility(spell_id, ability)
-        if ability.active and ability.icon then
+    ------------------
+    -- AURA UPDATE
+    ------------------
+
+    -- refresh aura timing
+    function module:UpdatePlayerAbility(spell_id, ability)
+        if not ability then return end
+        if not ability.active then return end
+
+        local time_remaining = 0
+
+        if ability.estimate_duration then
+            local expirationTime = ability.start_time + ability.estimate_duration
+            time_remaining = expirationTime - GetTime()
+            if (time_remaining < 0) then
+                ability.icon:End()
+            end
+        else
             local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
             if aura then
-                local time_remaining = aura.expirationTime - GetTime()
-            
-                if (time_remaining < 0) then
-                    time_remaining = 0
-                end
-                
-                ability.icon:SetAura(time_remaining)
+                time_remaining = aura.expirationTime - GetTime()
             end
+        end
+
+        if (time_remaining < 0) then
+            time_remaining = 0
+        end
+        
+        if (ability.icon) then
+            ability.icon:SetAura(time_remaining)
+        end
+    end
+
+    function module:UpdateOtherPlayerAbility(spell_id, ability)
+        if not ability then return end
+        if not ability.active then return end
+    end
+
+    -- refresh aura timings
+    function module:UpdatePlayerAuras()
+        local cds = self.cooldowns:FindCooldowns(opt.PlayerGUID)
+        if not cds then return end
+
+        for spell_id, ability in pairs(cds.abilities) do
+           self:UpdatePlayerAbility(spell_id, ability)
         end
     end
 
     function module:update()
-        self.cooldowns:UpdatePlayerAuras()
+        self:UpdatePlayerAuras()
     end
 
     function module:CreateAbilityRow(n)
@@ -113,7 +218,7 @@ function opt:BuildClassModule(name)
             end
         end
 
-        -- racial
+        -- racial8
         local racial = opt:GetRacialAbility(race)
         if racial then
             local spell_id = racial[1]

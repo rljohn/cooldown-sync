@@ -20,13 +20,22 @@ function cdDiagf(...)
 	local status, res = pcall(format, ...)
 	if status then
 		print('|cffFFF569Cooldown Sync:|r', res)
-	 end
-   end
+    end
+end
 
 -- DUMP
 function cdDump(data)
  if (not ENABLE_DUMPING) then return end
  DevTools_Dump(data)
+end
+
+function cdStackf(...)
+	if (not ENABLE_DIAG) then return end
+	local status, res = pcall(format, ...)
+	if status then
+		print('|cffFFF569Cooldown Sync:|r', res)
+        print(debugstack(2, 4, 4))
+    end
 end
 
 function opt:BuildLogModule(name)

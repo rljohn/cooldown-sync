@@ -110,7 +110,8 @@ CooldownSyncClassList = {
 			[3] = { 315443 }, -- Abomination Limb
 			[4] = { 47568 },  -- Empower Rune Weapon
 			[5] = { 207289 }, -- Unholy Assault
-			[6] = { 48707 }
+			[6] = { 48707 },
+			[7] = { 48265 }
 		},
 	},
 	
@@ -236,7 +237,7 @@ DPSBuddySpellActiveTime = {
 	[167105]	= 13, -- Warrior, Colossus Smash
 	[360194]	= 20, -- Rogue, Deathmark
 	[385627]	= 14, -- Rogue, Kingsbane
-	[42650]		= 30, -- Death Knight, Armoy of the Dead
+	[42650]		= 30, -- Death Knight, Army of the Dead
 	[49206]		= 30, -- Death Knight, Summon Gargoyle
 
 	-- Warlock Summons
@@ -295,7 +296,7 @@ DPSBuddyEstimates = {
 	[152279] 	= { 120, 45 }, -- Breath of Sindragosa (lasts until out of Runic Power, rough guess at 45s)
 	[279302] 	= { 90, 3 }, -- Frostyrm's Fury (base CD 3m, but likely to take the half-CD talent - not a real aura, so just display it for 3s to match stun duration)
 	[49206] 	= { 180, 25 }, -- Summon Gargoyle
-	[42650] 	= { 300, 30 }, -- Army of the Dead (death coils reduce cooldown. assume the DK will reduce the CD down from 8m to 5m?? innaccurate)
+	[42650] 	= { 300, 30 }, -- Army of the Dead (death coils reduce cooldown. assume the DK will reduce the CD down from 8m to 3m... innaccurate)
 	[207289]	= { 90, 20 }, -- Unholy Assault
 
 	-- Shaman
@@ -395,6 +396,10 @@ function opt:GetSpecInfo(class_id, spec_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
 	if (CooldownSyncClassList[class_id][spec_id] == nil) then return nil end
 	return CooldownSyncClassList[class_id][spec_id]
+end
+
+function opt:GetAuraEstimate(spell_id)
+	return DPSBuddySpellActiveTime[spell_id]
 end
 
 function opt:GetClassInfoBySpec(spec_id)
