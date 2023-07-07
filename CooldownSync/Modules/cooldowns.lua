@@ -36,6 +36,7 @@ function opt:AddCooldownModule()
         -- add cooldowns module
         local cds = {}
         cds.abilities = {}
+        cds.secondary_auras = {}
         self.cooldowns[guid] = cds
 
         return cds
@@ -64,12 +65,7 @@ function opt:AddCooldownModule()
         ability.cd_duration = 0
         ability.time_remaining = 0
         ability.cd_progress = 1.0
-        
-        -- aura to check instead of spell_id
-        if (info.aura) then
-            ability.aura = info.aura
-        end
-        
+
         -- minimum aura duration
         if (info.min) then
             ability.minimum_duration = info.min
@@ -95,7 +91,14 @@ function opt:AddCooldownModule()
             ability.exclusive = info.exclusive
         end
 
+        -- add the alternate aura lookup
+        if (info.aura) then
+            ability.aura = info.aura
+            cds.secondary_auras[info.aura] = ability
+        end
+
         cds.abilities[info.id] = ability
+        
     end
 
     -- finds the cooldowns that match a player guid
@@ -108,6 +111,13 @@ function opt:AddCooldownModule()
         local cds = self:FindCooldowns(guid)
         if not cds then return nil end
         return cds.abilities[spell_id]
+    end
+
+    -- lookup player by their alternate aura
+    function module:FindAbilityBySecondaryAura(guid, aura_id)
+        local cds = self:FindCooldowns(guid)
+        if not cds then return nil end
+        return cds.secondary_auras[aura_id]
     end
 
     -- lookup player, find ability by spellid and update icon

@@ -148,8 +148,13 @@ function opt:BuildClassModule(name)
     ------------------
 
     function module:HandleAuraGained(guid, spell_id)
+
         local ability = self.cooldowns:GetAbility(guid, spell_id)
-        if not ability then return nil end
+        if not ability then
+            ability = self.cooldowns:FindAbilityBySecondaryAura(guid, spell_id)
+            if not ability then return nil end
+        end
+
         if ability.active then return nil end
 
         -- trigger the active state
@@ -183,7 +188,11 @@ function opt:BuildClassModule(name)
 
     function module:HandleAuraLost(guid, spell_id)
         local ability = self.cooldowns:GetAbility(guid, spell_id)
-        if not ability then return end
+        if not ability then
+            ability = self.cooldowns:FindAbilityBySecondaryAura(guid, spell_id)
+            if not ability then return nil end
+        end
+        
         if not ability.active then return end
 
         if not ability.aura_estimate then
@@ -219,7 +228,16 @@ function opt:BuildClassModule(name)
                 ability.icon:End()
             end
         else
-            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+
+            -- allow aura override
+            local id
+            if ability.aura then
+                id = ability.aura
+            else
+                id = spell_id
+            end
+            
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
             if aura then
                 time_remaining = aura.expirationTime - GetTime()
             end
@@ -247,7 +265,15 @@ function opt:BuildClassModule(name)
                 ability.icon:End()
             end
         else
-            time_remaining = opt:GetAuraDuration(unitId, spell_id)
+            -- allow aura override
+            local id
+            if ability.aura then
+                id = ability.aura
+            else
+                id = spell_id
+            end
+
+            time_remaining = opt:GetAuraDuration(unitId, id)
         end
 
         if (ability.icon) then
@@ -306,12 +332,7 @@ function opt:BuildClassModule(name)
                 module.cooldowns:TrackAbility(guid, info)
 
                 local icon = opt:AddAbilityCooldownIcon(row, info.id, info.hidden)
-
-                cdDiagf('trace')
-                cdDump(row)
-
                 table.insert(row.icons, icon)
-
                 module.cooldowns:AddIcon(guid, info.id, icon)
 
                 if info.hidden then
@@ -348,7 +369,16 @@ function opt:BuildClassModule(name)
         local cds = self.cooldowns:FindCooldowns(opt.PlayerGUID)
         if not cds then return end
         for spell_id, ability in pairs(cds.abilities) do
-            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+
+            -- allow aura override
+            local id
+            if ability.aura then
+                id = ability.aura
+            else
+                id = spell_id
+            end
+
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(id)
             if (aura) then
                 opt:ModuleEvent_OnAuraGained(spell_id, opt.PlayerGUID, opt.PlayerName)
             end
