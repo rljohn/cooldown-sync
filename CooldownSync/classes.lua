@@ -143,7 +143,7 @@ CooldownSyncClassList = {
 			-- Void Eruption
 			{ id = 228260, cd = 120, exclusive = 391109, aura = 194249 },
 			-- Dark Ascension
-			{ id = 391109, cd = 120, exclusive = 228260, hidden = true },
+			{ id = 391109, cd = 60, exclusive = 228260, hidden = true },
 		},
 	},
 	

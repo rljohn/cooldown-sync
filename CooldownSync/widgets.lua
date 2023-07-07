@@ -20,7 +20,7 @@ end
 
 function opt:FindInactiveIcon()
     for _,icon in pairs(opt.CooldownIcons) do
-        if not icon:IsShown() then
+        if not icon.hidden and not icon:IsShown() then
             cdDiagf("Recycling icon")
             return icon
         end

@@ -31,8 +31,20 @@ function opt:BuildClassModule(name)
         previous = module.player
 
         for key, row in pairs(self.buddy_rows) do
+
             row:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, frame_spacing_y)
+            row.icon_offset_x = 0
+            row.icon_offset_y = -16
+
             previous = row
+
+            for _, icon in pairs(row.icons) do
+                icon:SetPoint('TOPLEFT', row, 'TOPLEFT', row.icon_offset_x, row.icon_offset_y)
+                if not icon.hidden then
+                    row.icon_offset_x = row.icon_offset_x + row.icon_spacing
+                end
+            end
+            
         end
     end
 
@@ -54,12 +66,31 @@ function opt:BuildClassModule(name)
     -- ACTIVE STATE
     ------------------
 
-    function module:SetAbilityActive(ability, spell_id)
+    function module:SetAbilityActive(guid, ability)
         if ability.active then return end
 
         ability.start_time = GetTime()
         ability.active = true
         if (ability.icon) then
+
+            -- show if this ability is hidden
+            if ability.icon.hidden then
+                ability.icon:Show()
+                ability.icon.hidden = false
+            end
+
+            -- hide its exclusive partner
+            if ability.exclusive then
+                local other = self.cooldowns:GetAbility(guid, ability.exclusive)
+                if other then
+                    if other.icon and not other.hidden then
+                        other.icon.hidden = true
+                        other.icon:Hide()
+                        self:align_bars()
+                    end
+                end
+            end
+
             ability.icon:Begin()
         end
     end
@@ -85,7 +116,7 @@ function opt:BuildClassModule(name)
         if ability.active then return nil end
 
         if ability.aura_estimate then
-            self:SetAbilityActive(ability)
+            self:SetAbilityActive(guid, ability)
         end
 
         return ability
@@ -122,7 +153,7 @@ function opt:BuildClassModule(name)
         if ability.active then return nil end
 
         -- trigger the active state
-        self:SetAbilityActive(ability)
+        self:SetAbilityActive(guid, ability)
         return ability
     end
 
@@ -259,6 +290,7 @@ function opt:BuildClassModule(name)
         row.icon_offset_x = 0
         row.icon_offset_y = -16
         row.icon_spacing = module.icon_spacing
+        row.icons = {}
         return row
     end
 
@@ -266,24 +298,42 @@ function opt:BuildClassModule(name)
 
         -- create icons for each ability
         local abilities = opt:GetSpecInfo(class, spec)
-            if abilities then
+        if abilities then
 
             -- create ability icons
             for index, info in opt:pairsByKeys ( abilities ) do
+
                 module.cooldowns:TrackAbility(guid, info)
-                local icon = opt:AddAbilityCooldownIcon(row, module, info.id)
+
+                local icon = opt:AddAbilityCooldownIcon(row, info.id, info.hidden)
+
+                cdDiagf('trace')
+                cdDump(row)
+
+                table.insert(row.icons, icon)
+
                 module.cooldowns:AddIcon(guid, info.id, icon)
+
+                if info.hidden then
+                    icon.hidden = true
+                    icon:Hide()
+                    self:align_bars()
+                end
             end
+
         end
 
         -- racial
         local racial = opt:GetRacialAbility(race)
         if racial then
+
             local info = racial[1]
             module.cooldowns:TrackAbility(guid, info)
 
-            local icon = opt:AddAbilityCooldownIcon(row, module, info.id)
+            local icon = opt:AddAbilityCooldownIcon(row, info.id, info.hidden)
             module.cooldowns:AddIcon(guid, info.id, icon)
+            table.insert(row.icons, icon)
+
         end
 
         return row
@@ -356,9 +406,13 @@ function opt:BuildClassModule(name)
     return module
 end
 
-function opt:AddAbilityCooldownIcon(parent, module, spell_id)
+function opt:AddAbilityCooldownIcon(parent, spell_id, hidden)
     local icon = opt:CreateCooldownIcon(parent, spell_id)
     icon:SetPoint('TOPLEFT', parent, 'TOPLEFT', parent.icon_offset_x, parent.icon_offset_y)
-    parent.icon_offset_x = parent.icon_offset_x + parent.icon_spacing
+
+    if not hidden then
+        parent.icon_offset_x = parent.icon_offset_x + parent.icon_spacing
+    end
+
     return icon
 end
