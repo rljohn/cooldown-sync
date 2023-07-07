@@ -1,6 +1,6 @@
 local opt = CooldownSyncConfig
 
-opt.CooldownIcons = {}
+local RecycledIcons = {}
 
 local Glower = LibStub("LibCustomGlow-1.0")
 local LGF = LibStub("LibGetFrame-1.0")
@@ -11,19 +11,19 @@ function opt:InitGlowLibrary()
 	end
 end
 
-function opt:ResetCooldownIcons()
-    for key, icon in pairs(self.CooldownIcons) do
-        icon:Reset()
-    end
-    opt.CooldownIcons = {}
+function opt:RecycleIcon(icon)
+    cdDiagf("Recycling icon.")
+    icon:Reset()
+    table.insert(RecycledIcons, icon)
 end
 
 function opt:FindInactiveIcon()
-    for _,icon in pairs(opt.CooldownIcons) do
-        if not icon.hidden and not icon:IsShown() then
-            cdDiagf("Recycling icon")
-            return icon
-        end
+
+    for key,icon in pairs(RecycledIcons) do
+        cdDiagf("Reusing recycled icon")
+        RecycledIcons[key] = nil
+        icon:Reset()
+        return icon
     end
 
     return nil
@@ -40,7 +40,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
     local panel = opt:FindInactiveIcon()
     if (panel == nil) then
 
-        panel = CreateFrame('FRAME', nil, parent, "BackdropTemplate")
+        panel = CreateFrame('FRAME', nil, opt.main, "BackdropTemplate")
         panel:SetSize(width, height)
 
         panel.spell = CreateFrame('FRAME', nil, panel, "BackdropTemplate")
@@ -126,10 +126,15 @@ function opt:CreateCooldownIcon(parent, spell_id)
         end
     
         function panel:Reset()
+            panel:End()
+            panel:EndCooldown()
+            panel.active = false
+            panel.glowing = false
+            panel.hiding_cooldown = true
+            panel.cd_duration = 0
+            panel.spell_id = spell_id
             self:Hide()
         end
-
-        table.insert(opt.CooldownIcons, panel)
     end
 
     -- reset properties
@@ -139,6 +144,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
     panel.cd_duration = 0
     panel.cd_start = 0
     panel.spell_id = spell_id
+    panel:HideCooldown()
     panel:Show()
     return panel
 end

@@ -8,6 +8,7 @@ function opt:BuildClassModule(name)
     
     module.player = nil
     module.buddy_rows = {}
+    module.recycled_rows = {}
 
     local frame_margin_x = 8
     local frame_margin_y = -8
@@ -311,8 +312,23 @@ function opt:BuildClassModule(name)
         self:UpdateBuddyAuras()
     end
 
+    function module:FindInactiveRow()
+
+        for key, row in pairs(self.recycled_rows) do
+            cdDiagf("Reusing recycled row")
+            self.recycled_rows[key] = nil
+            row:Show()
+            return row
+        end
+    
+        return nil
+    end
+
     function module:CreateAbilityRow(n)
-        local row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
+        local row = self:FindInactiveRow()
+        if not row then
+           row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
+        end
         row.icon_offset_x = 0
         row.icon_offset_y = -16
         row.icon_spacing = module.icon_spacing
@@ -404,7 +420,12 @@ function opt:BuildClassModule(name)
 
     function module:ResetCooldowns()
         self.cooldowns:Reset()
-        opt:ResetCooldownIcons()
+    
+        for _, icon in pairs(self.player.icons) do
+            opt:RecycleIcon(icon)
+        end
+        self.player.rows = {}
+
         self:SetupAbilities()
     end
 
@@ -418,8 +439,20 @@ function opt:BuildClassModule(name)
         self:align_bars()
     end
     
+    function module:RecycleBuddyRow(row)
+        if not row then return end
+        cdDiagf("Recycling buddy row")
+
+        for _, icon in pairs(row.icons) do
+            opt:RecycleIcon(icon)
+        end
+
+        row:Hide()
+        table.insert(self.recycled_rows, row)
+    end
+
     function module:buddy_unavailable(buddy)
-        self.buddy_rows[buddy.id]:Hide()
+        self:RecycleBuddyRow(self.buddy_rows[buddy.id])
         self.buddy_rows[buddy.id] = nil
         self:align_bars()
     end
