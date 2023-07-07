@@ -169,18 +169,14 @@ CooldownSyncClassList = {
 		},
 		-- Unholy
 		[252] = {
-			-- Summon Gargoyle
-			{ id = 49206, cd = 180, dur = 25 },
 			-- Army of the Dead
 			{ id = 42650, cd = 180, dur = 30 },
 			-- Unholy Assault
 			{ id = 207289, cd = 90 },
+			-- Summon Gargoyle
+			{ id = 49206, cd = 180, dur = 25, hidden = true },
 			-- Abomination Limb
 			{ id = 315443, cd = 120, aura = 383269, hidden = true },
-
-			-- do not submit
-			{ id = 48707, cd = 45 },
-			{ id = 48265, cd = 25 },
 		},
 	},
 	

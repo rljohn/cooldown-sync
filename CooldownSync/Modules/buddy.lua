@@ -171,6 +171,7 @@ function opt:AddBuddyModule()
     end
 
     function module:RemoveActiveBuddy(buddy)
+        cdDiagf("Removing active buddy: %s", buddy.id)
         for idx, b in pairs(self.active_buddies) do
             if b == buddy then
                 self.active_buddies[idx] = nil
@@ -230,8 +231,7 @@ function opt:AddBuddyModule()
         -- we could no longer find our buddy in our group
         if not info then
             if b then
-                self:RemoveActiveBuddy(b)
-                self:FreeBuddy(b)
+                self:OnBuddyUnavailable(b)
             end
             return
         end

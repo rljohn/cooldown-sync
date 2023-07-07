@@ -192,7 +192,7 @@ function opt:BuildClassModule(name)
             ability = self.cooldowns:FindAbilityBySecondaryAura(guid, spell_id)
             if not ability then return nil end
         end
-        
+
         if not ability.active then return end
 
         if not ability.aura_estimate then
@@ -419,6 +419,7 @@ function opt:BuildClassModule(name)
     end
     
     function module:buddy_unavailable(buddy)
+        self.buddy_rows[buddy.id]:Hide()
         self.buddy_rows[buddy.id] = nil
         self:align_bars()
     end
