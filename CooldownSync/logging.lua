@@ -73,12 +73,12 @@ function opt:BuildLogModule(name)
         --cdPrintf("OnCooldownsUpdated")
     end
 
-    function module:cooldown_start(spell_id, start, duration, time_remaining, percent)
+    function module:cooldown_start(spell_id, start, duration, time_remaining)
         cdPrintf("OnCooldownStart: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
-    function module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
-        --cdPrintf("OnCooldownUpdate: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
+    function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
+        cdPrintf("OnCooldownUpdate: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
     function module:cooldown_end(guid, spell_id)
@@ -90,7 +90,7 @@ function opt:BuildLogModule(name)
     end
 
     function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
-        -- cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+        --cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
     end
 
     function module:party_changed(self)

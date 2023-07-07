@@ -16,15 +16,6 @@ local function CDSync_OnCooldownEnd(ability)
     ability.cd_progress = 1.0
 end
 
-function opt:CalculateCooldownPercent(duration, time_remaining)
-    if duration == 0 then
-        return 1.0
-    end
-
-    local percent = opt:Clamp(time_remaining / duration, 0.0, 1.0)
-    return percent
-end
-
 function opt:AddCooldownModule()
     
     module = self:BuildModule("cooldowns")
@@ -36,12 +27,17 @@ function opt:AddCooldownModule()
 
     -- tracks cooldowns for a new player
     function module:TrackCooldowns(guid)
-        if self.cooldowns[guid] then return self.cooldowns[guid] end
+
+        -- early out if already exists
+        if self.cooldowns[guid] then 
+            return self.cooldowns[guid] 
+        end
 
         -- add cooldowns module
         local cds = {}
         cds.abilities = {}
         self.cooldowns[guid] = cds
+
         return cds
     end
 
@@ -52,46 +48,59 @@ function opt:AddCooldownModule()
     end
 
     -- begin tracking this ability for this player
-    function module:TrackAbility (guid, spell_id)
+    function module:TrackAbility (guid, info)
 
         local cds = self:TrackCooldowns(guid)
         if not cds then return end
 
         -- early out if we're already tracking this one
-        local ability = cds.abilities[spell_id]
+        local ability = cds.abilities[info.id]
         if ability then return end
 
         -- add new ability to track
         ability = {}
+        ability.spell_id = info.id
         ability.on_cooldown = false
         ability.cd_duration = 0
         ability.time_remaining = 0
         ability.cd_progress = 1.0
-
-        -- ability estimates
-        local estimate = opt:GetAuraEstimate(spell_id)
-        if (estimate) then
-            ability.estimate_duration = estimate
+        
+        -- aura to check instead of spell_id
+        if (info.aura) then
+            ability.aura = info.aura
+        end
+        
+        -- minimum aura duration
+        if (info.min) then
+            ability.minimum_duration = info.min
         end
 
-        cds.abilities[spell_id] = ability
+        -- ability estimates
+        if (info.dur) then
+            ability.aura_estimate = info.dur
+        end
+
+        -- cooldown estimates
+        if (info.cd) then
+            ability.cooldown_estimate = info.cd
+        end
+
+        -- start hidden?
+        if (info.hidden) then
+            ability.start_hidden = info.hidden
+        end
+
+        -- partner aura
+        if (info.exclusive) then
+            ability.exclusive = info.exclusive
+        end
+
+        cds.abilities[info.id] = ability
     end
 
     -- finds the cooldowns that match a player guid
     function module:FindCooldowns(guid)
         return self.cooldowns[guid]
-    end
-
-    -- refresh player auras
-    function module:CheckPlayerAuras()
-        local cds = self:FindCooldowns(opt.PlayerGUID)
-        if not cds then return end
-        for spell_id, ability in pairs(cds.abilities) do
-            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
-            if (aura) then
-                opt:ModuleEvent_OnAuraGained(spell_id, opt.PlayerGUID, opt.PlayerName)
-            end
-        end
     end
 
     -- lookup player and spell
@@ -111,26 +120,6 @@ function opt:AddCooldownModule()
     -- resets the cooldowns array
     function module:Reset()
         self.cooldowns = {}
-    end
-
-    -- local player gained aura event
-    function module:aura_gained(spell_id)
-        --self:SetAuraActive(opt.PlayerGUID, spell_id, true)
-    end
-
-    -- other player gained aura event
-    function module:other_aura_gained(guid, spell_id)
-        --self:SetAuraActive(guid, spell_id, true)
-    end
-
-    -- player lost aura event
-    function module:aura_lost(spell_id)
-        --self:SetAuraActive(opt.PlayerGUID, spell_id, false)
-    end
-
-    -- other player lost aura event
-    function module:other_aura_lost(guid, spell_id)
-        --self:SetAuraActive(guid, spell_id, false)
     end
 
     function module:cooldowns_updated()
@@ -165,17 +154,15 @@ function opt:AddCooldownModule()
                     local endTime = start + duration
                     local cd_remaining = endTime - GetTime()
     
-                    local percent = opt:CalculateCooldownPercent(duration, cd_remaining)
                     ability.cd_duration = duration
                     ability.time_remaining = cd_remaining
-                    ability.cd_progress = percent
     
                     if not ability.on_cooldown then
                         CDSync_OnCooldownStart(ability, cd_remaining)
-                        opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, cd_remaining, percent)
+                        opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, cd_remaining)
                     end
                     
-                    opt:ModuleEvent_OnCooldownUpdate(opt.PlayerGUID, spell_id, start, duration, cd_remaining, percent)
+                    opt:ModuleEvent_OnCooldownUpdate(opt.PlayerGUID, spell_id, start, duration, cd_remaining)
                 end
     
                 if not on_cooldown and ability.on_cooldown then
@@ -184,6 +171,21 @@ function opt:AddCooldownModule()
                 end
             end
         end
+    end
+
+    function module:EstimateCooldown(guid, ability)
+        if not ability.cooldown_estimate then return end
+        
+        cdDiagf('estimating: %d', ability.spell_id)
+
+        local start = GetTime()
+        local duration = ability.cooldown_estimate
+        local endTime = start + duration
+        local cd_remaining = endTime - GetTime()
+
+        CDSync_OnCooldownStart(ability, cd_remaining)
+        opt:ModuleEvent_OnCooldownStart(ability.spell_id, start, duration, cd_remaining)
+        opt:ModuleEvent_OnCooldownUpdate(guid, ability.spell_id, start, duration, cd_remaining)
     end
 
     -- do not register CD start/end, we fire those events

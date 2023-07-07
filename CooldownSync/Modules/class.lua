@@ -41,10 +41,12 @@ function opt:BuildClassModule(name)
         self:ResetCooldowns()
     end
 
-    function module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
+    function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
+        cdDiagf("cooldown_update: %d (%s) - %d, %d, %f", spell_id, guid, start, duration, time_remaining)
+
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if (ability and ability.icon) then
-            ability.icon:SetCooldown(start, duration, percent)
+            ability.icon:SetCooldown(start, duration)
         end
     end
 
@@ -53,6 +55,8 @@ function opt:BuildClassModule(name)
     ------------------
 
     function module:SetAbilityActive(ability, spell_id)
+        if ability.active then return end
+
         ability.start_time = GetTime()
         ability.active = true
         if (ability.icon) then
@@ -61,6 +65,7 @@ function opt:BuildClassModule(name)
     end
 
     function module:ClearAbilityActive(ability)
+        if not ability.active then return end
 
         ability.start_time = 0
         ability.active = false
@@ -74,15 +79,36 @@ function opt:BuildClassModule(name)
     -- SPELL CAST
     ------------------
 
-    function module:spell_cast(spell_id, target_guid, target_name)
-        local ability = self.cooldowns:GetAbility(opt.PlayerGUID, spell_id)
-        if not ability then return end
-        if ability.active then return end
+    function module:HandleSpellCast(guid, spell_id)
+        local ability = self.cooldowns:GetAbility(guid, spell_id)
+        if not ability then return nil end
+        if ability.active then return nil end
 
-        -- begin an estimate for this spell
-        if ability.estimate_duration then
+        if ability.aura_estimate then
             self:SetAbilityActive(ability)
+        end
+
+        return ability
+    end
+
+    function module:spell_cast(spell_id, target_guid, target_name)
+        local ability = self:HandleSpellCast(opt.PlayerGUID, spell_id)
+        
+        if ability then
             self:UpdatePlayerAbility(spell_id, ability)
+        end
+    end
+
+    function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
+        local buddy = self.buddy:FindBuddyByGuid(source_guid)
+        if not buddy then return end
+
+        cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+
+        local ability = self:HandleSpellCast(source_guid, spell_id)
+        if ability then
+            self:UpdateOtherPlayerAbility(spell_id, ability)
+            self.cooldowns:EstimateCooldown(source_guid, ability)
         end
     end
 
@@ -111,9 +137,12 @@ function opt:BuildClassModule(name)
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then return end
 
-        local ability = self:HandleAuraGained(opt.PlayerGUID, spell_id)
+        cdPrintf("OnOtherAuraGained: %d (%s)", spell_id, n)
+
+        local ability = self:HandleAuraGained(guid, spell_id)
         if ability then
             self:UpdateOtherPlayerAbility(ability)
+            self.cooldowns:EstimateCooldown(guid, ability)
         end
     end
 
@@ -126,7 +155,7 @@ function opt:BuildClassModule(name)
         if not ability then return end
         if not ability.active then return end
 
-        if not ability.estimate_duration then
+        if not ability.aura_estimate then
             self:ClearAbilityActive(ability)
         end
     end
@@ -146,15 +175,14 @@ function opt:BuildClassModule(name)
     -- AURA UPDATE
     ------------------
 
-    -- refresh aura timing
     function module:UpdatePlayerAbility(spell_id, ability)
         if not ability then return end
         if not ability.active then return end
 
         local time_remaining = 0
 
-        if ability.estimate_duration then
-            local expirationTime = ability.start_time + ability.estimate_duration
+        if ability.aura_estimate then
+            local expirationTime = ability.start_time + ability.aura_estimate
             time_remaining = expirationTime - GetTime()
             if (time_remaining < 0) then
                 ability.icon:End()
@@ -175,9 +203,25 @@ function opt:BuildClassModule(name)
         end
     end
 
-    function module:UpdateOtherPlayerAbility(spell_id, ability)
+    function module:UpdateOtherPlayerAbility(unitId, spell_id, ability)
         if not ability then return end
         if not ability.active then return end
+
+        local time_remaining = 0
+
+        if ability.aura_estimate then
+            local expirationTime = ability.start_time + ability.aura_estimate
+            time_remaining = expirationTime - GetTime()
+            if (time_remaining < 0) then
+                ability.icon:End()
+            end
+        else
+            time_remaining = opt:GetAuraDuration(unitId, spell_id)
+        end
+
+        if (ability.icon) then
+            ability.icon:SetAura(time_remaining)
+        end
     end
 
     -- refresh aura timings
@@ -190,8 +234,24 @@ function opt:BuildClassModule(name)
         end
     end
 
+    -- other player timings
+    function module:UpdateBuddyAuras()
+        for id, row in pairs(self.buddy_rows) do
+            local buddy = self.buddy:FindBuddy(id)
+            if buddy then
+                local cds = self.cooldowns:FindCooldowns(buddy.guid)
+                if (cds) then
+                    for spell_id, ability in pairs(cds.abilities) do
+                        self:UpdateOtherPlayerAbility(buddy.unit_id, spell_id, ability)
+                    end
+                end
+            end
+        end
+    end
+
     function module:update()
         self:UpdatePlayerAuras()
+        self:UpdateBuddyAuras()
     end
 
     function module:CreateAbilityRow(n)
@@ -209,30 +269,42 @@ function opt:BuildClassModule(name)
             if abilities then
 
             -- create ability icons
-            for index, ability in opt:pairsByKeys ( abilities ) do
-                local spell_id = ability[1]
-
-                module.cooldowns:TrackAbility(guid, spell_id)
-                local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
-                module.cooldowns:AddIcon(guid, spell_id, icon)
+            for index, info in opt:pairsByKeys ( abilities ) do
+                module.cooldowns:TrackAbility(guid, info)
+                local icon = opt:AddAbilityCooldownIcon(row, module, info.id)
+                module.cooldowns:AddIcon(guid, info.id, icon)
             end
         end
 
-        -- racial8
+        -- racial
         local racial = opt:GetRacialAbility(race)
         if racial then
-            local spell_id = racial[1]
-            module.cooldowns:TrackAbility(guid, spell_id)
+            local info = racial[1]
+            module.cooldowns:TrackAbility(guid, info)
 
-            local icon = opt:AddAbilityCooldownIcon(row, module, spell_id)
-            module.cooldowns:AddIcon(guid, spell_id, icon)
+            local icon = opt:AddAbilityCooldownIcon(row, module, info.id)
+            module.cooldowns:AddIcon(guid, info.id, icon)
         end
 
         return row
 
     end
 
-    -- setup abilities
+    --------------------
+    -- SETUP
+    --------------------
+    
+    function module:CheckPlayerAuras()
+        local cds = self.cooldowns:FindCooldowns(opt.PlayerGUID)
+        if not cds then return end
+        for spell_id, ability in pairs(cds.abilities) do
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+            if (aura) then
+                opt:ModuleEvent_OnAuraGained(spell_id, opt.PlayerGUID, opt.PlayerName)
+            end
+        end
+    end
+
     function module:SetupAbilities()
 
         local row = self:CreateAbilityRow(opt.PlayerName)
@@ -242,18 +314,24 @@ function opt:BuildClassModule(name)
         self:align_bars()
 
         -- check initial aura state
-        self.cooldowns:CheckPlayerAuras()
+        self:CheckPlayerAuras()
         self.cooldowns:cooldowns_updated()
     end
 
-    -- reset
+    --------------------
+    -- RESET
+    --------------------
+
     function module:ResetCooldowns()
         self.cooldowns:Reset()
         opt:ResetCooldownIcons()
         self:SetupAbilities()
     end
 
-    -- buddy settings
+    --------------------
+    -- BUDDIES
+    --------------------
+
     function module:buddy_available(buddy)
         local row = self:CreateAbilityRow(buddy.name)
         self.buddy_rows[buddy.id] = row
@@ -269,7 +347,6 @@ function opt:BuildClassModule(name)
 
         local row = self.buddy_rows[buddy.id]
         if row then
-            cdDump(buddy)
             self:SetupAbilityRow(row, buddy.guid, buddy.class, buddy.spec, buddy.race, false)
         end
 

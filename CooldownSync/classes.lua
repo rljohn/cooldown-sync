@@ -3,341 +3,363 @@ local opt = CooldownSyncConfig
 -- Auras for DOT Tracking
 CooldownSyncClassList = {
 
+	--[[
+		id = spell_id
+		cd = default cooldown
+		dur = override duration
+		min = minimum duration
+		icon = icon override
+		exclusive = talent is a choice node, so hide the partner if cast
+		hidden = hide until this ability is cast by player
+	]]--
+
 	-- Warrior
 	[1] = {
-		[71] = { -- Arms
-			[1] = { 107574 }, -- Avatar
-			[2] = { 376079 }, -- Spear of Bastion
-			[3] = { 167105 }, -- Colossus Smash
-			[4] = { 6673 }, -- Battle Shout
+		 -- Arms
+		[71] = {
+		 	-- Avatar
+			{ id = 107574, cd = 90, min = 18 },
+			 -- Spear of Bastion
+			{ id = 376079, cd = 90, dur = 8 },
+			 -- Colossus Smash
+			{ id = 167105, cd = 45, dur = 13 },
 		},
-		[72] = { -- Fury
-			[1] = { 1719 }, -- Recklessness
-			[2] = { 107574 }, -- Avatar
-			[3] = { 376079 }, -- Spear of Bastion
-			[4] = { 6673 }, -- Battle Shout
+		 -- Fury
+		[72] = {
+			-- Recklessness
+			{ id = 1719, cd = 90, min = 10 },
+			-- Avatar
+			{ id = 107574, cd = 90, min = 18 },
+			-- Spear of Bastion
+			{ id = 376079, cd = 90, },
 		},
-		[73] = { -- Protection
-			[1] = { 401150 }, -- Avatar
-			[2] = { 376079 }, -- Spear of Bastion
-			[3] = { 6673 }, -- Battle Shout
+		-- Protection
+		[73] = {
+			-- Avatar
+			{ id = 107574, cd = 90, min = 18 },
+			-- Spear of Bastion
+			{ id = 376079, cd = 90, dur = 8 },
 		},
 	},
 	
 	-- Paladin
 	[2] = {
-		[65] = { -- Holy
+		-- Holy
+		[65] = {
 		},
-		[66] = { -- Protection
-			[1] = { 31884 }, -- Avenging Wrath
-			[2] = { 327193 }, -- Moment of Glory
+		-- Protection
+		[66] = {
+			-- Avenging Wrath
+			{ id = 31884, cd = 120, min = 15},
+			-- Moment of Glory
+			{ id = 327193, cd = 15 },
 		},
-		[70] = { -- Retribution
-			[1] = { 231895 }, -- Crusade
-			[2] = { 31884 }, -- Avenging Wrath
+		-- Retribution
+		[70] = { 
+			-- Avenging Wrath
+			{ id = 31884, cd = 120, min = 15 },
+			-- Crusade
+			{ id = 231895, cd = 120, min = 20 },
 		},
 	},
 	
 	-- Hunter
 	[3] = {
-		[253] = { -- Beast Mastery
-			[1] = { 19574 }, -- Bestial Wrath
-			[2] = { 359844 }, -- Call of the Wild
-			[3] = { 193530 }, -- Aspect of the Wild
-			[4] = { 201430 }, -- Stampede
-			[5] = { 321530 }, -- Bloodshed
+		-- Beast Mastery
+		[253] = { 
+			-- Bestial Wrath
+			{ id = 19574, cd = 90 },
+			 -- Call of the Wild
+			{ id = 359844, cd = 180 },
+			-- Aspect of the Wild
+			{ id = 193530, cd = 120 },
+			-- Stampede
+			{ id = 201430, cd = 120 },
+			-- Bloodshed
+			{ id = 321530, cd = 60 },
 		},
-		[254] = { -- Marksmanship
-			[1] = { 288613 }, -- Trueshot
-			[2] = { 201430 }, -- Stampede
+		-- Marksmanship
+		[254] = {
+			-- Trueshot
+			{ id = 288613, cd = 120 },
+			-- Stampede
+			{ id = 201430, cd = 120 },
 		},
-		[255] = { -- Survival
-			[1] = { 360966 }, -- Spearhead
-			[2] = { 203415 }, -- Fury of the Eagle (debuff)
-			[3] = { 201430 }, -- Stampede
+		-- Survival
+		[255] = {
+			-- Spearhead
+			{ id = 360966, cd = 90 },
+			-- Fury of the Eagle (debuff)
+			{ id = 203415, cd = 45, dur = 4 },
+			-- Stampede
+			{ id = 201430, cd = 120 },
 		},
 	},
 	
 		
 	-- Rogue
 	[4] = {
-		[259] = { -- Assassination
-			[1] = { 360194 }, -- Deathmark (debuff)
-			[2] = { 385627 }, -- Kingsbane (debuff)
+		-- Assassination
+		[259] = {
+			-- Deathmark (debuff)
+			{ id = 360194, cd = 120, dur = 20 },
+			-- Kingsbane (debuff)
+			{ id = 385627, cd = 60, dur = 14 },
 		},
-		[260] = { -- Outlaw
-			[1] = { 13750 }, -- Adrenaline Rush
-			[2] = { 343142 }, -- Dreadblades
-			[3] = { 13877 }, -- Blade Flurry
+		-- Outlaw
+		[260] = {
+			-- Adrenaline Rush
+			{ id = 13750, cd = 180, dur = 20 },
+			-- Dreadblades
+			{ id = 343142, cd = 120, dur = 10 },
+			-- Blade Flurry
+			{ id = 13877, cd = 30, dur = 10 },
 		},
-		[261] = { -- Subtlety
-			[1] = { 121471 }, -- Shadow Blades
-			[2] = { 384631 }, -- Flagellation
+		-- Subtlety
+		[261] = {
+			-- Shadow Blades
+			{ id = 121471, cd = 180, dur = 20 },
+			-- Flagellation
+			{ id = 384631, cd = 90, dur = 24 },
 		},
 	},
 	
 	-- Priest
 	[5] = {
-		[256] = { -- Discipline
-			[1] = { 10060 }, -- Power Infusion		
+		-- Discipline
+		[256] = {
+			-- Power Infusion	
+			{ id = 10060, cd = 120 },
 		},
-		[257] = { -- Holy
-			[1] = { 10060 }, -- Power Infusion
+		-- Holy
+		[257] = {
+			-- Power Infusion	
+			{ id = 10060, cd = 120 },
 		},
 		-- Shadow
-		[258] =  { 
-			[1] = { 10060 }, -- Power Infusion
+		[258] =  {
+			-- Power Infusion	
+			{ id = 10060, cd = 120, },
+			-- Void Eruption
+			{ id = 228260, cd = 120, exclusive = 391109, aura = 194249 },
+			-- Dark Ascension
+			{ id = 391109, cd = 120, exclusive = 228260, hidden = true },
 		},
 	},
 	
 	-- Death Knight
 	[6] = {
-		[250] = { -- Blood
-			[1] = { 49028 }, -- Dancing Rune Weapon
-			[2] = { 194844 }, -- Bonestorm
-			[3] = { 315443 }, -- Abomination Limb
-			[4] = { 47568 },  -- Empower Rune Weapon
+		-- Blood
+		[250] = {
+			-- Dancing Rune Weapon
+			{ id = 49028, cd = 120, aura = 81256 },
+			-- Bonestorm
+			{ id = 194844, cd = 60 },
+			-- Abomination Limb
+			{ id = 315443, cd = 120, aura = 383269, hidden = true },
 		},
-		[251] = { -- Frost
-			[1] = { 152279 }, -- Breath of Sindragosa
-			[2] = { 279302 }, -- Frostwyrm's Fury
-			[3] = { 315443 }, -- Abomination Limb
-			[4] = { 47568 },  -- Empower Rune Weapon
+		-- Frost
+		[251] = {
+			-- Breath of Sindragosa
+			{ id = 152279, cd = 120 },
+			-- Frostwyrm's Fury
+			{ id = 279302, cd = 90, dur = 3 },
+			-- Abomination Limb
+			{ id = 315443, cd = 120, aura = 383269, hidden = true }
 		},
-		[252] = { -- Unholy
-			[1] = { 49206 }, -- Summon Gargoyle
-			[2] = { 42650 }, -- Army of the Dead
-			[3] = { 315443 }, -- Abomination Limb
-			[4] = { 47568 },  -- Empower Rune Weapon
-			[5] = { 207289 }, -- Unholy Assault
-			[6] = { 48707 },
-			[7] = { 48265 }
+		-- Unholy
+		[252] = {
+			-- Summon Gargoyle
+			{ id = 49206, cd = 180, dur = 25 },
+			-- Army of the Dead
+			{ id = 42650, cd = 180, dur = 30 },
+			-- Unholy Assault
+			{ id = 207289, cd = 90 },
+			-- Abomination Limb
+			{ id = 315443, cd = 120, aura = 383269, hidden = true },
+
+			-- do not submit
+			{ id = 48707, cd = 45 },
+			{ id = 48265, cd = 25 },
 		},
 	},
 	
 	-- Shaman
 	[7] = {
-		[262] = { -- Elemental
-			[1] = { 198067 }, -- Fire Elemental (pet)
-			[2] = { 114051 }, -- Ascendance
+		-- Elemental
+		[262] = {
+			-- Fire Elemental (pet)
+			{ id = 198067, cd = 150, dur = 30 },
+			-- Ascendance
+			{ id = 114051, cd = 180 },
 		},
-		[263] = { -- Enhancement
-			[1] = { 51533 }, -- Feral Spirit
-			[2] = { 114051 }, -- Ascendance
+		-- Enhancement
+		[263] = {
+			-- Feral Spirit
+			{ id = 51533, cd = 90, aura = 333957},
+			-- Ascendance
+			{ id = 114051, cd = 180 },
 		},
-		[264] = { -- Restoration
+		-- Restoration
+		[264] = {
 		},
 	},
 	
 	-- Mage
 	[8] = {
-		[62] = { -- Arcane
-			[1] = { 365350 }, -- Arcane Surge
-			[2] = { 382440 } -- Shifting Power
+		-- Arcane
+		[62] = {
+			-- Arcane Surge
+			{ id = 365350, cd = 90, aura = 365362 },
+			-- Shifting Power
+			{ id = 382440, cd = 60 },
 		},
-		[63] = { -- Fire
-			[1] = { 190319 }, -- Combustion
-			[2] = { 382440 } -- Shifting Power
+		-- Fire
+		[63] = {
+			-- Combustion
+			{ id = 190319, cd = 120, min = 12 },
+			-- Shifting Power
+			{ id = 382440, cd = 60 },
 		},
-		[64] = { -- Frost
-			[1] = { 12472 }, -- Icy Veins
-			[2] = { 382440 } -- Shifting Power
+		-- Frost
+		[64] = {
+			-- Icy Veins
+			{ id = 12472, cd = 180 },
+			-- Shifting Power
+			{ id = 382440, cd = 60 },
+
+			-- do not submit
+			-- Blizzard
+			{ id = 190356, cd = 10, dur = 5.5 },
 		},
 	},
 	
 	-- Warlock
 	[9] = {
-		[265] = { -- Affliction
-			[1] = { 205180 }, -- Summon Darkglare (pet)
+		-- Affliction
+		[265] = {
+			-- Summon Darkglare (pet)
+			{ id = 205180, cd = 120, dur = 30},
 		},
-		[266] = { -- Demonology
-			[1] = { 265187 }, -- Summon Demonic Tyrant (pet)
-			[2] = { 267217 }, -- Nether Portal
-			[3] = { 111898 }, -- Grimoire: Felguard
+		-- Demonology
+		[266] = {
+			-- Summon Demonic Tyrant (pet)
+			{ id = 265187, cd = 120, dur = 15},
+			-- Nether Portal
+			{ id = 267217, cd = 180 },
+			-- Grimoire: Felguard
+			{ id = 111898, cd = 120, dur = 17},
+
 		},
-		[267] = { -- Destruction
-			[1] = { 1122 }, -- Summon Infernal (pet)
+		-- Destruction
+		[267] = {
+			-- Summon Infernal (pet)
+			{ id = 1122, cd = 180, dur = 30},
 		},
 	},
 	
 	-- Monk
 	[10] = {
-		[268] = { -- Brewmaster
-			[1] = { 387184 }, -- Weapons of Order
+		-- Brewmaster
+		[268] = {
+			-- Weapons of Order
+			{ id = 387184, cd = 120 },
 		},
-		[269] = { -- Windwalker
-			[1] = { 137639 , 152173 }, -- Storm, Earth, Fire / Serenity
-			[2] = { 123904 }, -- Invoke Xuen, the White Tiger (pet)
+		-- Windwalker
+		[269] = {
+			-- Weapons of Order
+			{ id = 387184, cd = 120 },
+			-- Storm, Earth, Fire
+			{ id = 137639, cd = 90, exclusive = 152173},
+			-- Serenity
+			{ id = 152173, cd = 90, exclusive = 137639, hidden = true },
+			-- Invoke Xuen, the White Tiger (pet) 24
+			{ id = 123904, cd = 120, dur = 24 },
 		},
-		[270] = { -- Mistweaver
+		-- Mistweaver
+		[270] = {
 		},
 	},
 	
 	-- Druid
 	[11] = {
-		[102] = { -- Balance
-			[1] = { 102560, 391528 }, -- Incarnation: Chosen of Elune, Convoke the Spirits 
-			[2] = { 194223 }, -- Celestial Alignment
-			[3] = { 323546 }, -- Ravenous Frenzy
+		-- Balance
+		[102] = {
+			-- Incarnation: Chosen of Elune
+			{ id = 102560, cd = 180, exclusive = 391528},
+			-- Convoke the Spirits 
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102560, hidden = true },
+			-- Celestial Alignment
+			{ id = 194223, cd = 180, min = 16 },
+			-- Ravenous Frenzy
+			{ id = 323546, cd = 180 },
 		},
-		[103] = { -- Feral
-			[1] = { 102543, 391528 }, -- Incarnation: Avatar of Ashamane, Convoke the Spirits
-			[2] = { 106951 }, -- Berserk
+		-- Feral
+		[103] = {
+			-- Incarnation: Avatar of Ashamane
+			{ id = 102543, cd = 180, exclusive = 391528},
+			-- Convoke the Spirits 
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102543, hidden = true },
+			-- -- Berserk
+			{ id = 106951, cd = 180 },
 		},
-		[104] = { -- Guardian
-			[1] = { 102558, 391528 },-- Incarnation: Guardian of Ursoc, Convoke the Spirits
-			[2] = { 50334 }, -- Berserk
+		-- Guardian
+		[104] = {
+			-- Incarnation: Avatar of Ashamane
+			{ id = 102558, cd = 180, exclusive = 391528},
+			-- Convoke the Spirits 
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102558, hidden = true },
+			-- Berserk
+			{ id = 50334, cd = 180 },
 		},
-		[105] = { -- Restoration
+		-- Restoration
+		[105] = {
 		},
 	},
 	
 	-- Demon Hunter
 	[12] = {
-		[577] = { -- Havoc
-			[1] = { 191427 }, -- Metamorphosis (dps)
+		-- Havoc
+		[577] = {
+			-- Metamorphosis (dps)
+			{ id = 191427, cd = 240, min = 20, aura = 162264 },
 		},
-		[581] = { -- Vengeance
-			[1] = { 187827 }, -- Metamorphosis (tank)
+		-- Vengeance
+		[581] = {
+			-- Metamorphosis (tank)
+			{ id = 187827, cd = 240, min = 12 },
 		},
 	},
 
 	-- Evoker
 	[13] = {
-		[1467] = { -- Devasatation
-			[1] = { 375087 }, -- Dragonrage
+		-- Devasatation
+		[1467] = {
+			-- Dragonrage
+			{ id = 375087, cd = 120 },
 		},
-		[1468] = { -- Preservation
+		-- Preservation
+		[1468] = {
 		},
-		[1473] = { -- Augmentation
-			[1] = { 395152, }, -- Ebon Might
-			[2] = { 406732 	}, -- Spatial Paradox
+		-- Augmentation
+		[1473] = {
+			-- Ebon Might
+			{ id = 395152, cd = 30 },
+			-- Spatial Paradox
+			{ id = 406732, cd = 120 },
 		},
 	}
 }
 
--- Cooldowns that don't use its own spell ID for the aura it provides.
-DPSBuddySpellAuras = {
-	[365350] 	= 365362, 	-- Arcane Surge [Arcane Mage]
-	[49028] 	= 81256, 	-- Dancing Rune Weapon [Death Knight]
-	[315443]	= 383269,	-- Abomination Limb [Death Knight]
-	[51533]		= 333957,	-- Feral Spirit [Shaman]
-	[191427]	= 162264, 	-- Metamorphosis [Demon Hunter]
-}
-
--- Cooldowns that don't provide an aura at all, guess-timate the timer.
-DPSBuddySpellActiveTime = {
-	[198067]	= 30, -- Elemental Shaman, Fire Elemental
-	[123904]	= 24, -- Windwalker Monk, Invoke Xuen
-	[1122]		= 30, -- Destruction Warlock, Summon Infernal
-	[265187]	= 15, -- Demonology Warlock, Summon Demonic Tryant
-	[111898]	= 17, -- Demonology Warlock, Grimoire: Felguard
-	[205180]	= 30, -- Affliction Warlock, Summon Darkglare
-	[376079]	= 8,  -- Warrior, Spear of Bastion
-	[167105]	= 13, -- Warrior, Colossus Smash
-	[360194]	= 20, -- Rogue, Deathmark
-	[385627]	= 14, -- Rogue, Kingsbane
-	[42650]		= 30, -- Death Knight, Army of the Dead
-	[49206]		= 30, -- Death Knight, Summon Gargoyle
-
-	-- Warlock Summons
-	-- Hunter Spear Attack
-	-- Rogue Bleeds
-}
-
--- When running in one-sided mode, the best we can do is guess.
--- [1] = cooldown
--- [2] = duration
--- [3] = min_duration
--- [4] = icon spell_id
-DPSBuddyEstimates = {
-
-	-- Warrior
-	[107574] 	= { 90, 20 }, -- Avatar
-	[376079] 	= { 90, 8 }, -- Spear of Bastion (players likely to take this will take +3 seconds talent)
-	[167105] 	= { 45, 10 }, -- Colossus Smash
-	[1719] 		= { 90, 12, 10 }, -- Recklessness
-
-	-- Paladin
-	[31884] 	= { 120, 20, 15 }, -- Avenging Wrath
-	[231895]	= { 120, 25, 20 }, -- Crusade
-	[327193] 	= { 327193, 15 }, -- Moment of Glory
-
-	-- Hunter
-	[19574] 	= { 90, 15 }, -- Bestial Wrath
-	[193530] 	= { 120, 20 }, -- Aspect of the Wild
-	[359844]	= { 180, 20 }, -- Call of the Wild
-	[201430] 	= { 120, 12 }, -- Stampede
-	[321530] 	= { 60, 18 }, -- Bloodshed
-	[288613] 	= { 120, 15 }, -- Trueshot
-	[360966] 	= { 90, 12 }, -- Spearhead
-	[203415] 	= { 45, 4 }, -- Fury of the Eagle
-	[328231]	= { 120, 18 }, -- Wild Spirits
-
-	-- Rogue
-	[360194] 	= { 120, 20 }, -- Deathmark
-	[385627] 	= { 60, 14 }, -- Kingsbane
-	[13750] 	= { 180, 20 }, -- Adrenaline Rush
-	[343142] 	= { 120, 10 }, -- Dreadblades
-	-- [13877] 	= { 30, 10 }, -- Blade Flurry (procs pasively, not worth looking at)
-	[121471] 	= { 180, 20 }, -- Shadow Blades
-	[384631] 	= { 90, 24 }, -- Flagellation (lasts 12 seconds after effect ends)
-
-	-- Priest
-	[228260] 	= { 120, 40 }, -- Void Eruption (20s extended by insanity usage, rough guess at 40s)
-	[391109] 	= { 120, 20 }, -- Dark Ascension
-	[200174] 	= { 60, 15 }, -- Mindbender
-
-	-- Death Knight
-	[49028] 	= { 120, 8 }, -- Dancing Rune Weapon
-	[194844] 	= { 60, 10 }, -- Bonestorm (1s per 10 runic power, estimate at 10s)
-	[315443] 	= { 120, 12 }, -- Abomination Limb
-	[47568] 	= { 120, 20 }, -- Empower Rune Weapon (TODO: 2 charges?)
-	[152279] 	= { 120, 45 }, -- Breath of Sindragosa (lasts until out of Runic Power, rough guess at 45s)
-	[279302] 	= { 90, 3 }, -- Frostyrm's Fury (base CD 3m, but likely to take the half-CD talent - not a real aura, so just display it for 3s to match stun duration)
-	[49206] 	= { 180, 25 }, -- Summon Gargoyle
-	[42650] 	= { 300, 30 }, -- Army of the Dead (death coils reduce cooldown. assume the DK will reduce the CD down from 8m to 3m... innaccurate)
-	[207289]	= { 90, 20 }, -- Unholy Assault
-
-	-- Shaman
-	[198067] 	= { 150, 30 }, -- Fire Elemental
-	[51533] 	= { 90, 15 }, -- Feral Sprit (talents/abiliies reduce this CD. our guess here is likely innaccurate) 
-	[114051] 	= { 180, 15 }, -- Ascendance
-
-	-- Mage
-	[365350] 	= { 90, 12 }, -- Arcane Surge
-	[365362]	= { 90, 12, 12, 365350 }, -- Arcane Surge (Aura)
-	[190319] 	= { 120, 12 }, -- Combustion
-	[12472] 	= { 180, 25 }, -- Icy Veins
-
-	-- Warlock
-	[205180] 	= { 120, 20 }, -- Summon Darkglare
-	[265187] 	= { 90, 15 }, -- Summon Demonic Tyrant
-	[1122] 		= { 180, 30 }, -- Summon Infernal
-
-	-- Monk
-	[387184] 	= { 120, 30 }, -- Weapons of Order
-	[137639] 	= { 90, 15 }, -- Storm, Earth, Fire (TODO: 2 charges?)
-	[152173] 	= { 90, 12 }, -- Serenity
-	[123904] 	= { 120, 24 }, -- Invoke Xuen, the White Tiger
-
-	-- Druid
-	[102560] 	= { 180, 30 }, -- Incarnation: Chosen of Elune
-	[391528] 	= { 120, 4 }, -- Convoke the Spirits
-	[194223] 	= { 180, 20, 16 }, -- Celestial Alignment
-	[323546]	= { 180, 20 }, -- Ravenous Frenzy
-	[102543] 	= { 180, 30 }, -- Incarnation: Avatar of Ashamane
-	[106951] 	= { 180, 20 }, -- Berserk (Feral)
-	[102558] 	= { 180, 30 }, -- Incarnation: Guardian of Ursoc
-	[50334] 	= { 180, 15 }, -- Berserk (Guardian)
-
-	-- Demon Hunter
-	[191427] 	= { 240, 24, 20 }, -- Metamorphosis (Havoc - Spell)
-	[162264]	= { 240, 24, 20, 191427 }, -- Metamorphosis (Havoc - Aura) 
-	[187827] 	= { 240, 15, 12 }, -- Metamorphosis (Vengeance)
-
-	-- Evoker
-	[375087] 	= { 120, 14 }, -- Dragonrage
+local racialAbilities = {
+	["Orc"] = {
+		-- Blood Fury
+		{ id = 20572, cd = 120 },
+	},
+	["Troll"] = { 
+		-- Berserking
+		{ id = 26297, cd = 180 },
+	}
 }
 
 local classSpecs = {
@@ -380,12 +402,8 @@ local classSpecs = {
 	[1467] = {id = 13, class = "Evoker", spec = "Devastation"},
 	[1468] = {id = 13, class = "Evoker", spec = "Preservation"},
 	[1473] = {id = 13, class = "Evoker", spec = "Augmentation"}
-  }
-
-local racialAbilities = {
-	["Orc"] = { 20572, 120, 15 },
-	["Troll"] = { 26297, 180, 12 }
 }
+
 
 function opt:GetClassInfo(class_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
@@ -396,10 +414,6 @@ function opt:GetSpecInfo(class_id, spec_id)
 	if (CooldownSyncClassList[class_id] == nil) then return nil end
 	if (CooldownSyncClassList[class_id][spec_id] == nil) then return nil end
 	return CooldownSyncClassList[class_id][spec_id]
-end
-
-function opt:GetAuraEstimate(spell_id)
-	return DPSBuddySpellActiveTime[spell_id]
 end
 
 function opt:GetClassInfoBySpec(spec_id)

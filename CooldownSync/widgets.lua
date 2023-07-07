@@ -108,7 +108,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self.cooldown_icon:SetCooldown(self.cd_start, self.cd_duration)
         end
     
-        function panel:SetCooldown(start, duration, percent)
+        function panel:SetCooldown(start, duration)
             self.cd_start = start
             self.cd_duration = duration
     

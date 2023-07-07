@@ -271,7 +271,7 @@ end
 
 -- auras
 
-function opt:GetAuraDuration(spell_id, unit_id)
+function opt:GetAuraDuration(unit_id, spell_id)
 
 	local result = -1
 	AuraUtil.ForEachAura(unit_id, "HELPFUL", nil, function(name, icon, _, _, duration, expirationTime, _, _, _, spellId, ...)
@@ -328,6 +328,22 @@ end
 function opt:TableContainsKey(t, k)
 	return t[k] ~= nil
 end
+
+function opt:RemoveValueFromTable(tbl, value)
+	local indicesToRemove = {}
+  
+	-- Find indices of elements to remove
+	for index, val in pairs(tbl) do
+	  if val == value then
+		table.insert(indicesToRemove, index)
+	  end
+	end
+  
+	-- Remove elements
+	for i = #indicesToRemove, 1, -1 do
+	  table.remove(tbl, indicesToRemove[i])
+	end
+  end
 
 -- players
 

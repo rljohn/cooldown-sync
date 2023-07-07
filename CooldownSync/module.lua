@@ -158,18 +158,18 @@ function opt:ModuleEvent_OnCooldownsUpdated()
         end
     end
 end
-function opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, time_remaining, percent)
+function opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, time_remaining)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_start) then
-            module:cooldown_start(spell_id, start, duration, time_remaining, percent)
+            module:cooldown_start(spell_id, start, duration, time_remaining)
         end
     end
 end
 
-function opt:ModuleEvent_OnCooldownUpdate(guid, spell_id, start, duration, time_remaining, percent)
+function opt:ModuleEvent_OnCooldownUpdate(guid, spell_id, start, duration, time_remaining)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_update) then
-            module:cooldown_update(guid, spell_id, start, duration, time_remaining, percent)
+            module:cooldown_update(guid, spell_id, start, duration, time_remaining)
         end
     end
 end
