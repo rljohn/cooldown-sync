@@ -55,8 +55,6 @@ function opt:BuildClassModule(name)
     end
 
     function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
-        cdDiagf("cooldown_update: %d (%s) - %d, %d, %f", spell_id, guid, start, duration, time_remaining)
-
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if (ability and ability.icon) then
             ability.icon:SetCooldown(start, duration)
@@ -315,7 +313,6 @@ function opt:BuildClassModule(name)
     function module:FindInactiveRow()
 
         for key, row in pairs(self.recycled_rows) do
-            cdDiagf("Reusing recycled row")
             self.recycled_rows[key] = nil
             row:Show()
             return row
@@ -441,8 +438,6 @@ function opt:BuildClassModule(name)
     
     function module:RecycleBuddyRow(row)
         if not row then return end
-        cdDiagf("Recycling buddy row")
-
         for _, icon in pairs(row.icons) do
             opt:RecycleIcon(icon)
         end

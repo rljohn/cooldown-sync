@@ -185,8 +185,6 @@ function opt:AddCooldownModule()
 
     function module:EstimateCooldown(guid, ability)
         if not ability.cooldown_estimate then return end
-        
-        cdDiagf('estimating: %d', ability.spell_id)
 
         local start = GetTime()
         local duration = ability.cooldown_estimate

@@ -38,7 +38,7 @@ local function SetValue(key, value)
 	opt.env[key] = value
 end
 
-local function SetDefaultValue(key, value)
+function opt:SetDefaultValue(key, value)
 	if (opt.env[key] == nil) then
 		SetValue(key, value)
 	end
@@ -53,16 +53,19 @@ end
 function opt:LoadMissingValues()
 
 	-- options
-	SetDefaultValue('DB', {})
-	SetDefaultValue('Buddies', {})
-	SetDefaultValue('RaidBuddies', {})
-	SetDefaultValue('ShowMinimapIcon', true)
-	SetDefaultValue('ShowBackground', true)
-	SetDefaultValue('ShowTitle', true)
-	SetDefaultValue('LockButton', false)
-	SetDefaultValue('IconSize', 32)
-	SetDefaultValue('FrameX', -1)
-	SetDefaultValue('FrameY', -1)
+	self:SetDefaultValue('DB', {})
+	self:SetDefaultValue('Buddies', {})
+	self:SetDefaultValue('RaidBuddies', {})
+	self:SetDefaultValue('ShowMinimapIcon', true)
+	self:SetDefaultValue('ShowBackground', true)
+	self:SetDefaultValue('ShowTitle', true)
+	self:SetDefaultValue('LockButton', false)
+	self:SetDefaultValue('IconSize', 32)
+	self:SetDefaultValue('FrameX', -1)
+	self:SetDefaultValue('FrameY', -1)
+
+	-- module defaults
+	self:ModuleEvent_LoadDefaultValues()
 	
 end
 
@@ -71,8 +74,9 @@ end
 function opt:OnLogin()
 
 	-- init
-	opt:BuildLogModule("logging")
-	opt:InitGlowLibrary()
+	self:BuildLogModule("logging")
+	self:InitGlowLibrary()
+	self:SetupLocale()
 	
 	-- check name, realm
 	opt.PlayerName = UnitName("player")
@@ -102,22 +106,22 @@ function opt:OnLogin()
 		opt.globals = CooldownSyncGlobalConfig
 	end
 
-	-- resolve any missing values
+	-- create main panel
+	InterfaceOptions_AddCategory(opt)
+
+	-- create modules and load missing values
+	self:CreateModules()
 	self:LoadMissingValues()
 	
 	-- talents
 	self:UpdateTalentSpec()
 
-	-- create panel
-	InterfaceOptions_AddCategory(opt)
-	self:SetupLocale()
+	-- create widgets
 	self:CreateWidgets()
 	self:CreateMainFrame()
-
-	--
-	self:CreateModules()
-	opt:ModuleEvent_OnInit()
 	
+	opt:ModuleEvent_OnInit()
+
 	-- request initial sync
 	C_Timer.After(1, function()
 		opt:ModuleEvent_OnPostInit()

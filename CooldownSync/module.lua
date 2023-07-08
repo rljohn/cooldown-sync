@@ -47,6 +47,14 @@ function opt:GetModule(id)
 end
 
 -- Module Event Handlers
+function opt:ModuleEvent_LoadDefaultValues()
+    for key, module in pairs(opt.modules) do
+        if (module.load_default_values) then
+            module:load_default_values()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnInit()
     for key, module in pairs(opt.modules) do
         if (module.init) then

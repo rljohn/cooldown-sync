@@ -88,8 +88,7 @@ function opt:AddBuddyModule()
 
     -- resets all buddy info
     function module:Reset()
-
-        cdDiagf("Reset")
+        
         while #self.active_buddies > 0 do
             local b = table.remove(self.active_buddies)
             self:FreeBuddy(b)
@@ -108,12 +107,9 @@ function opt:AddBuddyModule()
     -- register a buddy
     function module:RegisterBuddy(name)
 
-        cdDiagf("Registering buddy: %s", name)
-
         -- early out if already exists
         local b = self:FindBuddy(name)
         if (b) then
-            cdDiagf("Already registered")
             return
         end
 
@@ -164,14 +160,12 @@ function opt:AddBuddyModule()
 
     -- clear buddy registrations
     function module:ClearBuddies()
-        cdDiagf("Clearing buddies...")
         opt.env.Buddies = {}
         opt.env.RaidBuddies = {}
         self:RefreshBuddies()
     end
 
     function module:RemoveActiveBuddy(buddy)
-        cdDiagf("Removing active buddy: %s", buddy.id)
         for idx, b in pairs(self.active_buddies) do
             if b == buddy then
                 self.active_buddies[idx] = nil
@@ -181,7 +175,6 @@ function opt:AddBuddyModule()
     end
 
     function module:OnBuddyUnavailable(buddy)
-        cdDiagf("Buddy %s unavailable", buddy.id)
         opt:ModuleEvent_BuddyUnavailable(buddy)
         self:FreeBuddy(buddy)
         self:RemoveActiveBuddy(buddy)
@@ -189,8 +182,6 @@ function opt:AddBuddyModule()
 
     -- update buddy status
     function module:RefreshBuddies()
-
-        cdDiagf("Refreshing buddies...")
 
         local list
         if IsInRaid() then 
