@@ -71,6 +71,14 @@ function opt:ModuleEvent_OnPostInit()
     end
 end
 
+function opt:ModuleEvent_OnResize()
+    for key, module in pairs(opt.modules) do
+        if (module.on_resize) then
+            module:on_resize()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnUpdate(elapsed)
     for key, module in pairs(opt.modules) do
         if (module.update) then

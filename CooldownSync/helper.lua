@@ -105,7 +105,7 @@ end
 -- Checkbox
 
 function opt:CheckBoxOnClick(self)
-	opt.env[self:GetName()] = self:GetChecked()
+	opt.env[self.id] = self:GetChecked()
 		
 	if self:GetChecked() then
 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) 
@@ -115,7 +115,8 @@ function opt:CheckBoxOnClick(self)
 end
 
 function opt:CreateCheckBox(parent, name)
-	local check = CreateFrame('CheckButton', name, parent, 'OptionsBaseCheckButtonTemplate')
+	local check = CreateFrame('CheckButton', 'CD_' .. name, parent, 'OptionsBaseCheckButtonTemplate')
+	check.id = name
 	check:Raise()
 	
 	check.label = check:CreateFontString(nil, 'ARTWORK', 'GameFontWhite')
@@ -137,13 +138,18 @@ end
 -- Slider
 
 function opt:OnSliderValueChanged(self, value)
+	local previous = opt.env[self.id]
+	if previous == value then return false end
+
 	local strval = string.format("%.2f", value)
-	opt.env[self:GetName()] = value
+	opt.env[self.id] = value
 	self.label:SetText(strval)
+	return true
 end
 
 function opt:CreateSlider(parent, name, minval, maxval, stepvalue, width)
-	local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
+	local slider = CreateFrame("Slider", 'CD_' .. name, parent, "OptionsSliderTemplate")
+	slider.id = name
 	slider:SetOrientation("HORIZONTAL")
 	slider:SetThumbTexture([[Interface\Buttons\UI-SliderBar-Button-Vertical]])
 	slider:SetMinMaxValues(minval, maxval)
@@ -153,9 +159,9 @@ function opt:CreateSlider(parent, name, minval, maxval, stepvalue, width)
 	slider:SetObeyStepOnDrag(true)
 	slider.title = opt.titles[name]
 	
-	getglobal(name .. 'Low'):SetText(tostring(minval)); --Sets the left-side slider text (default is "Low").
-	getglobal(name .. 'High'):SetText(tostring(maxval)); --Sets the right-side slider text (default is "High").
-	getglobal(name .. 'Text'):SetText(opt.titles[name] or name or '!MissingTitle'); --Sets the "title" text (top-centre of slider).
+	getglobal('CD_' .. name .. 'Low'):SetText(tostring(minval)); --Sets the left-side slider text (default is "Low").
+	getglobal('CD_' .. name .. 'High'):SetText(tostring(maxval)); --Sets the right-side slider text (default is "High").
+	getglobal('CD_' .. name .. 'Text'):SetText(opt.titles[name] or name or '!MissingTitle'); --Sets the "title" text (top-centre of slider).
  
  	slider:SetValue(opt.env[name])
 	

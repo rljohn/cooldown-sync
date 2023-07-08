@@ -6,10 +6,61 @@ function opt:SetupLocale()
 
 	opt.titles = {
 
-		-- addon
+		--------------------
+		-- Addon
+		--------------------
+
 		CooldownSync = 'Cooldown Sync',
 		CooldownSyncConfig = 'Cooldown Sync Config',
-	
+
+		--------------------
+		-- Settings
+		--------------------
+
+		-- Show Button
+		ShowText = 'Show Frame',
+		ShowTextTooltip = "Choose when the frame should be displayed",
+		
+		-- Icon Size
+		IconSize = 'Icon Size',
+		IconSizeTooltip = 'Size of the PI Buddy cooldown icons.',
+
+		-- Lock button
+		LockButton = 'Lock Frame',
+		LockButtonHeader = 'Lock Frame',
+		LockButtonTooltip = 'Locks the frame.',
+
+		-- Background
+		ShowBackground = 'Show Background',
+		ShowBackgroundHeader = 'Show Background',
+		ShowBackgroundTooltip = 'Show the frame background.',
+		
+		-- Title
+		ShowTitle = 'Show Title',
+		ShowTitleHeader = 'Show Title',
+		ShowTitleTooltip = 'Show the frame title.',
+
+		-- Cooldowns
+		ShowCooldownTimers = "Show Cooldown Timers",
+		ShowCooldownTimersHeader = "Show Cooldown Timers",
+		ShowCooldownTimersTooltip = "Display a timer when spells are on cooldown",
+
+		-- Spell Timers
+		ShowSpellTimers = "Show Spell Timers",
+		ShowSpellTimersHeader = "Show Spell Timers",
+		ShowSpellTimersTooltip = "Display a timer when spells are active",
+
+		-- Spell Glow
+		
+		ShowSpellGlow = "Show Spell Glow",
+		ShowSpellGlowHeader = "Show Spell Glow",
+		ShowSpellGlowTooltip = "Show a glow around spells when they are active.\n\nNOTE: Disabling glow effects may improve performance.",
+
+		-- minimap
+		ShowMinimapIcon = 'Show Minimap Icon',
+		ShowMinimapHeader = 'Show Minimap Icon',
+		ShowMinimapTooltip = 'Toggle the PIBuddy minimap icon.',
+
 		--------------------
 		-- PRIEST
 		--------------------
@@ -42,6 +93,13 @@ function opt:SetupLocale()
 		Priest_PITargetLastTargetParty = 'Target Last Target',
 		Priest_PITargetLastTargetRaid  = 'Target Last Target',
 		Priest_PITargetLastTargetTooltip = 'Attempt to target your last target.',
+
+		-- sound
+
+		Priest_Sound = 'Play Sound on buddy cooldown',
+		Priest_SoundTooltip = 'Sound to play when your buddy activates their cooldown.',
+		Priest_SoundPiMe = 'Play Sound on |cffFFF569PI ME|r Request',
+		Priest_SoundPiMeTooltip = 'Sound to play when your buddy requests Power Infusion.',
 	}
 	
 end

@@ -101,18 +101,6 @@ function opt:LockMainFrame()
 	main:SetScript("OnDragStop", nil)
 end
 
-function opt:OnResize()
-
-	if (main == nil) then
-		return
-	end
-	
-	local width = PADDING	
-	main:SetWidth(width)
-	main:SetHeight(opt.env.IconSize + (2*PADDING))
-
-end
-
 function opt:SetMainFrameBackgroundVisible(visible)
 	if (visible) then
 		main:SetBackdropColor(0, 0, 0, .4)

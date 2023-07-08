@@ -11,34 +11,50 @@ function opt:BuildClassModule(name)
     module.recycled_rows = {}
 
     local frame_margin_x = 8
-    local frame_margin_y = -8
-    local frame_spacing_y = -8
+    local frame_margin_y = 8
 
-    -- build cooldown icons
-    module.icon_spacing = opt.env.IconSize + 8
+    local frame_spacing_y = 8
+    local frame_spacing_x = 8
+
+    local icon_offset_y = 16
+    local min_width = 88
 
     -- ui
 
     function module:init()
-        cdPrintf("Module (%s) initialized", self.name)
         self:SetupAbilities()
     end
 
-    function module:align_bars()
-        if not self.player then return end
-
+    -- resets icon positions
+    -- TODO: Instead of row offsets, just offset to the previous icon
+    function module:AlignIcons()
+        
+        -- player row is anchored to the main frame
         local previous = opt.main
-        module.player:SetPoint('TOPLEFT', previous, 'TOPLEFT', frame_margin_x, frame_margin_y)
+        self.player:SetPoint('TOPLEFT', previous, 'TOPLEFT', frame_margin_x, -frame_margin_y)
+        self.player.icon_offset_x = 0
+        self.player.icon_offset_y = -icon_offset_y
+        self.player.icon_spacing = opt.env.IconSize + frame_spacing_x
+
+        -- re-anchor the icons
+        for _,icon in pairs(self.player.icons) do
+            icon:SetPoint('TOPLEFT', self.player, 'TOPLEFT', self.player.icon_offset_x, self.player.icon_offset_y)
+            if not icon.hidden then
+                self.player.icon_offset_x = self.player.icon_offset_x + self.player.icon_spacing
+            end
+        end
+
         previous = module.player
 
+        -- buddy rows are anchored to the player, and then the previous row
         for key, row in pairs(self.buddy_rows) do
 
-            row:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, frame_spacing_y)
+            row:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, -frame_spacing_y)
             row.icon_offset_x = 0
-            row.icon_offset_y = -16
+            row.icon_offset_y = -icon_offset_y
+            row.icon_spacing = opt.env.IconSize + frame_spacing_x
 
-            previous = row
-
+            -- re-align the columns
             for _, icon in pairs(row.icons) do
                 icon:SetPoint('TOPLEFT', row, 'TOPLEFT', row.icon_offset_x, row.icon_offset_y)
                 if not icon.hidden then
@@ -46,7 +62,114 @@ function opt:BuildClassModule(name)
                 end
             end
             
+            previous = row
         end
+    end
+
+    function module:align_bars()
+        if not self.player then return end
+
+        -- resize each row and icon
+        self:ResizeFrames()
+
+        -- re-align icons in each row
+        self:AlignIcons()
+
+        -- from the results, reset the main frame size
+        self:ResizeMainFrame()
+    end
+
+    function module:ResizeFrames()
+
+        -- iterate through the icons.
+        -- count the non-hidden ones so we can calculate row size
+        local count = 0
+        for _, icon in pairs(self.player.icons) do
+            icon.spell:SetSize(opt.env.IconSize, opt.env.IconSize)
+            if not icon.hidden then
+                count = count + 1
+            end
+        end
+
+        -- pretend at least two icons is present
+        if count <= 2 then count = 2 end
+        local width = count * (opt.env.IconSize + frame_spacing_x)
+        local height = opt.env.IconSize + icon_offset_y
+
+        self.player:SetSize(width, height)
+
+        for key, row in pairs(self.buddy_rows) do
+            count = 0
+
+            -- resize each icon
+            for _, icon in pairs(row.icons) do
+                icon.spell:SetSize(opt.env.IconSize, opt.env.IconSize)
+                if not icon.hidden then
+                    count = count + 1
+                end
+            end
+
+            -- pretend at least two icons are present
+            if count <= 2 then count = 2 end
+
+            -- resize the row
+            width = count * (opt.env.IconSize + frame_spacing_x)
+            height = opt.env.IconSize + icon_offset_y
+            row:SetSize(width, height)
+        end
+    end
+
+    function module:on_resize()
+        self:align_bars()
+    end
+
+    function module:ResizeMainFrame()
+        if (opt.main == nil) then return end
+
+        -- the player row is always present
+        local rows = 1
+        local columns = 0
+        for _, icon in pairs(self.player.icons) do
+            if not icon.hidden then
+                columns = columns + 1
+            end
+        end
+        -- pretend at least two icons is present
+        if columns <= 2 then columns = 2 end
+        local max_columns = columns
+
+        -- iterate through all buddy rows
+        for key, row in pairs(self.buddy_rows) do
+            
+            columns = 0
+
+            -- count the number of non-hidden columns
+            for _, icon in pairs(row.icons) do
+                if not icon.hidden then
+                    columns = columns + 1
+                end
+            end
+
+            -- check if this is the widest frame
+            if (columns > max_columns) then
+                max_columns = columns
+            end
+
+            -- increment rows
+            rows = rows + 1
+        end
+
+        local min_height = 96
+
+        -- require some minimum dimensions
+
+        local new_width = (frame_spacing_x) + (max_columns * (opt.env.IconSize + frame_spacing_x))
+        if (new_width < min_width) then new_width = min_width end
+
+        local new_height = (frame_spacing_y) + (max_columns * (opt.env.IconSize + icon_offset_y + frame_spacing_y))
+        if (new_height < min_height) then new_height = min_height end
+
+        opt.main:SetSize(new_width, new_height)
     end
 
     -- events
@@ -133,8 +256,6 @@ function opt:BuildClassModule(name)
         local buddy = self.buddy:FindBuddyByGuid(source_guid)
         if not buddy then return end
 
-        cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
-
         local ability = self:HandleSpellCast(source_guid, spell_id)
         if ability then
             self:UpdateOtherPlayerAbility(spell_id, ability)
@@ -171,8 +292,6 @@ function opt:BuildClassModule(name)
     function module:other_aura_gained (spell_id, guid, n)
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then return end
-
-        cdPrintf("OnOtherAuraGained: %d (%s)", spell_id, n)
 
         local ability = self:HandleAuraGained(guid, spell_id)
         if ability then
@@ -328,7 +447,7 @@ function opt:BuildClassModule(name)
         end
         row.icon_offset_x = 0
         row.icon_offset_y = -16
-        row.icon_spacing = module.icon_spacing
+        row.icon_spacing = opt.env.IconSize + frame_spacing_x
         row.icons = {}
         return row
     end
@@ -402,8 +521,9 @@ function opt:BuildClassModule(name)
 
         local row = self:CreateAbilityRow(opt.PlayerName)
         self:SetupAbilityRow(row, opt.PlayerGUID, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
-
         self.player = row
+
+        -- setup bar alignment
         self:align_bars()
 
         -- check initial aura state
@@ -421,8 +541,6 @@ function opt:BuildClassModule(name)
         for _, icon in pairs(self.player.icons) do
             opt:RecycleIcon(icon)
         end
-        self.player.rows = {}
-
         self:SetupAbilities()
     end
 

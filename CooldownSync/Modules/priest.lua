@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 local opt = CooldownSyncConfig
 
 function opt:AddPriestModule()

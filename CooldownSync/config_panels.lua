@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 local opt = CooldownSyncConfig
 local ADDON_VERSION = "<VERSION>"
 
@@ -19,6 +20,104 @@ function opt:CreateWidgets()
 		
 	opt.ui.main = opt:CreatePanel(opt, nil, 580, 175)
 	opt.ui.main:SetPoint('TOPLEFT', opt, 'TOPLEFT', 25, -48)
+
+	-- title
+
+	opt.ui.controlsTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+	opt.ui.controlsTitle:SetText(opt.titles.CooldownSync)
+	opt.ui.controlsTitle:SetPoint('TOPLEFT', opt.ui.main, 'TOPLEFT', 0, 32)
+
+	-- show (visibility)
+
+	opt.ui.showOptionsLabel = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+	opt.ui.showOptionsLabel:SetText(opt.titles.ShowText)
+	opt.ui.showOptionsLabel:SetPoint('TOPLEFT', opt.ui.main, 'TOPLEFT', 8, -8)
+		
+	opt.ui.showOptions = LibDD:Create_UIDropDownMenu("PIBuddyShowOptionsDropdown", opt.ui.main)
+	opt.ui.showOptions:SetPoint('TOPLEFT', opt.ui.showOptionsLabel, 'BOTTOMLEFT', -20, -8)
+	LibDD:UIDropDownMenu_Initialize(opt.ui.showOptions, function(self, level, menuList)
+	
+		local info = LibDD:UIDropDownMenu_CreateInfo()
+		info.func = function(self, arg1, arg2, checked)
+			LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.showOptions, arg1)
+			opt.env.ShowButton = arg1
+			opt:ForceUiUpdate()
+		end
+		
+		info.text, info.value, info.arg1, info.arg2 = "Show Always", 1, 1, "Show Always"
+		LibDD:UIDropDownMenu_AddButton(info)
+
+		info.text, info.value, info.arg1, info.arg2 = "Combat Only", 2, 2, "Combat Only"
+		LibDD:UIDropDownMenu_AddButton(info)
+		
+		info.text, info.value, info.arg1, info.arg2 = "Group Only", 3, 3, "Group Only"
+		LibDD:UIDropDownMenu_AddButton(info)
+
+		info.text, info.value, info.arg1, info.arg2 = "With Buddy Only", 4, 4, "With Buddy Only"
+		LibDD:UIDropDownMenu_AddButton(info)
+		
+		info.text, info.value, info.arg1, info.arg2 = "Never", 5, 5, "Never"
+		LibDD:UIDropDownMenu_AddButton(info)
+		
+		LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.showOptions, opt.env.ShowButton)
+	end)
+	opt:AddTooltip(opt.ui.showOptionsLabel, opt.titles.ShowText, opt.titles.ShowTextTooltip)
+	opt:AddTooltip(opt.ui.showOptions, opt.titles.ShowText, opt.titles.ShowTextTooltip)
+
+	-- lock button
+
+	opt.ui.lock = opt:CreateCheckBox(opt, 'LockButton')
+	opt.ui.lock:SetPoint("TOPLEFT", opt.ui.showOptionsLabel, "TOPLEFT", 0, -58)
+	opt.ui.lock:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			if (self:GetChecked()) then
+				opt:Lock()
+			else
+				opt:Unlock()
+			end
+		end)
+	opt:AddTooltip(opt.ui.lock, opt.titles.LockButtonHeader, opt.titles.LockButtonTooltip)
+	
+	-- show background
+	
+	opt.ui.showBackground = opt:CreateCheckBox(opt, 'ShowBackground')
+	opt.ui.showBackground:SetPoint("TOPLEFT", opt.ui.lock, "TOPLEFT", 0, -25)
+	opt.ui.showBackground:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:ForceUiUpdate()
+		end)
+	opt:AddTooltip(opt.ui.showBackground, opt.titles.ShowBackgroundHeader, opt.titles.ShowBackgroundTooltip)
+	
+	-- show title
+	
+	opt.ui.showTitle = opt:CreateCheckBox(opt, 'ShowTitle')
+	opt.ui.showTitle:SetPoint("TOPLEFT", opt.ui.showBackground, "TOPLEFT", 0, -25)
+	opt.ui.showTitle:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:ForceUiUpdate()
+		end)
+	opt:AddTooltip(opt.ui.showTitle, opt.titles.ShowTitleHeader, opt.titles.ShowTitleTooltip)
+	
+	opt.ui.showMinimap = opt:CreateCheckBox(opt, 'ShowMinimapIcon')
+	opt.ui.showMinimap:SetPoint("TOPLEFT", opt.ui.showTitle, "TOPLEFT", 0, -25)
+	opt.ui.showMinimap:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:MinimapUpdate()
+		end)
+	opt:AddTooltip(opt.ui.showMinimap, opt.titles.ShowMinimapHeader, opt.titles.ShowMinimapTooltip)
+
+	-- size
+
+	opt.ui.iconSize = opt:CreateSlider(opt, 'IconSize', 32, 96, 8, 140)
+	opt.ui.iconSize:SetPoint("TOPLEFT", opt.ui.main, "TOPLEFT", 205, -26)
+	opt.ui.iconSize:SetScript("OnValueChanged", function(self, value, ...)
+			local changed = opt:OnSliderValueChanged(self, value)
+			if changed then
+				opt:ModuleEvent_OnResize()
+			end
+		end)
+	opt:AddTooltip(opt.ui.iconSize, opt.titles.IconSize, opt.titles.IconSizeTooltip)
+
 end
 
 -- Widget Visiblility
