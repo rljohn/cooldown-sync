@@ -270,6 +270,14 @@ function opt:ModuleEvent_InspectSpecialization(guid, spec)
     end
 end
 
+function opt:ModuleEvent_OnPlayerDied()
+    for key, module in pairs(opt.modules) do
+        if (module.player_died) then
+            module:player_died()
+        end
+    end
+end
+
 -- Class Modules
 function opt:BuildClassModules(class)
 

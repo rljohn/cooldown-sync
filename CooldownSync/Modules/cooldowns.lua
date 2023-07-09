@@ -183,6 +183,16 @@ function opt:AddCooldownModule()
         end
     end
 
+    function module:player_died()
+        local cds = self:FindCooldowns(opt.PlayerGUID)
+        if not cds then return end
+
+        for spell_id, ability in pairs(cds.abilities) do
+            CDSync_OnCooldownEnd(ability)
+            opt:ModuleEvent_OnCooldownEnd(opt.PlayerGUID, spell_id)
+        end
+    end
+
     function module:EstimateCooldown(guid, ability)
         if not ability.cooldown_estimate then return end
 

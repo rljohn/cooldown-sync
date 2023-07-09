@@ -95,6 +95,7 @@ function opt:CreateWidgets()
 	opt.ui.showTitle:SetScript('OnClick', function(self, event, ...)
 			opt:CheckBoxOnClick(self)
 			opt:ForceUiUpdate()
+			opt:ModuleEvent_OnResize()
 		end)
 	opt:AddTooltip(opt.ui.showTitle, opt.titles.ShowTitleHeader, opt.titles.ShowTitleTooltip)
 	
@@ -125,5 +126,30 @@ end
 function opt:ForceUiUpdate()
 
 	if (opt.main == nil) then return end
+
+	local show = true
+
+	if (opt.env.ShowButton == true) then
+		show = true
+	elseif (not opt.InCombat and opt.env.ShowButton == 2) then -- in combat only
+		show = false
+	elseif (not opt.InGroup and opt.env.ShowButton == 3) then -- in group only
+		show = false
+	elseif (not opt.InGroup and opt.env.ShowButton == 4) then -- with buddy only
+		show = false
+	elseif (opt.env.ShowButton == 5) then -- show never
+		show = false
+	end
+
+	if (show) then
+		if (not opt.main:IsShown()) then
+			opt:ShowMainFrame()
+		end
+	elseif (opt.main:IsShown()) then
+		opt:HideMainFrame()
+	end
+
+	opt:SetMainFrameBackgroundVisible(opt.env.ShowBackground)
+	opt:SetMainFrameTitleVisible(opt.env.ShowTitle)
 
 end

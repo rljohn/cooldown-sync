@@ -10,8 +10,8 @@ function opt:BuildClassModule(name)
     module.buddy_rows = {}
     module.recycled_rows = {}
 
-    local frame_margin_x = 8
-    local frame_margin_y = 8
+    local frame_margin_x = 10
+    local frame_margin_y = 10
 
     local frame_spacing_y = 8
     local frame_spacing_x = 8
@@ -31,7 +31,7 @@ function opt:BuildClassModule(name)
         
         -- player row is anchored to the main frame
         local previous = opt.main
-        self.player:SetPoint('TOPLEFT', previous, 'TOPLEFT', frame_margin_x, -frame_margin_y)
+        self.player:SetPoint('TOPLEFT', previous, 'TOPLEFT', frame_margin_x, -frame_margin_y + 2)
         self.player.icon_offset_x = 0
         self.player.icon_offset_y = -icon_offset_y
         self.player.icon_spacing = opt.env.IconSize + frame_spacing_x
@@ -126,7 +126,7 @@ function opt:BuildClassModule(name)
     function module:ResizeMainFrame()
         if (opt.main == nil) then return end
 
-        local max_header_len = self.player:GetWidth() + (2*frame_spacing_x)
+        local max_header_len = self.player.header:GetWidth() + (2*frame_spacing_x)
 
         -- the player row is always present
         local rows = 1
@@ -171,16 +171,24 @@ function opt:BuildClassModule(name)
             rows = rows + 1
         end
 
-        local min_height = 96
+        local min_height = 60
 
         -- require some minimum dimensions
 
-        local new_width = (frame_spacing_x) + (max_columns * (opt.env.IconSize + frame_spacing_x))
+        local new_width = (frame_margin_x) + (max_columns * (opt.env.IconSize + frame_spacing_x)) + (frame_margin_x-frame_spacing_x)
         if (new_width < min_width) then new_width = min_width end
 
-        local new_height = (frame_spacing_y) + (rows * (opt.env.IconSize + icon_offset_y + frame_spacing_y))
+        local new_height = (frame_margin_y) + (rows * (opt.env.IconSize + icon_offset_y + frame_spacing_y)) + (frame_margin_y-frame_spacing_y)
         if (new_height < min_height) then new_height = min_height end
 
+        -- ensure the main header has room
+        if opt.env.ShowTitle then
+            local title_width = opt.main.header:GetWidth()
+            if title_width > new_width then
+                new_width = title_width + frame_margin_x
+            end
+        end
+        -- ensure the player headers have room
         if max_header_len > new_width then
             new_width = max_header_len
         end

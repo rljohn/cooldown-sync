@@ -168,17 +168,13 @@ function opt:OnPlayerFocusChanged()
 	self:ForceUiUpdate()
 end
 
-function opt:CheckDpsCooldownInfo()
-
-end
-
 function opt:OnLogout()
 	-- save settings
 	CooldownSyncPerCharacterConfig = opt.env
 end
 
 function opt:OnPlayerDied()
-
+	self:ModuleEvent_OnPlayerDied()
 end
 
 function opt:CreateMinimapIcon()
