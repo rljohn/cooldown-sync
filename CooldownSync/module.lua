@@ -238,6 +238,14 @@ function opt:ModuleEvent_BuddySpecChanged(buddy)
     end
 end
 
+function opt:ModuleEvent_InspectRequest(guid)
+    for key, module in pairs(opt.modules) do
+        if (module.inspect_request) then
+            module:inspect_request(guid)
+        end
+    end
+end
+
 function opt:ModuleEvent_InspectReady(guid)
     for key, module in pairs(opt.modules) do
         if (module.inspect_ready) then

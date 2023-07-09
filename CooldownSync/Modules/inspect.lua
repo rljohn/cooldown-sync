@@ -5,20 +5,22 @@ function opt:AddInspectModule()
     module.requests = {}
 
     function module:add_request(unit_id, id, guid)
-        if not self.requests[id] then
+        if self.requests[id] then return end
 
-            -- create new request
-            local request = {}
-            request.start = GetTime()
-            request.unit_id = unit_id
-            request.guid = guid
-            request.send_addon_msg = false
-            request.notified = false
+        -- create new request
+        local request = {}
+        request.start = GetTime()
+        request.last = 0 
+        request.unit_id = unit_id
+        request.guid = guid
+        request.send_addon_msg = false
+        request.notified = false
 
-            -- add request
-            self.requests[id] = request
-            module.active = true
-        end
+        -- add request
+        self.requests[id] = request
+        module.active = true
+
+        opt:ModuleEvent_InspectRequest(guid)
     end
 
     function module:update()
@@ -26,6 +28,8 @@ function opt:AddInspectModule()
         -- optimize, early out
         if not module.active then return end
         
+        local time = GetTime()
+
         for key, request in pairs(self.requests) do
             -- only do this once
             if not request.send_addon_msg then
@@ -34,10 +38,12 @@ function opt:AddInspectModule()
             end
 
             -- only do this once
-            if not request.notified then
-                if CanInspect(request.unit_id) then
+            if not request.notified or ((time-request.last) > 2) then
+                if CanInspect(request.unit_id) and CheckInteractDistance(request.unit_id, 1) then
+                    request.last = time
                     request.notified = true
                     NotifyInspect(request.unit_id)
+                    cdDiagf("Inspecting: %s", request.unit_id)
                 end
             end
         end
@@ -62,6 +68,7 @@ function opt:AddInspectModule()
 
                 -- clear active flag if required
                 if opt:GetTableSize(self.requests) == 0 then
+                    cdDiagf("no longer active")
                     module.active = false
                 end
                 

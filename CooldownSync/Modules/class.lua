@@ -95,9 +95,9 @@ function opt:BuildClassModule(name)
         if count <= 2 then count = 2 end
         local width = count * (opt.env.IconSize + frame_spacing_x)
         local height = opt.env.IconSize + icon_offset_y
-
         self.player:SetSize(width, height)
 
+        -- resize buddy frames
         for key, row in pairs(self.buddy_rows) do
             count = 0
 
@@ -126,6 +126,8 @@ function opt:BuildClassModule(name)
     function module:ResizeMainFrame()
         if (opt.main == nil) then return end
 
+        local max_header_len = self.player:GetWidth() + (2*frame_spacing_x)
+
         -- the player row is always present
         local rows = 1
         local columns = 0
@@ -141,6 +143,13 @@ function opt:BuildClassModule(name)
         -- iterate through all buddy rows
         for key, row in pairs(self.buddy_rows) do
             
+            if row.header then
+                local len = row.header:GetWidth() + (2*frame_spacing_x)
+                if (len > max_header_len) then
+                    max_header_len = len
+                end
+            end
+
             columns = 0
 
             -- count the number of non-hidden columns
@@ -149,6 +158,9 @@ function opt:BuildClassModule(name)
                     columns = columns + 1
                 end
             end
+
+            -- pretend at least two icons are present
+            if columns <= 2 then columns = 2 end
 
             -- check if this is the widest frame
             if (columns > max_columns) then
@@ -166,8 +178,12 @@ function opt:BuildClassModule(name)
         local new_width = (frame_spacing_x) + (max_columns * (opt.env.IconSize + frame_spacing_x))
         if (new_width < min_width) then new_width = min_width end
 
-        local new_height = (frame_spacing_y) + (max_columns * (opt.env.IconSize + icon_offset_y + frame_spacing_y))
+        local new_height = (frame_spacing_y) + (rows * (opt.env.IconSize + icon_offset_y + frame_spacing_y))
         if (new_height < min_height) then new_height = min_height end
+
+        if max_header_len > new_width then
+            new_width = max_header_len
+        end
 
         opt.main:SetSize(new_width, new_height)
     end
@@ -561,6 +577,7 @@ function opt:BuildClassModule(name)
         end
 
         row:Hide()
+        row.header:Hide()
         table.insert(self.recycled_rows, row)
     end
 

@@ -4,6 +4,7 @@ local COUNT = 10
 function opt:AddBuddyModule()
 
     module = self:BuildModule('buddy')
+    module.inspect = self:GetModule("inspect")
     module.buddy_pool = {}
     module.active_buddies = {}
 
@@ -88,7 +89,7 @@ function opt:AddBuddyModule()
 
     -- resets all buddy info
     function module:Reset()
-        
+
         while #self.active_buddies > 0 do
             local b = table.remove(self.active_buddies)
             self:FreeBuddy(b)
@@ -251,6 +252,7 @@ function opt:AddBuddyModule()
                 b.online = info.online
             end
 
+            self.inspect:add_request(b.unit_id, b.id, b.guid)
             return
         end
 
@@ -277,8 +279,7 @@ function opt:AddBuddyModule()
         buddy.spec = 0
         buddy.spec_name = "Unknown"
 
-        local inspect = opt:GetModule("inspect")
-        inspect:add_request(buddy.unit_id, buddy.id, buddy.guid)
+        self.inspect:add_request(buddy.unit_id, buddy.id, buddy.guid)
 
         opt:ModuleEvent_BuddyAvailable(buddy)
     end

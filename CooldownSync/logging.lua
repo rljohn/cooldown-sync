@@ -121,6 +121,14 @@ function opt:BuildLogModule(name)
         cdPrintf("OnBuddyUnavailable: %s", buddy.id)
     end
 
+    function module:inspect_request(guid)
+        cdPrintf("OnInspectRequested: %s", guid)
+    end
+
+    function module:inspect_specialization(guid, spec)
+        cdPrintf("InspectSpecialization: %s - %s", guid, spec)
+    end
+
     function module:buddy_spec_changed(buddy)
         cdPrintf("OnBuddySpecChanged: %s - %s", buddy.id, buddy.spec_name)
     end

@@ -7,6 +7,7 @@ function opt:PrintHelp()
 end
 
 local buddy = nil
+local inspect = nil
 SLASH_CooldownSync1 = '/cds';
 function SlashCmdList.CooldownSync(msg, editbox)
 
@@ -23,6 +24,9 @@ function SlashCmdList.CooldownSync(msg, editbox)
 	local count = #args
 	if not buddy then
 		buddy = opt:GetModule("buddy")
+	end
+	if not inspect then
+		inspect = opt:GetModule("inspect")
 	end
 
 	-- 1 param actions
@@ -55,7 +59,9 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			elseif (args[2] == "global") then
 				cdDump(opt.globals)
 			elseif (args[2] == "buddy") then
-				cdDump(buddy) 
+				cdDump(buddy)
+			elseif (args[2] == "inspect") then
+				cdDump(inspect)
 			end
 			return
 		end
