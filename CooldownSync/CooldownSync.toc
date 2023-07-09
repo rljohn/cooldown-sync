@@ -29,6 +29,7 @@ widgets.lua
 Modules/buddy.lua
 Modules/class.lua
 Modules/cooldowns.lua
+Modules/glow.lua
 Modules/inspect.lua
 
 # Class Modules

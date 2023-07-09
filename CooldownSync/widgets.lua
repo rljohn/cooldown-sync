@@ -12,6 +12,7 @@ function opt:InitGlowLibrary()
 end
 
 function opt:RecycleIcon(icon)
+    cdDiagf('Recycling icon')
     icon:Reset()
     table.insert(RecycledIcons, icon)
 end
@@ -21,9 +22,11 @@ function opt:FindInactiveIcon()
     for key,icon in pairs(RecycledIcons) do
         RecycledIcons[key] = nil
         icon:Reset()
+        cdDiagf('Found inactive icon')
         return icon
     end
 
+    cdDiagf('Must create new icon')
     return nil
 end
 
@@ -46,7 +49,6 @@ function opt:CreateCooldownIcon(parent, spell_id)
         panel.spell:SetWidth(opt.env.IconSize)
         panel.spell:SetHeight(opt.env.IconSize)
         panel.spell.texture = panel.spell:CreateTexture(nil, "ARTWORK")
-        panel.spell.texture:SetTexture(GetSpellTexture(spell_id))
         panel.spell.texture:SetAllPoints(panel.spell)
         panel.spell.texture:SetTexCoord(ICON_ZOOM, 1-ICON_ZOOM, ICON_ZOOM, 1-ICON_ZOOM)
 
@@ -134,6 +136,9 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self:Hide()
         end
     end
+
+    -- set icons
+    panel.spell.texture:SetTexture(GetSpellTexture(spell_id))
 
     -- reset properties
     panel.active = false

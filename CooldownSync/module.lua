@@ -7,28 +7,6 @@ function opt:BuildModule(id)
     -- create default module with nil implementation
     module = {}
     module.name = id
-    module.init = function()
-        cdPrintf("Module (%s) initialized", id)
-    end
-    module.post_init = nil
-    module.update = nil
-    module.talents_changed = nil
-    module.combat_start = nil
-    module.combat_end = nil
-    module.aura_gained = nil
-    module.aura_lost = nil
-    module.cooldowns_updated = nil
-    module.cooldown_update = nil
-    module.cooldown_start = nil
-    module.cooldown_end = nil
-    module.spell_cast = nil
-    module.other_spell_cast = nil
-    module.party_changed = nil
-    module.buddy_added = nil
-    module.buddy_removed = nil
-    module.buddy_available = nil
-    module.buddy_unavailable = nil
-    module.inspect_ready = nil
 
     -- register module
     self:AddModule(id, module)
@@ -79,18 +57,26 @@ function opt:ModuleEvent_OnResize()
     end
 end
 
-function opt:ModuleEvent_OnUpdate(elapsed)
+function opt:ModuleEvent_OnUpdate()
     for key, module in pairs(opt.modules) do
         if (module.update) then
-            module:update(elapsed)
+            module:update()
         end
     end
 end
 
-function opt:ModuleEvent_OnTalentsChanged()
+function opt:ModuleEvent_OnSlowUpdate()
+    for key, module in pairs(opt.modules) do
+        if (module.update_slow) then
+            module:update_slow()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnTalentsChanged(unit_id)
     for key, module in pairs(opt.modules) do
         if (module.talents_changed) then
-            module:talents_changed()
+            module:talents_changed(unit_id)
         end
     end
 end
@@ -238,6 +224,30 @@ function opt:ModuleEvent_BuddySpecChanged(buddy)
     end
 end
 
+function opt:ModuleEvent_OnBuddyDied(buddy)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_died) then
+            module:buddy_died()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnBuddyAlive(buddy)
+    for key, module in pairs(opt.modules) do
+        if (module.buddy_alive) then
+            module:buddy_alive()
+        end
+    end
+end
+
+function opt:ModuleEvent_BuddyUnitIdChanged(buddy, unit_id)
+    for key, module in pairs(opt.modules) do
+        if (module.unit_id_changed) then
+            module:unit_id_changed(buddy, unit_id)
+        end
+    end
+end
+
 function opt:ModuleEvent_InspectRequest(guid)
     for key, module in pairs(opt.modules) do
         if (module.inspect_request) then
@@ -254,14 +264,6 @@ function opt:ModuleEvent_InspectReady(guid)
     end
 end
 
-function opt:ModuleEvent_BuddyUnitIdChanged(buddy, unit_id)
-    for key, module in pairs(opt.modules) do
-        if (module.unit_id_changed) then
-            module:unit_id_changed(buddy, unit_id)
-        end
-    end
-end
-
 function opt:ModuleEvent_InspectSpecialization(guid, spec)
     for key, module in pairs(opt.modules) do
         if (module.inspect_specialization) then
@@ -274,6 +276,14 @@ function opt:ModuleEvent_OnPlayerDied()
     for key, module in pairs(opt.modules) do
         if (module.player_died) then
             module:player_died()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnUnitDied(guid)
+    for key, module in pairs(opt.modules) do
+        if (module.unit_died) then
+            module:unit_died()
         end
     end
 end
@@ -314,6 +324,7 @@ end
 function opt:CreateModules()
 
     -- all classes
+    self:AddGlowModule()
     self:AddInspectModule()
     self:AddBuddyModule()
     self:AddCooldownModule()

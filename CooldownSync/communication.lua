@@ -41,6 +41,9 @@ function opt:SendMessage(data, target, realm)
 		data.version = opt.MESSAGE_VERSION
 	end
 	
+	data.sender = opt.PlayerName
+	data.sender_realm = opt.PlayerRealm
+
     local serialized = LibSerialize:Serialize(data)
     local compressed = LibDeflate:CompressDeflate(serialized)
     local encoded = LibDeflate:EncodeForWoWAddonChannel(compressed)
@@ -54,6 +57,12 @@ function opt:SendMessage(data, target, realm)
 		cdDump(data)
 		AceComm:SendCommMessage("CooldownSync", encoded, "RAID", nil)
 	end
+end
+
+function opt:SendReply(message, response)
+	response.target = message.sender
+	response.realm = message.sender_realm
+	opt:SendMessage(response, response.target, response.realm)
 end
 
 -- Received an addon COMM message
@@ -71,7 +80,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 
 	if (data == nil or data.id == nil) then 
 		cdDiagf("Discarding message, invalid data")
-		cdDump(data)
+		--cdDump(data)
 		return
 	end
 
@@ -79,7 +88,7 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	if (not data.target or 
         (data.target ~= "all" and data.target ~= opt.PlayerName and data.target ~= opt.PlayerNameRealm)) then
 		cdDiagf("Discarding '%s' message, not for me", opt:PrintMessageId(data.id))
-		cdDump(data)
+		--cdDump(data)
 		return
 	end
 
@@ -87,6 +96,6 @@ function opt:OnCommReceived(prefix, payload, distribution, sender)
 	data.name = sender
 
 	cdDiagf("Handling message '%s' from '%s'", opt:PrintMessageId(data.id), sender)
-	cdDump(data)
+	--cdDump(data)
 	opt:HandleMessage(data)
 end

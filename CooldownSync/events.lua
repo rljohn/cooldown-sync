@@ -137,6 +137,15 @@ function opt:OnCombatEvent(...)
 		return
 	end
 
+	------------------------------------
+	-- Unit Died
+	------------------------------------
+
+	if (subevent == "UNIT_DIED") then
+		opt:ModuleEvent_OnUnitDied(sourceGUID)
+		return
+	end
+
 end
 
 function opt:OnEnterCombat()
@@ -184,11 +193,12 @@ local function CooldownSync_EventHandler(self, event, ...)
 	elseif (event == "GROUP_ROSTER_UPDATE") then
 		opt:OnGroupChanged()
 	elseif (event == "PLAYER_SPECIALIZATION_CHANGED") then
-		opt:OnTalentsChanged()
+		local unit_id = ...
+		opt:OnTalentsChanged(unit_id)
 	elseif (event == "PARTY_CONVERTED_TO_RAID") then
 		opt:OnGroupChanged()
 	elseif (event == "TRAIT_CONFIG_UPDATED") then
-		opt:OnTalentsChanged()
+		opt:OnTalentsChanged("player")
 	elseif (event == "PLAYER_FOCUS_CHANGED") then
 		opt:OnPlayerFocusChanged()
 	elseif (event == "PLAYER_DEAD") then

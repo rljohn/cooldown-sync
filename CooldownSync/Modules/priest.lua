@@ -278,7 +278,7 @@ function opt:AddPriestModule()
         self:RefreshPIMacros(party)
     end
 
-    function module:update()
+    function module:slow_update()
         self:UpdateMacros()
     end
 

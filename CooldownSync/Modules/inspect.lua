@@ -4,23 +4,26 @@ function opt:AddInspectModule()
     module = self:BuildModule("inspect")
     module.requests = {}
 
-    function module:add_request(unit_id, id, guid)
-        if self.requests[id] then return end
+    function module:add_request(buddy)
+        if self.requests[buddy.id] then return end
 
         -- create new request
         local request = {}
         request.start = GetTime()
-        request.last = 0 
-        request.unit_id = unit_id
-        request.guid = guid
+        request.last = 0
+        request.unit_id = buddy.unit_id
+        request.class = buddy.class_id
+        request.guid = buddy.guid
+        request.name = buddy.name
+        request.realm = buddy.realm
         request.send_addon_msg = false
         request.notified = false
 
         -- add request
-        self.requests[id] = request
+        self.requests[buddy.id] = request
         module.active = true
 
-        opt:ModuleEvent_InspectRequest(guid)
+        opt:ModuleEvent_InspectRequest(buddy.guid)
     end
 
     function module:update()
@@ -68,7 +71,7 @@ function opt:AddInspectModule()
 
                 -- clear active flag if required
                 if opt:GetTableSize(self.requests) == 0 then
-                    cdDiagf("no longer active")
+                    cdDiagf("Inspection module inactive")
                     module.active = false
                 end
                 

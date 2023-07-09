@@ -47,15 +47,28 @@ function opt:CreateMainFrame()
 	opt.main = main
 
 	-- Tick
-	local ONUPDATE_INTERVAL = 0.05
+	local ONUPDATE_INTERVAL = 0.1
+	local SLOWUPDATE_INTERVAL = 1
+
 	local TimeSinceLastUpdate = 0
+	local TimeSinceLastSlowUpdate = 0
+
 	main:SetScript("OnUpdate", function(self, elapsed)
+
+		-- 10Hz update frequency
 		TimeSinceLastUpdate = TimeSinceLastUpdate + elapsed
 		if TimeSinceLastUpdate >= ONUPDATE_INTERVAL then
 			TimeSinceLastUpdate = 0
-			opt:OnUpdate(elapsed)
-			opt:ModuleEvent_OnUpdate(elapsed)
+			opt:ModuleEvent_OnUpdate()
 		end
+
+		-- 1Hz update frequency
+		TimeSinceLastSlowUpdate = TimeSinceLastSlowUpdate + elapsed
+		if TimeSinceLastSlowUpdate >= SLOWUPDATE_INTERVAL then
+			TimeSinceLastSlowUpdate = 0
+			opt:ModuleEvent_OnSlowUpdate()
+		end
+
 	end)
 
 end

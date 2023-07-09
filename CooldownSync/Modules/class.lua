@@ -10,10 +10,10 @@ function opt:BuildClassModule(name)
     module.buddy_rows = {}
     module.recycled_rows = {}
 
-    local frame_margin_x = 10
-    local frame_margin_y = 10
+    local frame_margin_x = 12
+    local frame_margin_y = 12
 
-    local frame_spacing_y = 8
+    local frame_spacing_y = 12
     local frame_spacing_x = 8
 
     local icon_offset_y = 16
@@ -197,8 +197,10 @@ function opt:BuildClassModule(name)
     end
 
     -- events
-    function module:talents_changed()
-        self:ResetCooldowns()
+    function module:talents_changed(unit_id)
+        if (unit_id == "player") then
+            self:ResetPlayerCooldowns()
+        end
     end
 
     function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
@@ -559,13 +561,40 @@ function opt:BuildClassModule(name)
     -- RESET
     --------------------
 
-    function module:ResetCooldowns()
-        self.cooldowns:Reset()
-    
-        for _, icon in pairs(self.player.icons) do
+    function module:ResetPlayerCooldowns()
+       
+        local cds = self.cooldowns:FindCooldowns(opt.PlayerGUID)
+        cds:Reset()
+  
+        -- clear all icons
+         for _, icon in pairs(self.player.icons) do
             opt:RecycleIcon(icon)
         end
-        self:SetupAbilities()
+        self.player.icons = {}
+
+        -- reconfigure ability tracking
+        self:SetupAbilityRow(self.player, opt.PlayerGUID, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
+        self:align_bars()
+        self:CheckPlayerAuras()
+        self.cooldowns:cooldowns_updated()
+    end
+
+    function module:ClearBuddyCooldowns(buddy)
+        local cds = self.cooldowns:FindCooldowns(buddy.guid)
+        if cds then
+            cds:Reset()
+        end
+
+        local row = self.buddy_rows[buddy.id]
+        if not row then return end
+
+        -- clear all icons
+        for _, icon in pairs(row.icons) do
+            opt:RecycleIcon(icon)
+        end
+        row.icons = {}
+
+        row.icon_offset_x = 0
     end
 
     --------------------
@@ -583,6 +612,7 @@ function opt:BuildClassModule(name)
         for _, icon in pairs(row.icons) do
             opt:RecycleIcon(icon)
         end
+        row.icons = {}
 
         row:Hide()
         row.header:Hide()
@@ -597,9 +627,19 @@ function opt:BuildClassModule(name)
 
     function module:buddy_spec_changed(buddy)
 
+        local cds = self.cooldowns:FindCooldowns(buddy.guid)
+        if cds then
+            cds:Reset()
+        end
+
         local row = self.buddy_rows[buddy.id]
         if row then
-            self:SetupAbilityRow(row, buddy.guid, buddy.class, buddy.spec, buddy.race, false)
+            if buddy.spec == 0 then
+                self:ClearBuddyCooldowns(buddy)
+            else
+                self:ClearBuddyCooldowns(buddy)
+                self:SetupAbilityRow(row, buddy.guid, buddy.class, buddy.spec, buddy.race, false)
+            end
         end
 
         self:align_bars()

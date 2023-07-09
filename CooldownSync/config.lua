@@ -140,10 +140,14 @@ function opt:OnLogin()
 	self:ForceUiUpdate()
 end
 
-function opt:OnTalentsChanged()
+function opt:OnTalentsChanged(unit_id)
 	if (not opt.Initialized) then return end
-	self:UpdateTalentSpec()
-	opt:ModuleEvent_OnTalentsChanged()
+
+	if (unit_id == "player") then
+		self:UpdateTalentSpec()
+	end
+
+	opt:ModuleEvent_OnTalentsChanged(unit_id)
 	self:ForceUiUpdate()
 end
 
@@ -152,6 +156,7 @@ function opt:UpdateTalentSpec()
 	local currentSpec = GetSpecialization()
 	local id, name, description, icon, role, primaryStat = GetSpecializationInfo(currentSpec)
 	opt.PlayerSpec = id
+	opt.PlayerSpecName = name
 end
 
 function opt:OnPlayerFocusChanged()
@@ -227,11 +232,5 @@ end
 
 function opt:Config()
 	InterfaceOptionsFrame_OpenToCategory(opt)
-end
-
--- tick functions
-
-function opt:OnUpdate(elapsed)
-	
 end
 

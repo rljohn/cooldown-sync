@@ -30,7 +30,7 @@ function opt:AddCooldownModule()
 
         -- early out if already exists
         if self.cooldowns[guid] then 
-            return self.cooldowns[guid] 
+            return self.cooldowns[guid]
         end
 
         -- add cooldowns module
@@ -38,6 +38,11 @@ function opt:AddCooldownModule()
         cds.abilities = {}
         cds.secondary_auras = {}
         self.cooldowns[guid] = cds
+
+        function cds:Reset()
+            self.abilities = {}
+            self.secondary_auras = {}
+        end
 
         return cds
     end
@@ -125,11 +130,6 @@ function opt:AddCooldownModule()
         local ability = self:GetAbility(guid, spell_id)
         if not ability then return end
         ability.icon = icon
-    end
-
-    -- resets the cooldowns array
-    function module:Reset()
-        self.cooldowns = {}
     end
 
     function module:cooldowns_updated()

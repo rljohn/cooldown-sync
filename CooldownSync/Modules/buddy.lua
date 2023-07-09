@@ -87,6 +87,19 @@ function opt:AddBuddyModule()
         return nil
     end
 
+    -- retrieve a buddy based on unit_id
+    function module:FindBuddyByUnitId(unit_id)
+        for idx, buddy in pairs(self.active_buddies) do
+            if (buddy) then
+                if (buddy.unit_id == unit_id) then
+                    return buddy
+                end
+            end
+        end
+
+        return nil
+    end
+
     -- resets all buddy info
     function module:Reset()
 
@@ -237,22 +250,24 @@ function opt:AddBuddyModule()
         if b then
 
             if (b.unit_id ~= info.unit_id) then
-                cdDiagf("Buddy %s: unitid %s -> %s", b.id, b.unit_id, info.unit_id)
                 opt:ModuleEvent_BuddyUnitIdChanged(b, info.unit_id)
                 b.unit_id = info.unit_id
             end
 
             if (b.dead ~= info.dead) then
-                cdDiagf("Buddy %s: dead %s -> %s", b.id, tostring(b.dead), tostring(info.dead))
                 b.dead = info.dead
+                if b.dead then
+                    opt:ModuleEvent_OnBuddyDied(b)
+                else
+                    opt.ModuleEvent_OnBuddyAlive(b)
+                end
             end
 
             if (b.online ~= info.online) then
-                cdDiagf("Buddy %s: online %s -> %s", b.id, tostring(b.online), tostring(info.online))
                 b.online = info.online
             end
 
-            self.inspect:add_request(b.unit_id, b.id, b.guid)
+            self.inspect:add_request(b)
             return
         end
 
@@ -279,8 +294,7 @@ function opt:AddBuddyModule()
         buddy.spec = 0
         buddy.spec_name = "Unknown"
 
-        self.inspect:add_request(buddy.unit_id, buddy.id, buddy.guid)
-
+        self.inspect:add_request(buddy)
         opt:ModuleEvent_BuddyAvailable(buddy)
     end
         
@@ -290,6 +304,55 @@ function opt:AddBuddyModule()
 
     function module:party_changed()
         self:RefreshBuddies()
+    end
+
+    function module:talents_changed(unit_id)
+        if (unit_id == "player") then
+            for idx, buddy in pairs(self.active_buddies) do
+                opt:SendTalentSpecChanged(opt.PlayerSpec, buddy.name, buddy.realm)
+            end
+        else
+            local buddy = self:FindBuddyByUnitId(unit_id)
+            if buddy then
+                buddy.spec = 0
+                buddy.spec_name = "UNKNOWN"
+                self.inspect:add_request(buddy)
+                opt:ModuleEvent_BuddySpecChanged(buddy)
+            end
+        end
+        
+    end
+
+    function module:talents_received(name, spec_id, spec_name)
+        local buddy = self:FindBuddy(name)
+        if not buddy then return end
+        buddy.spec = spec_id
+        buddy.spec_name = spec_name
+        opt:ModuleEvent_BuddySpecChanged(buddy)
+    end
+
+    function module:update_slow(elapsed)
+
+        -- check if any dead buddies are alive now
+        -- no need to hit this super fast
+        for idx, buddy in pairs(self.active_buddies) do
+            local dead = UnitIsDeadOrGhost(buddy.unit_id)
+            if dead ~= buddy.dead then
+                if buddy.dead then
+                    opt:ModuleEvent_OnBuddyDied(buddy)
+                else
+                    opt.ModuleEvent_OnBuddyAlive(buddy)
+                end
+            end
+        end
+    end
+
+    function module:unit_died(guid)
+        local buddy = self:FindBuddyByGuid(guid)
+        if buddy then
+            buddy.dead = true
+            opt:ModuleEvent_OnBuddyDied(guid)
+        end
     end
 
     function module:inspect_specialization(guid, spec)

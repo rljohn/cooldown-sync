@@ -41,8 +41,8 @@ end
 function opt:BuildLogModule(name)
     module = self:BuildModule(name)
 
-    function module:talents_changed(self)
-        cdPrintf("OnTalentsChanged")
+    function module:talents_changed(unit_id)
+        cdPrintf("OnTalentsChanged: %s", unit_id)
     end
 
     function module:combat_start()
@@ -93,7 +93,7 @@ function opt:BuildLogModule(name)
         --cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
     end
 
-    function module:party_changed(self)
+    function module:party_changed()
         cdPrintf("OnPartyChanged")
     end
 
