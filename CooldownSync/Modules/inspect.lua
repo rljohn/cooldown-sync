@@ -46,7 +46,6 @@ function opt:AddInspectModule()
                     request.last = time
                     request.notified = true
                     NotifyInspect(request.unit_id)
-                    cdDiagf("Inspecting: %s", request.unit_id)
                 end
             end
         end
@@ -58,7 +57,6 @@ function opt:AddInspectModule()
 
         -- clear active flag if required
         if opt:GetTableSize(self.requests) == 0 then
-            cdDiagf("Inspection module inactive")
             module.active = false
         end
     end
@@ -76,6 +74,15 @@ function opt:AddInspectModule()
                 -- forward talents on to other modules
                 local spec = GetInspectSpecialization(request.unit_id)
                 opt:ModuleEvent_InspectSpecialization(request.guid, spec)
+                self:RemoveRequest(key)
+                return
+            end
+        end
+    end
+
+    function module:talents_received(name, spec_id)
+        for key, request in pairs(self.requests) do
+            if request.name == name then
                 self:RemoveRequest(key)
                 return
             end

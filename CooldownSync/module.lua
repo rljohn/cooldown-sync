@@ -272,6 +272,14 @@ function opt:ModuleEvent_InspectSpecialization(guid, spec)
     end
 end
 
+function opt:ModuleEvnet_OnTalentsReceived(name, spec_id)
+    for key, module in pairs(opt.modules) do
+        if (module.talents_received) then
+            module:talents_received(name, spec_id)
+        end
+    end
+end
+
 function opt:ModuleEvent_OnPlayerDied()
     for key, module in pairs(opt.modules) do
         if (module.player_died) then
@@ -284,6 +292,14 @@ function opt:ModuleEvent_OnUnitDied(guid)
     for key, module in pairs(opt.modules) do
         if (module.unit_died) then
             module:unit_died()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnMainFrameRightClick()
+    for key, module in pairs(opt.modules) do
+        if (module.main_frame_right_click) then
+            module:main_frame_right_click()
         end
     end
 end

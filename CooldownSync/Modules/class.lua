@@ -272,7 +272,6 @@ function opt:BuildClassModule(name)
 
     function module:spell_cast(spell_id, target_guid, target_name)
         local ability = self:HandleSpellCast(opt.PlayerGUID, spell_id)
-        
         if ability then
             self:UpdatePlayerAbility(spell_id, ability)
         end
@@ -450,10 +449,18 @@ function opt:BuildClassModule(name)
         end
     end
 
+    ------------------------------
+    -- update loop
+    ------------------------------
+
     function module:update()
         self:UpdatePlayerAuras()
         self:UpdateBuddyAuras()
     end
+
+    ------------------------------
+    -- Ability Rows
+    ------------------------------
 
     function module:FindInactiveRow()
 
@@ -470,6 +477,8 @@ function opt:BuildClassModule(name)
         local row = self:FindInactiveRow()
         if not row then
            row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
+        else
+            row.header:Show()
         end
         row.icon_offset_x = 0
         row.icon_offset_y = -16

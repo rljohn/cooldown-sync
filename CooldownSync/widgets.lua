@@ -12,7 +12,6 @@ function opt:InitGlowLibrary()
 end
 
 function opt:RecycleIcon(icon)
-    cdDiagf('Recycling icon')
     icon:Reset()
     table.insert(RecycledIcons, icon)
 end
@@ -22,11 +21,9 @@ function opt:FindInactiveIcon()
     for key,icon in pairs(RecycledIcons) do
         RecycledIcons[key] = nil
         icon:Reset()
-        cdDiagf('Found inactive icon')
         return icon
     end
 
-    cdDiagf('Must create new icon')
     return nil
 end
 

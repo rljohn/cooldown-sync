@@ -119,7 +119,7 @@ function opt:AddBuddyModule()
     end
 
     -- register a buddy
-    function module:RegisterBuddy(name)
+    function module:RegisterBuddy(name, in_raid)
 
         -- early out if already exists
         local b = self:FindBuddy(name)
@@ -131,7 +131,7 @@ function opt:AddBuddyModule()
         setting.enabled = false
 
         -- add to settings
-        if (opt.InRaid) then
+        if (in_raid) then
             if (not opt:TableContainsKey(opt.env.RaidBuddies, name)) then
                 opt.env.RaidBuddies[name] = setting
                 opt:ModuleEvent_BuddyAdded(name)
@@ -323,14 +323,6 @@ function opt:AddBuddyModule()
         
     end
 
-    function module:talents_received(name, spec_id, spec_name)
-        local buddy = self:FindBuddy(name)
-        if not buddy then return end
-        buddy.spec = spec_id
-        buddy.spec_name = spec_name
-        opt:ModuleEvent_BuddySpecChanged(buddy)
-    end
-
     function module:update_slow(elapsed)
 
         -- check if any dead buddies are alive now
@@ -357,14 +349,27 @@ function opt:AddBuddyModule()
 
     function module:inspect_specialization(guid, spec)
         local buddy = self:FindBuddyByGuid(guid)
-        if buddy then
-            if (spec ~= buddy.spec) then
-                buddy.spec = spec
+        if not buddy then return end
+        
+        if (spec ~= buddy.spec) then
+            buddy.spec = spec
 
-                local spec_info = opt:GetClassInfoBySpec(buddy.spec)
-                buddy.spec_name = spec_info.spec
-                opt:ModuleEvent_BuddySpecChanged(buddy)
-            end
+            local spec_info = opt:GetClassInfoBySpec(buddy.spec)
+            buddy.spec_name = spec_info.spec
+            opt:ModuleEvent_BuddySpecChanged(buddy)
+        end
+    end
+
+    function module:talents_received(name, spec_id)
+        local buddy = self:FindBuddy(name)
+        if not buddy then return end
+
+        if (spec_id ~= buddy.spec) then
+            buddy.spec = spec_id
+
+            local spec_info = opt:GetClassInfoBySpec(buddy.spec)
+            buddy.spec_name = spec_info.spec
+            opt:ModuleEvent_BuddySpecChanged(buddy)
         end
     end
 end

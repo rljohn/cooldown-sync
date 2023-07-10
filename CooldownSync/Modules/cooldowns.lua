@@ -132,6 +132,37 @@ function opt:AddCooldownModule()
         ability.icon = icon
     end
 
+    function module:BlessingOfSeasonsHelper(guid, spell_id)
+        if (spell_id == 388007 or spell_id == 388010 or
+            spell_id == 388011 or spell_id == 388013) then
+            local ability = self:GetAbility(guid, 388007)
+            if ability then
+                 -- summer -> autumn
+                if spell_id == 388007 then
+                    ability.icon.spell.texture:SetTexture(GetSpellTexture(388010))
+                -- autumn -> winter
+                elseif spell_id == 388010 then
+                    ability.icon.spell.texture:SetTexture(GetSpellTexture(388011))
+                -- winter -> spring
+                elseif spell_id == 388011 then
+                    ability.icon.spell.texture:SetTexture(GetSpellTexture(388013))
+                -- spring -> 
+                elseif spell_id == 388013 then
+                    ability.icon.spell.texture:SetTexture(3636845)
+                end
+                
+            end
+        end
+    end
+
+    function module:spell_cast(spell_id, target_guid, target_name)
+        self:BlessingOfSeasonsHelper(opt.PlayerGUID, spell_id)
+    end
+
+    function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
+        self:BlessingOfSeasonsHelper(source_guid, spell_id)
+    end
+
     function module:cooldowns_updated()
         
         local cds = self:FindCooldowns(opt.PlayerGUID)

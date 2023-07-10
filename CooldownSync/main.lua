@@ -71,6 +71,12 @@ function opt:CreateMainFrame()
 
 	end)
 
+	main:SetScript('OnMouseDown', function(self, button, ...)
+		if (button == "RightButton") then
+			opt:ModuleEvent_OnMainFrameRightClick()
+		end
+	end)
+
 end
 
 function opt:ShowMainFrame()

@@ -137,4 +137,8 @@ function opt:BuildLogModule(name)
         cdPrintf("OnUnitIdChanged: %s - %s", buddy.id, unit_id)
     end
 
+    function module:main_frame_right_click()
+        cdPrintf("OnMainFrameRightClick")
+    end
+
 end

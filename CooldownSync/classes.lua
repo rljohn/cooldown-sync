@@ -47,6 +47,8 @@ CooldownSyncClassList = {
 	[2] = {
 		-- Holy
 		[65] = {
+			-- Blessing of Summer
+			{ id = 388007, cd = 45 },
 		},
 		-- Protection
 		[66] = {

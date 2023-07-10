@@ -81,8 +81,8 @@ function opt:HandleMessage(message)
 	if message.id == TALENT_SPEC_REQUEST then
 		opt:SendTalentSpecReply(message)
 	elseif message.id == TALENT_SPEC_CHANGED then
-		if buddy then
-			buddy:talents_received(message.sender, message.spec_id, message.spec_name)
+		if inspect then
+			opt:ModuleEvnet_OnTalentsReceived(message.sender, message.spec_id, message.spec_name)
 		end
 	end
 
@@ -106,6 +106,5 @@ function opt:SendTalentSpecReply(message)
 	local response = {}
 	response.id = TALENT_SPEC_REPLY
 	response.spec_id = opt.PlayerSpec
-	response.spec_name = opt.PlayerSpecName
 	opt:SendReply(message, response)
 end

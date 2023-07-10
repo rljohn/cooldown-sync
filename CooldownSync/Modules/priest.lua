@@ -167,9 +167,9 @@ function opt:AddPriestModule()
         local title = macro_panel:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
         title:SetPoint('TOPLEFT', macro_panel, 'TOPLEFT', 0, 32)
         if (party) then
-            title:SetText(opt.titles.MacroConfig)
+            title:SetText(opt.titles.Priest_MacroConfig)
         else
-            title:SetText(opt.titles.MacroConfigRaid)
+            title:SetText(opt.titles.Priest_MacroConfigRaid)
         end
 
         -- edit box
@@ -278,7 +278,7 @@ function opt:AddPriestModule()
         self:RefreshPIMacros(party)
     end
 
-    function module:slow_update()
+    function module:update_slow()
         self:UpdateMacros()
     end
 
