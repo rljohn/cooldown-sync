@@ -52,6 +52,17 @@ function opt:AddInspectModule()
         end
     end
 
+    function module:RemoveRequest(key)
+        -- remove our request
+        self.requests[key] = nil
+
+        -- clear active flag if required
+        if opt:GetTableSize(self.requests) == 0 then
+            cdDiagf("Inspection module inactive")
+            module.active = false
+        end
+    end
+
     function module:inspect_ready(guid)
 
         for key, request in pairs(self.requests) do
@@ -65,17 +76,25 @@ function opt:AddInspectModule()
                 -- forward talents on to other modules
                 local spec = GetInspectSpecialization(request.unit_id)
                 opt:ModuleEvent_InspectSpecialization(request.guid, spec)
-
-                -- remove our request
-                self.requests[key] = nil
-
-                -- clear active flag if required
-                if opt:GetTableSize(self.requests) == 0 then
-                    cdDiagf("Inspection module inactive")
-                    module.active = false
-                end
-                
+                self:RemoveRequest(key)
                 return
+            end
+        end
+    end
+
+    function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
+        for key, request in pairs(self.requests) do
+            if (source_guid == request.guid) then
+                
+                if request.notified then
+                    ClearInspectPlayer()
+                end
+
+                local spec_id = opt:FindSpec(class, spell_id)
+                if not spec_id then return end
+
+                opt:ModuleEvent_InspectSpecialization(request.guid, spec_id)
+                self:RemoveRequest(key)
             end
         end
     end
@@ -91,6 +110,7 @@ function opt:AddInspectModule()
 
                 -- trigger a new inspect of this unit-id
                 if request.notified then
+                    ClearInspectPlayer()
                     NotifyInspect(unit_id)
                 end
             end

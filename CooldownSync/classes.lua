@@ -11,6 +11,7 @@ CooldownSyncClassList = {
 		icon = icon override
 		exclusive = talent is a choice node, so hide the partner if cast
 		hidden = hide until this ability is cast by player
+		multi = tracked by multiple specs do don't identify with it
 	]]--
 
 	-- Warrior
@@ -156,7 +157,7 @@ CooldownSyncClassList = {
 			-- Bonestorm
 			{ id = 194844, cd = 60 },
 			-- Abomination Limb
-			{ id = 315443, cd = 120, aura = 383269, hidden = true },
+			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true },
 		},
 		-- Frost
 		[251] = {
@@ -165,7 +166,7 @@ CooldownSyncClassList = {
 			-- Frostwyrm's Fury
 			{ id = 279302, cd = 90, dur = 3 },
 			-- Abomination Limb
-			{ id = 315443, cd = 120, aura = 383269, hidden = true }
+			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true }
 		},
 		-- Unholy
 		[252] = {
@@ -207,26 +208,16 @@ CooldownSyncClassList = {
 		[62] = {
 			-- Arcane Surge
 			{ id = 365350, cd = 90, aura = 365362 },
-			-- Shifting Power
-			{ id = 382440, cd = 60 },
 		},
 		-- Fire
 		[63] = {
 			-- Combustion
 			{ id = 190319, cd = 120, min = 12 },
-			-- Shifting Power
-			{ id = 382440, cd = 60 },
 		},
 		-- Frost
 		[64] = {
 			-- Icy Veins
 			{ id = 12472, cd = 180 },
-			-- Shifting Power
-			{ id = 382440, cd = 60 },
-
-			-- do not submit
-			-- Blizzard
-			{ id = 190356, cd = 10, dur = 5.5 },
 		},
 	},
 	
@@ -284,7 +275,7 @@ CooldownSyncClassList = {
 			-- Incarnation: Chosen of Elune
 			{ id = 102560, cd = 180, exclusive = 391528},
 			-- Convoke the Spirits 
-			{ id = 391528, cd = 120, dur = 4, exclusive = 102560, hidden = true },
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102560, hidden = true, multi = true },
 			-- Celestial Alignment
 			{ id = 194223, cd = 180, min = 16 },
 			-- Ravenous Frenzy
@@ -295,7 +286,7 @@ CooldownSyncClassList = {
 			-- Incarnation: Avatar of Ashamane
 			{ id = 102543, cd = 180, exclusive = 391528},
 			-- Convoke the Spirits 
-			{ id = 391528, cd = 120, dur = 4, exclusive = 102543, hidden = true },
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102543, hidden = true, multi = true },
 			-- -- Berserk
 			{ id = 106951, cd = 180 },
 		},
@@ -304,7 +295,7 @@ CooldownSyncClassList = {
 			-- Incarnation: Avatar of Ashamane
 			{ id = 102558, cd = 180, exclusive = 391528},
 			-- Convoke the Spirits 
-			{ id = 391528, cd = 120, dur = 4, exclusive = 102558, hidden = true },
+			{ id = 391528, cd = 120, dur = 4, exclusive = 102558, hidden = true, multi = true },
 			-- Berserk
 			{ id = 50334, cd = 180 },
 		},
@@ -418,4 +409,19 @@ end
 
 function opt:GetRacialAbility(race)
 	return racialAbilities[race]
+end
+
+function opt:FindSpec(class_id, spell_id)
+	local class_abilities = CooldownSyncClassList[class_id]
+	if not class_abilities then return end
+
+	for spec_id, spec_abilities in class_abilities do
+		for _, spell_info in spec_abilities do
+			if spell_info.id == spell_id then
+				return spec_id
+			end
+		end
+	end
+
+	return nil
 end
