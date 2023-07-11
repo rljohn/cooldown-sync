@@ -50,23 +50,29 @@ function opt:SetupLocale()
 		ShowSpellTimersHeader = "Show Spell Timers",
 		ShowSpellTimersTooltip = "Display a timer when spells are active",
 
-		-- Spell Glow
-		
-		ShowSpellGlow = "Show Spell Glow",
-		ShowSpellGlowHeader = "Show Spell Glow",
-		ShowSpellGlowTooltip = "Show a glow around spells when they are active.\n\nNOTE: Disabling glow effects may improve performance.",
-
 		-- minimap
 		ShowMinimapIcon = 'Show Minimap Icon',
 		ShowMinimapHeader = 'Show Minimap Icon',
-		ShowMinimapTooltip = 'Toggle the PIBuddy minimap icon.',
+		ShowMinimapTooltip = 'Toggle the Cooldown sync minimap icon.',
 
+		-- Spell Glow
+
+		ShowSpellGlow = "Show Spell Glow",
+		ShowSpellGlowHeader = "Show Spell Glow",
+		ShowSpellGlowTooltip = "Show a glow around spells when they are active.\n\nNOTE: Disabling glow effects may improve performance.",
+	
 		-- Buddy
 		PartyBuddy = 'Buddy (Party Content)',
 		RaidBuddy = 'Buddy (Raid Content)',
-		Buddy = 'Buddy',
+		Buddy = 'Buddy:',
 		ApplyBtn = 'Apply',
+		ApplyBtnHeader = 'Apply Buddy',
 		SetAsTargetBtn = 'Copy Target',
+
+		PartyBuddyTooltip = 'Configure a Buddy for party content.',
+		RaidBuddyTooltip = 'Configure a Buddy for raid groups.',
+		CopyTargetTooltip = 'Set your current target as your buddy.\n\nYou can also right click on the main frame to set your current target as your buddy.',
+		ApplyBtnTooltip = 'Click to confirm your current buddy.',
 
 		--------------------
 		-- PRIEST
@@ -103,10 +109,12 @@ function opt:SetupLocale()
 		
 		-- sound
 
-		Priest_Sound = 'Play Sound on buddy cooldown',
-		Priest_SoundTooltip = 'Sound to play when your buddy activates their cooldown.',
-		Priest_SoundPiMe = 'Play Sound on Power Infusion Request',
-		Priest_SoundPiMeTooltip = 'Sound to play when your buddy requests Power Infusion.',
+		Priest_Sound = 'Play Sound on Buddy Cooldown',
+		Priest_SoundTooltip = 'Sound to play when your buddy activates their cooldowns.',
+	
+		Priest_ShowFrameGlow = "Show Frame Glow",
+		Priest_ShowFrameGlowHeader = "Show Frame Glow",
+		Priest_ShowFrameGlowTooltip = "Show a glow around party and raid frames when a buddy's major cooldowns are active.",
 
 		--------------------
 		-- PALADIN
@@ -145,11 +153,14 @@ function opt:SetupLocale()
 		
 		-- sound
 
-		Paladin_Sound = 'Play Sound on buddy cooldown',
+		Paladin_Sound = 'Play Sound on Buddy Cooldown:',
 		Paladin_SoundTooltip = 'Sound to play when your buddy activates their cooldown.',
-		Paladin_SoundPiMe = 'Play Sound on Blessing of Summer Request',
-		Paladin_SoundPiMeTooltip = 'Sound to play when your buddy requests Blessing of Summer.',
 
+		-- Spell Glow
+
+		Paladin_ShowFrameGlow = "Show Frame Glow",
+		Paladin_ShowFrameGlowHeader = "Show Frame Glow",
+		Paladin_ShowFrameGlowTooltip = "Show a glow around party and raid frames when a buddy's major cooldowns are active.",
 	}
 	
 end

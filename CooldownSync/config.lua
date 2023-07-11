@@ -68,6 +68,9 @@ function opt:LoadMissingValues()
 	self:SetDefaultValue('IconSize', 32)
 	self:SetDefaultValue('FrameX', -1)
 	self:SetDefaultValue('FrameY', -1)
+	self:SetDefaultValue('ShowCooldownTimers', true)
+	self:SetDefaultValue('ShowSpellTimers', true)
+	self:SetDefaultValue('ShowSpellGlow', true)
 
 	-- module defaults
 	self:ModuleEvent_LoadDefaultValues()

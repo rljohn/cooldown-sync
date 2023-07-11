@@ -1,15 +1,19 @@
 local opt = CooldownSyncConfig
 
+local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
+local media = LibStub("LibSharedMedia-3.0")
+
 function opt:AddPaladinModule()
     module = opt:BuildClassModule("paladin")
 
     function module.load_default_values()
 
+        opt:SetDefaultValue("Paladin_DpsCooldownAudio")
         opt:SetDefaultValue('Paladin_Buddy', "")
         opt:SetDefaultValue('Paladin_RaidBuddy', "")
 
         opt:SetDefaultValue('Paladin_CooldownAudio', "None")
-
+        opt:SetDefaultValue('Paladin_ShowFrameGlow',  true)
         opt:SetDefaultValue('Paladin_Trinket1Party', true)
         opt:SetDefaultValue('Paladin_Trinket1Raid', true)
         opt:SetDefaultValue('Paladin_Trinket2Party', true)
@@ -280,24 +284,29 @@ function opt:AddPaladinModule()
         self:BuildOptionsPanel()
         self:BuildPartyOptions()
         self:BuildRaidOptions()
+        self:BuildMiscOptions()
     end
 
-    local EDITBOX_OFFSET_Y = 16
+    local EDITBOX_OFFSET_X = 58
     local EDITBOX_WIDTH = 144
     local BUTTON_HEIGHT = 22
     local COPY_TARGET_OFFSET_Y = -4
 
     function module:BuildOptionsPanel()
-                
-        opt.ui.paladinTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-        opt.ui.paladinTitle:SetText(opt.titles.Paladin_Options)
-        opt.ui.paladinTitle:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -48)
+            
+        opt.ui.bottom = opt:CreatePanel(opt, nil, 264, 100)
+        opt.ui.bottom:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -80)
 
-        opt.ui.bottom = opt:CreatePanel(opt, nil, 232, 88)
-        opt.ui.bottom:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -96)
+        local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        title:SetText(opt.titles.PartyBuddy)
+        title:SetPoint('TOPLEFT', opt.ui.bottom, 'TOPLEFT', 0, 32)
 
-        opt.ui.bottom2 = opt:CreatePanel(opt, nil, 232, 96)
-        opt.ui.bottom2:SetPoint('TOPLEFT', opt.ui.bottom, 'BOTTOMLEFT', 0, -40)
+        opt.ui.bottom2 = opt:CreatePanel(opt, nil, 264, 100)
+        opt.ui.bottom2:SetPoint('TOPLEFT', opt.ui.bottom, 'BOTTOMLEFT', 0, -72)
+
+        local title2 = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        title2:SetText(opt.titles.RaidBuddy)
+        title2:SetPoint('TOPLEFT', opt.ui.bottom2, 'TOPLEFT', 0, 32)
         
     end
 
@@ -305,14 +314,14 @@ function opt:AddPaladinModule()
 
         -- party buddy
 
-        opt.ui.buddyTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-        opt.ui.buddyTitle:SetText(opt.titles.PartyBuddy)
-        opt.ui.buddyTitle:SetPoint('TOPLEFT',  opt.ui.bottom, 'TOPLEFT', 8, -4)
+        opt.ui.buddyTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        opt.ui.buddyTitle:SetText(opt.titles.Buddy)
+        opt.ui.buddyTitle:SetPoint('TOPLEFT',  opt.ui.bottom, 'TOPLEFT', 8, -8)
         
         -- party edit box 
 
         opt.ui.buddyEditBox = opt:CreateEditBox(opt, 'Paladin_PartyEditBox', 64, EDITBOX_WIDTH, 32)
-        opt.ui.buddyEditBox:SetPoint('TOPLEFT', opt.ui.buddyTitle, 'TOPLEFT', 2, -EDITBOX_OFFSET_Y)
+        opt.ui.buddyEditBox:SetPoint('TOPLEFT', opt.ui.buddyTitle, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
         opt.ui.buddyEditBox:SetText(opt.env.Paladin_Buddy)
         opt.ui.buddyEditBox:SetCursorPosition(0)
         opt.ui.buddyEditBox:SetScript('OnEnterPressed', function(self)
@@ -321,8 +330,7 @@ function opt:AddPaladinModule()
         opt.ui.buddyEditBox:SetScript('OnEscapePressed', function(self)
                 opt.ui.buddyEditBox:ClearFocus()
             end)
-
-        --opt:AddTooltip(opt.ui.dpsEditBox, opt.titles.PartyConfig, opt.titles.PartyBuddyDps)
+        opt:AddTooltip(opt.ui.buddyEditBox, opt.titles.PartyBuddy, opt.titles.PartyBuddyTooltip)
             
         -- apply btn
         opt.ui.buddySubmitBtn = CreateFrame("Button", "Paladin_ApplyButton", opt, "UIPanelButtonTemplate")
@@ -334,6 +342,7 @@ function opt:AddPaladinModule()
            module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
         end)
         opt.ui.buddySubmitBtn:Disable()
+        opt:AddTooltip(opt.ui.buddySubmitBtn, opt.titles.ApplyBtnHeader, opt.titles.ApplyBtnTooltip)
 
         -- copy target btn
         opt.ui.buddySetTargetBtn = CreateFrame("Button", "Paladin_SetTargetButton", opt, "UIPanelButtonTemplate")
@@ -347,7 +356,7 @@ function opt:AddPaladinModule()
                 opt.ui.buddyEditBox:SetCursorPosition(0)
             end
         end)
-        --opt:AddTooltip(opt.ui.buddySetTargetBtn, opt.titles.SetAsTargetBtn, opt.titles.CopyTargetTooltip)
+        opt:AddTooltip(opt.ui.buddySetTargetBtn, opt.titles.SetAsTargetBtn, opt.titles.CopyTargetTooltip)
         
         opt.ui.buddyEditBox:SetScript('OnTextChanged', function(self)
             module:OnBuddyEditChanged(opt.ui.buddyEditBox, opt.env.Paladin_Buddy, opt.ui.buddySubmitBtn)
@@ -359,14 +368,14 @@ function opt:AddPaladinModule()
     
         -- party buddy
 
-        opt.ui.buddyTitleRaid = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
-        opt.ui.buddyTitleRaid:SetText(opt.titles.RaidBuddy)
-        opt.ui.buddyTitleRaid:SetPoint('TOPLEFT',  opt.ui.bottom, 'TOPLEFT', 8, -132)
+        opt.ui.buddyTitleRaid = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        opt.ui.buddyTitleRaid:SetText(opt.titles.Buddy)
+        opt.ui.buddyTitleRaid:SetPoint('TOPLEFT',  opt.ui.bottom2, 'TOPLEFT', 8, -8)
         
         -- party edit box 
         
         opt.ui.buddyEditBoxRaid = opt:CreateEditBox(opt, 'Paladin_RaidEditBox', 64, EDITBOX_WIDTH, 32)
-        opt.ui.buddyEditBoxRaid:SetPoint('TOPLEFT', opt.ui.buddyTitleRaid, 'TOPLEFT', 2, -EDITBOX_OFFSET_Y)
+        opt.ui.buddyEditBoxRaid:SetPoint('TOPLEFT', opt.ui.buddyTitleRaid, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
         opt.ui.buddyEditBoxRaid:SetText(opt.env.Paladin_RaidBuddy)
         opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
         opt.ui.buddyEditBoxRaid:SetScript('OnEnterPressed', function(self)
@@ -382,7 +391,7 @@ function opt:AddPaladinModule()
         opt.ui.buddySubmitBtnRaid:SetHeight(BUTTON_HEIGHT)
         opt.ui.buddySubmitBtnRaid:SetText(opt.titles.ApplyBtn)
         opt.ui.buddySubmitBtnRaid:SetScript("OnClick", function(self, arg1)
-            module:ApplyBuddy(opt.ui.buddyEditBoxRaid, opt.ui.buddySubmitBtnRaid, false)
+            module:ApplyBuddy(opt.ui.buddyEditBoxRaid, opt.ui.buddySubmitBtnRaid, true)
         end)
         opt.ui.buddySubmitBtn:Disable()
 
@@ -399,6 +408,133 @@ function opt:AddPaladinModule()
             end
         end)
 
+    end
+
+    function module:BuildMiscOptions()
+
+        opt.ui.pallyConfig = opt:CreatePanel(opt, "ConfigFrame", 258, 96)
+        opt.ui.pallyConfig:SetPoint('TOPLEFT', opt.ui.bottom, 'TOPRIGHT', 64, 0)
+        
+        opt.ui.pallyConfigTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        opt.ui.pallyConfigTitle:SetText(opt.titles.Paladin_Options)
+        opt.ui.pallyConfigTitle:SetPoint('TOPLEFT', opt.ui.pallyConfig, 'TOPLEFT', 0, 32)
+
+        opt.ui.DpsCooldownSound = LibDD:Create_UIDropDownMenu("CDSyncPaladinSoundDropdown", opt.ui.main)
+        
+        local SoundDB = media:List("sound")
+    
+        local PER_PAGE = 25
+
+        LibDD:UIDropDownMenu_Initialize(opt.ui.DpsCooldownSound, function(self, level, menuList)
+
+            -- reset to populate
+            local SoundDB = media:List("sound")
+            local NumSounds = getn(SoundDB)
+            local NumCategories = NumSounds / PER_PAGE
+    
+            -- find the selected index
+            local selectedIndex = 0
+            local selectedPage = 0
+            for i = 1, #SoundDB do
+                local sound = SoundDB[i]
+                if (sound == opt.env.Paladin_DpsCooldownAudio) then
+                    selectedPage = floor(i / PER_PAGE) + 1
+                    break
+                end
+            end
+    
+            -- #1 option is to play Blessing of Summer sound
+            if (not level or level == 1) then
+                local powerInfusion = UIDropDownMenu_CreateInfo()
+                powerInfusion.text = "Blessing of Summer"
+                powerInfusion.arg1 = "Blessing of Summer"
+                powerInfusion.value = "Blessing of Summer"
+                powerInfusion.func = function(self)
+                    opt.env.Paladin_DpsCooldownAudio = self.value
+                    PlaySound(160074, "Master")
+                    LibDD:CloseDropDownMenus()
+                    LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+                end
+                LibDD:UIDropDownMenu_AddButton(powerInfusion)
+            end
+    
+            -- build the page
+            if (NumSounds > 1 and (level == 1 or level == nil)) then
+                
+                -- add categories
+                for i = 1, NumCategories do
+                    local info = UIDropDownMenu_CreateInfo()
+                    info.text = "Page " .. i
+                    info.func = nil
+                    info.hasArrow = true
+                    info.menuList = i
+                    info.checked = (selectedPage == i)
+                    LibDD:UIDropDownMenu_AddButton(info)
+                end
+    
+            elseif (menuList or NumSounds == 1) then
+    
+                local startIdx = (menuList and (menuList-1) * PER_PAGE) or 1
+                local endIdx = startIdx + PER_PAGE
+    
+                for i = 1, #SoundDB do
+    
+                    if (i >= startIdx and i < endIdx) then
+                    
+                        local sound = SoundDB[i]
+    
+                        local info = UIDropDownMenu_CreateInfo()
+                        info.text = sound
+                        info.arg1 = sound
+                        info.value = sound
+                        info.checked = (opt.env.Paladin_DpsCooldownAudio == sound)
+    
+                        info.func = function(self)
+    
+                            opt.env.Paladin_DpsCooldownAudio = self.value
+    
+                            local soundFile = media:Fetch("sound", self.value)
+                            if (soundFile) then
+                                PlaySoundFile(soundFile)
+                            end
+    
+                            LibDD:CloseDropDownMenus()
+                            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+                        end
+                        LibDD:UIDropDownMenu_AddButton(info, level)
+                    end
+                end
+            end
+        end)
+    
+        LibDD:UIDropDownMenu_SetWidth(opt.ui.DpsCooldownSound, 220)
+        opt.ui.DpsCooldownSound:SetPoint("TOPLEFT", opt.ui.pallyConfig, "TOPLEFT", 0, -32)
+    
+        if (opt.env.Paladin_DpsCooldownAudio and opt.env.Paladin_DpsCooldownAudio ~= "") then
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+            LibDD:UIDropDownMenu_SetText(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+        else
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, "Blessing of Summer")
+        end
+    
+        -- audio
+
+        opt.ui.soundLabel = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        opt.ui.soundLabel:SetText(opt.titles.Paladin_Sound)
+        opt.ui.soundLabel:SetPoint('BOTTOMLEFT', opt.ui.DpsCooldownSound, 'TOPLEFT', 20, 6)
+        opt:AddTooltip(opt.ui.soundLabel, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
+        opt:AddTooltip(opt.ui.DpsCooldownSound, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
+
+         -- frame glow
+
+         opt.ui.frame_glow = opt:CreateCheckBox(opt, 'Paladin_ShowFrameGlow')
+         opt.ui.frame_glow:SetPoint("TOPLEFT", opt.ui.DpsCooldownSound, "BOTTOMLEFT", 16, -4)
+         opt.ui.frame_glow:SetScript('OnClick', function(self, event, ...)
+                 opt:CheckBoxOnClick(self)
+                 opt:ForceUiUpdate()
+             end)
+         opt:AddTooltip(opt.ui.frame_glow, opt.titles.Paladin_ShowFrameGlowHeader, opt.titles.Paladin_ShowFrameGlowTooltip)
+         
     end
 
     function module:OnBuddyEditChanged(box, buddy, submit_button)

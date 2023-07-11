@@ -119,6 +119,37 @@ function opt:CreateWidgets()
 		end)
 	opt:AddTooltip(opt.ui.iconSize, opt.titles.IconSize, opt.titles.IconSizeTooltip)
 
+	-- frame glow
+
+	opt.ui.icon_glow = opt:CreateCheckBox(opt, 'ShowSpellGlow')
+	opt.ui.icon_glow:SetPoint("TOPLEFT", opt.ui.lock, "TOPLEFT", 200, 0)
+	opt.ui.icon_glow:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:ForceUiUpdate()
+		end)
+	opt:AddTooltip(opt.ui.icon_glow, opt.titles.ShowSpellGlowHeader, opt.titles.ShowSpellGlowTooltip)
+
+	-- spell timers
+
+	opt.ui.spell_timers = opt:CreateCheckBox(opt, 'ShowSpellTimers')
+	opt.ui.spell_timers:SetPoint("TOPLEFT", opt.ui.icon_glow, "TOPLEFT", 0, -25)
+	opt.ui.spell_timers:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:ForceUiUpdate()
+		end)
+	opt:AddTooltip(opt.ui.spell_timers, opt.titles.ShowSpellTimersHeader, opt.titles.ShowSpellTimersTooltip)
+
+	-- cooldown timers
+
+	opt.ui.show_cooldowns = opt:CreateCheckBox(opt, 'ShowCooldownTimers')
+	opt.ui.show_cooldowns:SetPoint("TOPLEFT", opt.ui.spell_timers, "TOPLEFT", 0, -25)
+	opt.ui.show_cooldowns:SetScript('OnClick', function(self, event, ...)
+			opt:CheckBoxOnClick(self)
+			opt:ForceUiUpdate()
+		end)
+	opt:AddTooltip(opt.ui.show_cooldowns, opt.titles.ShowCooldownTimersHeader, opt.titles.ShowCooldownTimersTooltip)
+	
+
 end
 
 -- Widget Visiblility

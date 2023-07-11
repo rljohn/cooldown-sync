@@ -1,9 +1,11 @@
 import shutil
 import sys
 import os
-from distutils.dir_util import copy_tree
+from shutil import copytree, ignore_patterns
 
 version = "1.1"
+type = "alpha"
+
 addon_name = "CooldownSync"
 staging_folder_name = "build"
 
@@ -20,7 +22,7 @@ def cleanup_staging_folder(folder_name):
 
 def copy_to_staging_folder(addon_name, folder_name):
     outdir = os.path.join(folder_name, addon_name)
-    copy_tree(addon_name, outdir)
+    copytree(addon_name, outdir, ignore=ignore_patterns('*.json', '.vscode'))
 
 def update_version(addon_name, folder_name, version):
     
@@ -52,11 +54,12 @@ def main():
         copy_to_staging_folder(addon_name, staging_folder_name)
 
         # remove existing zip file
-        zip_file = f"{addon_name}_{version}_Release"
-        os.remove(zip_file)
+        zip_file = f"{addon_name}_{version}_{type}"
+        if os.path.isfile(zip_file):
+            os.remove(zip_file)
 
         # generate new zip file
-        shutil.make_archive(zip_file, 'zip', base_dir=os.path.join(staging_folder_name, addon_name))
+        shutil.make_archive(zip_file, 'zip', root_dir=staging_folder_name)
     except:
         pass
     finally:

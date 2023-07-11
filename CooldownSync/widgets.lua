@@ -68,7 +68,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
                 self:HideCooldown()
             end
     
-            if (Glower) then
+            if (Glower and opt.env.ShowSpellGlow) then
                 Glower.PixelGlow_Start ( self.spell, nil, nil, nil, nil, nil, 1, 1)
                 self.glowing = true
             end
