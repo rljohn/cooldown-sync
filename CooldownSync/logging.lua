@@ -90,7 +90,13 @@ function opt:BuildLogModule(name)
     end
 
     function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
-        cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+        if target_guid and target_name then
+            cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+        elseif source_guid and source_name then
+            cdPrintf("OnOtherSpellCast: %d from %s (%s) - no target", spell_id, source_name, source_guid)
+        else
+            cdPrintf("OnOtherSpellCast: %d", spell_id)
+        end
     end
 
     function module:party_changed()

@@ -129,6 +129,7 @@ function opt:OnCombatEvent(...)
 
 	if (subevent == "SPELL_CAST_SUCCESS") then
 		local spell_id = select(12,...)
+		
 		if (sourceGUID == opt.PlayerGUID) then
 			opt:ModuleEvent_OnSpellCast(spell_id, destGUID, destName)
 		else

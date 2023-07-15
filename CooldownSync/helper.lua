@@ -42,6 +42,10 @@ function opt:CreateAbilityRow(parent, name, width, height, player)
 	panel.header:SetText(player)
 	panel.header:SetPoint('TOPLEFT', panel, 'TOPLEFT', 0, 0)
 
+	panel.status = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+	panel.status:SetText("Waiting for talents...")
+	panel.status:SetPoint('TOPLEFT', panel, 'TOPLEFT', 0, -16)
+
 	return panel
 end
 

@@ -168,7 +168,7 @@ CooldownSyncClassList = {
 			-- Frostwyrm's Fury
 			{ id = 279302, cd = 90, dur = 3 },
 			-- Abomination Limb
-			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true }
+			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true },
 		},
 		-- Unholy
 		[252] = {
@@ -214,12 +214,14 @@ CooldownSyncClassList = {
 		-- Fire
 		[63] = {
 			-- Combustion
-			{ id = 190319, cd = 120, min = 12 },
+			{ id = 190319, cd = 120, min = 10 },
 		},
 		-- Frost
 		[64] = {
 			-- Icy Veins
 			{ id = 12472, cd = 180 },
+			-- Blizzard (Do Not Submit)
+			{ id = 190356, cd = 10, dur = 5.5 },
 		},
 	},
 	

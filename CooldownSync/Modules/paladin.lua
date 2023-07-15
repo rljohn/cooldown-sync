@@ -141,7 +141,6 @@ function opt:AddPaladinModule()
             self.macroEditBoxRaid:SetText(text)
         end
 
-        cdDiagf("Refresh Macros")
         self:CheckMacros()
     end
 
@@ -397,7 +396,7 @@ function opt:AddPaladinModule()
         opt.ui.buddySubmitBtnRaid:SetScript("OnClick", function(self, arg1)
             module:ApplyBuddy(opt.ui.buddyEditBoxRaid, opt.ui.buddySubmitBtnRaid, true)
         end)
-        opt.ui.buddySubmitBtn:Disable()
+        opt.ui.buddySubmitBtnRaid:Disable()
 
         -- copy target btn
         opt.ui.buddySetTargetBtnRaid = CreateFrame("Button", "Paladin_RaidSetTargetButton", opt, "UIPanelButtonTemplate")
@@ -631,8 +630,10 @@ function opt:AddPaladinModule()
 
         if is_raid then
             opt.env.Paladin_RaidBuddy = frame:GetText()
+            module.ExportMacrosRaid = true
         else
             opt.env.Paladin_Buddy = frame:GetText()
+            module.ExportMacros = true
         end
 
         frame:ClearFocus()
@@ -649,6 +650,16 @@ function opt:AddPaladinModule()
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then end
         opt:PlayAudio(opt.env.Paladin_CooldownAudio, opt.env.Paladin_CooldownChannel)
+
+        if opt.env.Paladin_ShowFrameGlow then
+            buddy:Glow()
+        end
+    end
+
+    function module:ability_end(guid, ability)
+        local buddy = self.buddy:FindBuddyByGuid(guid)
+        if not buddy then end
+        buddy:EndGlow()
     end
 
     function module:main_frame_right_click()

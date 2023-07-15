@@ -41,6 +41,7 @@ function opt:BuildClassModule(name)
             icon:SetPoint('TOPLEFT', self.player, 'TOPLEFT', self.player.icon_offset_x, self.player.icon_offset_y)
             if not icon.hidden then
                 self.player.icon_offset_x = self.player.icon_offset_x + self.player.icon_spacing
+                hasIcons = true
             end
         end
 
@@ -66,6 +67,28 @@ function opt:BuildClassModule(name)
         end
     end
 
+    function module:UpdateStatusVisibility(row)
+        local hasIcons = false
+        for _,icon in pairs(row.icons) do
+            if not icon.hidden then
+                hasIcons = true
+            end
+        end
+        
+        if hasIcons then
+            row.status:Hide()
+        else
+            row.status:Show()
+        end
+    end
+
+    function module:UpdateStatusText()
+        self:UpdateStatusVisibility(self.player)
+        for key, row in pairs(self.buddy_rows) do
+            self:UpdateStatusVisibility(row)
+        end
+    end
+
     function module:align_bars()
         if not self.player then return end
 
@@ -74,6 +97,7 @@ function opt:BuildClassModule(name)
 
         -- re-align icons in each row
         self:AlignIcons()
+        self:UpdateStatusText()
 
         -- from the results, reset the main frame size
         self:ResizeMainFrame()
@@ -262,7 +286,10 @@ function opt:BuildClassModule(name)
     function module:HandleSpellCast(guid, spell_id)
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if not ability then return nil end
-        if ability.active then return nil end
+        if ability.active then
+            print('ignoring, already active')
+            return nil 
+        end
 
         if ability.aura_estimate then
             self:SetAbilityActive(guid, ability)
@@ -293,7 +320,7 @@ function opt:BuildClassModule(name)
     -- AURA GAINED
     ------------------
 
-    function module:HandleAuraGained(guid, spell_id)
+    function module:HandleAuraGained(guid, unit_id, spell_id)
 
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if not ability then
@@ -301,7 +328,25 @@ function opt:BuildClassModule(name)
             if not ability then return nil end
         end
 
-        if ability.active then return nil end
+        -- no need to re-activate
+        if ability.active then
+            return nil
+        end
+
+        local time_remaining
+        if (unit_id == "player") then
+            local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell_id)
+            if aura then
+                time_remaining = aura.expirationTime - GetTime()
+            end
+        else
+            time_remaining = opt:GetAuraDuration(unit_id, spell_id)
+        end
+
+        if ability.minimum_duration and ability.minimum_duration > 0 then
+            cdDiagf("Ignoring aura, it wasn't long enough")
+            return nil
+        end
 
         -- trigger the active state
         self:SetAbilityActive(guid, ability)
@@ -309,7 +354,7 @@ function opt:BuildClassModule(name)
     end
 
     function module:aura_gained(spell_id)
-        local ability = self:HandleAuraGained(opt.PlayerGUID, spell_id)
+        local ability = self:HandleAuraGained(opt.PlayerGUID, "player", spell_id)
         if ability then
             self:UpdatePlayerAbility(spell_id, ability)
         end
@@ -319,7 +364,7 @@ function opt:BuildClassModule(name)
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then return end
 
-        local ability = self:HandleAuraGained(guid, spell_id)
+        local ability = self:HandleAuraGained(guid, buddy.unit_id, spell_id)
         if ability then
             self:UpdateOtherPlayerAbility(buddy.guid, buddy.unit_id, spell_id, ability)
             self.cooldowns:EstimateCooldown(guid, ability)
@@ -370,7 +415,7 @@ function opt:BuildClassModule(name)
             local expirationTime = ability.start_time + ability.aura_estimate
             time_remaining = expirationTime - GetTime()
             if (time_remaining < 0) then
-                ability.icon:End()
+                self:ClearAbilityActive(ability)
                 opt:ModuleEvent_OnAbilityEnd(opt.PlayerGUID, ability)
             end
         else
@@ -408,7 +453,7 @@ function opt:BuildClassModule(name)
             local expirationTime = ability.start_time + ability.aura_estimate
             time_remaining = expirationTime - GetTime()
             if (time_remaining < 0) then
-                ability.icon:End()
+                self:ClearAbilityActive(ability)
                 opt:ModuleEvent_OnAbilityEnd(guid, unitId, ability)
             end
         else

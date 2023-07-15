@@ -1,4 +1,8 @@
+---@diagnostic disable: undefined-field
 local opt = CooldownSyncConfig
+
+local LGF = LibStub("LibGetFrame-1.0")
+local Glower = LibStub("LibCustomGlow-1.0")
 
 local COUNT = 10
 function opt:AddBuddyModule()
@@ -14,18 +18,56 @@ function opt:AddBuddyModule()
         local buddy = {}
         
         function buddy:Reset()
-            buddy.id = nil
-            buddy.unit_id = nil
-            buddy.name = nil
-            buddy.realm = nil
-            buddy.name_and_realm = nil
-            buddy.guid = nil
-            buddy.class = nil
-            buddy.class_id = 0
-            buddy.spec = 0
-            buddy.spec_name = nil
-            buddy.online = false
-            buddy.dead = false
+            self:EndGlow()
+            self.id = nil
+            self.unit_id = nil
+            self.name = nil
+            self.realm = nil
+            self.name_and_realm = nil
+            self.guid = nil
+            self.class = nil
+            self.class_id = 0
+            self.spec = 0
+            self.spec_name = nil
+            self.online = false
+            self.dead = false
+            self.glowing = false
+            self.glow_frames = nil
+        end
+
+        function buddy:Glow()
+            if self.glowing then return end
+            if not LGF then return end
+            if not Glower then return end
+
+            self.glow_frames = LGF.GetUnitFrame(self.unit_id, {
+				ignorePlayerFrame = false,
+				ignoreTargetFrame = false,
+				ignoreTargettargetFrame = false,
+                ignorePartyFrame = false,
+				returnAll = true,
+			  })
+
+            if not self.glow_frames then return end
+
+            for _, frame in pairs(self.glow_frames) do
+                Glower.PixelGlow_Start(frame)
+            end
+
+            self.glowing = true
+        end
+
+        function buddy:EndGlow()
+            if not self.glowing then return end
+            self.glowing = false
+
+            if not self.glow_frames then return end
+            for _, frame in pairs(self.glow_frames) do
+                if (frame) then
+                    Glower.PixelGlow_Stop(frame)
+                end
+            end
+            self.glow_frames = nil
         end
     
         buddy:Reset()
@@ -41,7 +83,7 @@ function opt:AddBuddyModule()
             if (self.buddy_pool[i]) then
                 local buddy = self.buddy_pool[i]
                 self.buddy_pool[i] = nil
-                buddy.Reset()
+                buddy:Reset()
                 return buddy
             end
         end

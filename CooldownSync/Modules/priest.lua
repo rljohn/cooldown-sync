@@ -40,7 +40,6 @@ function opt:AddPriestModule()
     end
 
     function module:CheckMacros()
-        cdDiagf("Check Macros")
         self.ExportMacrosRaid = opt.InRaid and opt.env.Priest_GenerateMacroRaid
         self.ExportMacros = opt.InGroup and opt.env.Priest_GenerateMacroParty
     end
