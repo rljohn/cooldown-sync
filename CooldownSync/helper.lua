@@ -420,3 +420,22 @@ function opt:GetUnitInfo(n)
 	
 	return nil
 end
+
+-- Audio
+
+local media = LibStub("LibSharedMedia-3.0")
+
+function opt:PlayAudio(sound, channel)
+	if not sound or sound == "None" then return end
+
+	if (sound == "Power Infusion") then
+		PlaySound(170678, channel)
+	elseif (sound == "Blessing of Summer") then
+		PlaySound(160074, channel)
+	else
+		local soundFile = media:Fetch("sound", sound)
+		if (soundFile) then
+			PlaySoundFile(soundFile, "Master")
+		end
+	end
+end

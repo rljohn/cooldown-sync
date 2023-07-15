@@ -5,14 +5,14 @@ local media = LibStub("LibSharedMedia-3.0")
 
 function opt:AddPaladinModule()
     module = opt:BuildClassModule("paladin")
+    module.buddy = opt:GetModule("buddy")
 
     function module.load_default_values()
 
-        opt:SetDefaultValue("Paladin_DpsCooldownAudio")
         opt:SetDefaultValue('Paladin_Buddy', "")
         opt:SetDefaultValue('Paladin_RaidBuddy', "")
-
         opt:SetDefaultValue('Paladin_CooldownAudio', "None")
+        opt:SetDefaultValue('Paladin_CooldownChannel', "Master")
         opt:SetDefaultValue('Paladin_ShowFrameGlow',  true)
         opt:SetDefaultValue('Paladin_Trinket1Party', true)
         opt:SetDefaultValue('Paladin_Trinket1Raid', true)
@@ -412,32 +412,38 @@ function opt:AddPaladinModule()
 
     function module:BuildMiscOptions()
 
-        opt.ui.pallyConfig = opt:CreatePanel(opt, "ConfigFrame", 258, 96)
+        opt.ui.pallyConfig = opt:CreatePanel(opt, "ConfigFrame", 258, 180)
         opt.ui.pallyConfig:SetPoint('TOPLEFT', opt.ui.bottom, 'TOPRIGHT', 64, 0)
         
         opt.ui.pallyConfigTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
         opt.ui.pallyConfigTitle:SetText(opt.titles.Paladin_Options)
         opt.ui.pallyConfigTitle:SetPoint('TOPLEFT', opt.ui.pallyConfig, 'TOPLEFT', 0, 32)
 
-        opt.ui.DpsCooldownSound = LibDD:Create_UIDropDownMenu("CDSyncPaladinSoundDropdown", opt.ui.main)
+        opt.ui.CooldownSound = LibDD:Create_UIDropDownMenu("CDSyncPaladinSoundDropdown", opt.ui.main)
         
         local SoundDB = media:List("sound")
     
         local PER_PAGE = 25
 
-        LibDD:UIDropDownMenu_Initialize(opt.ui.DpsCooldownSound, function(self, level, menuList)
+        LibDD:UIDropDownMenu_Initialize(opt.ui.CooldownSound, function(self, level, menuList)
 
             -- reset to populate
-            local SoundDB = media:List("sound")
             local NumSounds = getn(SoundDB)
-            local NumCategories = NumSounds / PER_PAGE
+            local NumCategories
+            if NumSounds > PER_PAGE then
+                NumCategories = (NumSounds / PER_PAGE)
+            elseif NumSounds > 1 then
+                NumCategories = 1
+            else
+                NumCategories = 0
+            end
     
             -- find the selected index
             local selectedIndex = 0
             local selectedPage = 0
             for i = 1, #SoundDB do
                 local sound = SoundDB[i]
-                if (sound == opt.env.Paladin_DpsCooldownAudio) then
+                if (sound == opt.env.Paladin_CooldownAudio) then
                     selectedPage = floor(i / PER_PAGE) + 1
                     break
                 end
@@ -445,17 +451,19 @@ function opt:AddPaladinModule()
     
             -- #1 option is to play Blessing of Summer sound
             if (not level or level == 1) then
-                local powerInfusion = UIDropDownMenu_CreateInfo()
-                powerInfusion.text = "Blessing of Summer"
-                powerInfusion.arg1 = "Blessing of Summer"
-                powerInfusion.value = "Blessing of Summer"
-                powerInfusion.func = function(self)
-                    opt.env.Paladin_DpsCooldownAudio = self.value
-                    PlaySound(160074, "Master")
+                local defaultOption = UIDropDownMenu_CreateInfo()
+                local cooldownText = "Blessing of Summer"
+                defaultOption.text = cooldownText
+                defaultOption.arg1 = cooldownText
+                defaultOption.value = cooldownText
+                defaultOption.func = function(self)
+                    print(cooldownText)
+                    opt.env.Paladin_CooldownAudio = cooldownText
+                    PlaySound(160074, opt.env.Paladin_CooldownChannel)
                     LibDD:CloseDropDownMenus()
-                    LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+                    LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, cooldownText)
                 end
-                LibDD:UIDropDownMenu_AddButton(powerInfusion)
+                LibDD:UIDropDownMenu_AddButton(defaultOption)
             end
     
             -- build the page
@@ -487,19 +495,19 @@ function opt:AddPaladinModule()
                         info.text = sound
                         info.arg1 = sound
                         info.value = sound
-                        info.checked = (opt.env.Paladin_DpsCooldownAudio == sound)
+                        info.checked = (opt.env.Paladin_CooldownAudio == sound)
     
                         info.func = function(self)
     
-                            opt.env.Paladin_DpsCooldownAudio = self.value
+                            opt.env.Paladin_CooldownAudio = self.value
     
                             local soundFile = media:Fetch("sound", self.value)
                             if (soundFile) then
-                                PlaySoundFile(soundFile)
+                                PlaySoundFile(soundFile, opt.env.Paladin_CooldownChannel)
                             end
     
                             LibDD:CloseDropDownMenus()
-                            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+                            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
                         end
                         LibDD:UIDropDownMenu_AddButton(info, level)
                     end
@@ -507,28 +515,78 @@ function opt:AddPaladinModule()
             end
         end)
     
-        LibDD:UIDropDownMenu_SetWidth(opt.ui.DpsCooldownSound, 220)
-        opt.ui.DpsCooldownSound:SetPoint("TOPLEFT", opt.ui.pallyConfig, "TOPLEFT", 0, -32)
+        LibDD:UIDropDownMenu_SetWidth(opt.ui.CooldownSound, 220)
+        opt.ui.CooldownSound:SetPoint("TOPLEFT", opt.ui.pallyConfig, "TOPLEFT", 0, -32)
     
-        if (opt.env.Paladin_DpsCooldownAudio and opt.env.Paladin_DpsCooldownAudio ~= "") then
-            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
-            LibDD:UIDropDownMenu_SetText(opt.ui.DpsCooldownSound, opt.env.Paladin_DpsCooldownAudio)
+        if (opt.env.Paladin_CooldownAudio and opt.env.Paladin_CooldownAudio ~= "") then
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
+            LibDD:UIDropDownMenu_SetText(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
         else
-            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.DpsCooldownSound, "Blessing of Summer")
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, "Blessing of Summer")
         end
     
-        -- audio
+        -- audio label
 
-        opt.ui.soundLabel = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-        opt.ui.soundLabel:SetText(opt.titles.Paladin_Sound)
-        opt.ui.soundLabel:SetPoint('BOTTOMLEFT', opt.ui.DpsCooldownSound, 'TOPLEFT', 20, 6)
-        opt:AddTooltip(opt.ui.soundLabel, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
-        opt:AddTooltip(opt.ui.DpsCooldownSound, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
+        local soundLabel = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        soundLabel:SetText(opt.titles.Paladin_Sound)
+        soundLabel:SetPoint('BOTTOMLEFT', opt.ui.CooldownSound, 'TOPLEFT', 20, 6)
+        opt:AddTooltip(soundLabel, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
+        opt:AddTooltip(opt.ui.CooldownSound, opt.titles.Paladin_Sound, opt.titles.Paladin_SoundTooltip)
+
+        -- audio channel
+
+        opt.ui.CooldownChannel =  LibDD:Create_UIDropDownMenu("CDSyncPaladinChannelDropdown", opt.ui.main)
+        LibDD:UIDropDownMenu_Initialize(opt.ui.CooldownChannel, function(self, level, menuList)
+
+            local callback = function(self)
+                opt.env.Paladin_CooldownChannel = self.value
+                LibDD:CloseDropDownMenus()
+                LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownChannel, opt.env.Paladin_CooldownChannel)
+
+                print(opt.env.Paladin_CooldownAudio)
+                local soundFile = media:Fetch("sound", opt.env.Paladin_CooldownAudio)
+                if (soundFile) then
+                    PlaySoundFile(soundFile, opt.env.Paladin_CooldownChannel)
+                end
+            end
+
+            local add_func = function(value)
+                local info = UIDropDownMenu_CreateInfo()
+                info.text = value
+                info.arg1 = value
+                info.value = value
+                info.func = callback
+                LibDD:UIDropDownMenu_AddButton(info)
+            end
+
+            add_func("Master")
+            add_func("Music")
+            add_func("SFX")
+            add_func("Ambience")
+
+        end)
+        LibDD:UIDropDownMenu_SetWidth(opt.ui.CooldownChannel, 220)
+        opt.ui.CooldownChannel:SetPoint("TOPLEFT", opt.ui.CooldownSound, "BOTTOMLEFT", 0, -32)
+
+        if (opt.env.Paladin_CooldownChannel and opt.env.Paladin_CooldownChannel ~= "") then
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownChannel, opt.env.Paladin_CooldownChannel)
+            LibDD:UIDropDownMenu_SetText(opt.ui.CooldownChannel, opt.env.Paladin_CooldownChannel)
+        else
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownChannel, "Master")
+        end
+
+        -- channel label
+
+        local channelHeader = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        channelHeader:SetText(opt.titles.Paladin_Channel)
+        channelHeader:SetPoint('BOTTOMLEFT', opt.ui.CooldownChannel, 'TOPLEFT', 20, 6)
+        opt:AddTooltip(channelHeader, opt.titles.Paladin_Channel, opt.titles.Paladin_ChannelTooltip)
+        opt:AddTooltip(opt.ui.CooldownChannel, opt.titles.Paladin_Channel, opt.titles.Paladin_ChannelTooltip)
 
          -- frame glow
 
          opt.ui.frame_glow = opt:CreateCheckBox(opt, 'Paladin_ShowFrameGlow')
-         opt.ui.frame_glow:SetPoint("TOPLEFT", opt.ui.DpsCooldownSound, "BOTTOMLEFT", 16, -4)
+         opt.ui.frame_glow:SetPoint("TOPLEFT", opt.ui.CooldownChannel, "BOTTOMLEFT", 16, -12)
          opt.ui.frame_glow:SetScript('OnClick', function(self, event, ...)
                  opt:CheckBoxOnClick(self)
                  opt:ForceUiUpdate()
@@ -586,6 +644,12 @@ function opt:AddPaladinModule()
 
     function module:update_slow()
         self:UpdateMacros()
+    end
+
+    function module:ability_begin(guid, ability)
+        local buddy = self.buddy:FindBuddyByGuid(guid)
+        if not buddy then end
+        opt:PlayAudio(opt.env.Paladin_CooldownAudio, opt.env.Paladin_CooldownChannel)
     end
 
     function module:main_frame_right_click()

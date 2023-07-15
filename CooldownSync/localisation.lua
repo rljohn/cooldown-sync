@@ -156,6 +156,9 @@ function opt:SetupLocale()
 		Paladin_Sound = 'Play Sound on Buddy Cooldown:',
 		Paladin_SoundTooltip = 'Sound to play when your buddy activates their cooldown.',
 
+		Paladin_Channel = 'Audio Channel',
+		Paladin_ChannelTooltip = 'Audio channel to use when your buddy activates their cooldown.',
+
 		-- Spell Glow
 
 		Paladin_ShowFrameGlow = "Show Frame Glow",

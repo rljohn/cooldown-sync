@@ -240,6 +240,7 @@ function opt:BuildClassModule(name)
             end
 
             ability.icon:Begin()
+            opt:ModuleEvent_OnAbilityBegin(guid, ability)
         end
     end
 
@@ -283,7 +284,7 @@ function opt:BuildClassModule(name)
 
         local ability = self:HandleSpellCast(source_guid, spell_id)
         if ability then
-            self:UpdateOtherPlayerAbility(spell_id, ability)
+            self:UpdateOtherPlayerAbility(buddy.guid, buddy.unit_id, spell_id, ability)
             self.cooldowns:EstimateCooldown(source_guid, ability)
         end
     end
@@ -320,7 +321,7 @@ function opt:BuildClassModule(name)
 
         local ability = self:HandleAuraGained(guid, spell_id)
         if ability then
-            self:UpdateOtherPlayerAbility(ability)
+            self:UpdateOtherPlayerAbility(buddy.guid, buddy.unit_id, spell_id, ability)
             self.cooldowns:EstimateCooldown(guid, ability)
         end
     end
@@ -340,6 +341,7 @@ function opt:BuildClassModule(name)
 
         if not ability.aura_estimate then
             self:ClearAbilityActive(ability)
+            opt:ModuleEvent_OnAbilityEnd(guid, ability)
         end
     end
 
@@ -369,6 +371,7 @@ function opt:BuildClassModule(name)
             time_remaining = expirationTime - GetTime()
             if (time_remaining < 0) then
                 ability.icon:End()
+                opt:ModuleEvent_OnAbilityEnd(opt.PlayerGUID, ability)
             end
         else
 
@@ -395,7 +398,7 @@ function opt:BuildClassModule(name)
         end
     end
 
-    function module:UpdateOtherPlayerAbility(unitId, spell_id, ability)
+    function module:UpdateOtherPlayerAbility(guid, unitId, spell_id, ability)
         if not ability then return end
         if not ability.active then return end
 
@@ -406,6 +409,7 @@ function opt:BuildClassModule(name)
             time_remaining = expirationTime - GetTime()
             if (time_remaining < 0) then
                 ability.icon:End()
+                opt:ModuleEvent_OnAbilityEnd(guid, unitId, ability)
             end
         else
             -- allow aura override
@@ -442,7 +446,7 @@ function opt:BuildClassModule(name)
                 local cds = self.cooldowns:FindCooldowns(buddy.guid)
                 if (cds) then
                     for spell_id, ability in pairs(cds.abilities) do
-                        self:UpdateOtherPlayerAbility(buddy.unit_id, spell_id, ability)
+                        self:UpdateOtherPlayerAbility(buddy.guid, buddy.unit_id, spell_id, ability)
                     end
                 end
             end

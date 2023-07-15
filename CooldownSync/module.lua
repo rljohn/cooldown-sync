@@ -304,6 +304,22 @@ function opt:ModuleEvent_OnMainFrameRightClick()
     end
 end
 
+function opt:ModuleEvent_OnAbilityBegin(guid, ability)
+    for key, module in pairs(opt.modules) do
+        if (module.ability_begin) then
+            module:ability_begin(guid, ability)
+        end
+    end
+end
+
+function opt:ModuleEvent_OnAbilityEnd(guid, ability)
+    for key, module in pairs(opt.modules) do
+        if (module.ability_end) then
+            module:ability_end(guid, ability)
+        end
+    end
+end
+
 -- Class Modules
 function opt:BuildClassModules(class)
 

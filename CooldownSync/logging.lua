@@ -90,7 +90,7 @@ function opt:BuildLogModule(name)
     end
 
     function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
-        --cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+        cdPrintf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
     end
 
     function module:party_changed()
@@ -141,4 +141,13 @@ function opt:BuildLogModule(name)
         cdPrintf("OnMainFrameRightClick")
     end
 
+    function module:ability_begin(guid, ability)
+        cdPrintf("OnAbilityBegin: %s - %s", guid, ability.id)
+    end
+
+    function module:ability_end(guid, ability)
+        cdPrintf("OnAbilityEnd: %s - %s", guid, ability.id)
+    end
+
+        
 end
