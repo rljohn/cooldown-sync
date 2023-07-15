@@ -54,7 +54,6 @@ function opt:AddBuddyModule()
         -- find first free space in pool
         for i = 1, COUNT do
             if (not self.buddy_pool[i]) then
-                cdDiagf("Freeing buddy at index: %d", i)
                 self.buddy_pool[i] = buddy
                 self.buddy_pool[i]:Reset()
             end
@@ -147,12 +146,10 @@ function opt:AddBuddyModule()
     end
 
     -- unregister buddy
-    function module:RemoveBuddy(name)
-
-        cdDiagf("Unregister buddy: %s", name)
+    function module:RemoveBuddy(name, is_raid)
 
         -- remove from settings
-        if (opt.InRaid) then
+        if (is_raid) then
             if (opt.env.RaidBuddies[name] ~= nil) then
                 opt.env.RaidBuddies[name] = nil
             end
@@ -199,7 +196,7 @@ function opt:AddBuddyModule()
 
         local list
         if IsInRaid() then 
-            list = opt.env.RaidBuddies 
+            list = opt.env.RaidBuddies
         else
             list = opt.env.Buddies
         end
@@ -209,7 +206,7 @@ function opt:AddBuddyModule()
 
             local found = false
             for key, value in pairs(list) do
-                if buddy.id == key then
+                if buddy.id == strlower(key) then
                     found = true
                 end
             end
@@ -309,7 +306,7 @@ function opt:AddBuddyModule()
     function module:talents_changed(unit_id)
         if (unit_id == "player") then
             for idx, buddy in pairs(self.active_buddies) do
-                opt:SendTalentSpecChanged(opt.PlayerSpec, buddy.name, buddy.realm)
+                opt:SendTalentSpecChanged(opt.PlayerSpec, opt.PlayerSpecName, buddy.name, buddy.realm)
             end
         else
             local buddy = self:FindBuddyByUnitId(unit_id)

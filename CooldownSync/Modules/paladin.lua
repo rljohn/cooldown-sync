@@ -281,10 +281,7 @@ function opt:AddPaladinModule()
     module.base_init = module.init
     function module:init()
         self:base_init()
-        self:BuildOptionsPanel()
-        self:BuildPartyOptions()
-        self:BuildRaidOptions()
-        self:BuildMiscOptions()
+        self:BuildPanels()
     end
 
     local EDITBOX_OFFSET_X = 58
@@ -292,36 +289,43 @@ function opt:AddPaladinModule()
     local BUTTON_HEIGHT = 22
     local COPY_TARGET_OFFSET_Y = -4
 
-    function module:BuildOptionsPanel()
+    function module:BuildPanels()
             
-        opt.ui.bottom = opt:CreatePanel(opt, nil, 264, 100)
-        opt.ui.bottom:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -80)
+        local party = opt:CreatePanel(opt, nil, 264, 100)
+        party:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -80)
 
         local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
         title:SetText(opt.titles.PartyBuddy)
-        title:SetPoint('TOPLEFT', opt.ui.bottom, 'TOPLEFT', 0, 32)
+        title:SetPoint('TOPLEFT', party, 'TOPLEFT', 0, 32)
 
-        opt.ui.bottom2 = opt:CreatePanel(opt, nil, 264, 100)
-        opt.ui.bottom2:SetPoint('TOPLEFT', opt.ui.bottom, 'BOTTOMLEFT', 0, -72)
+        local raid = opt:CreatePanel(opt, nil, 264, 100)
+        raid:SetPoint('TOPLEFT', party, 'BOTTOMLEFT', 0, -72)
 
         local title2 = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
         title2:SetText(opt.titles.RaidBuddy)
-        title2:SetPoint('TOPLEFT', opt.ui.bottom2, 'TOPLEFT', 0, 32)
+        title2:SetPoint('TOPLEFT', raid, 'TOPLEFT', 0, 32)
+
+        local options = opt:CreatePanel(opt, "ConfigFrame", 258, 180)
+        options:SetPoint('TOPLEFT', party, 'TOPRIGHT', 64, 0)
         
+        self:BuildPartyOptions(party)
+        self:BuildRaidOptions(raid)
+        self:BuildMiscOptions(options)
+
     end
 
-    function module:BuildPartyOptions()
+    function module:BuildPartyOptions(parent)
 
         -- party buddy
 
-        opt.ui.buddyTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-        opt.ui.buddyTitle:SetText(opt.titles.Buddy)
-        opt.ui.buddyTitle:SetPoint('TOPLEFT',  opt.ui.bottom, 'TOPLEFT', 8, -8)
+        local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        title:SetText(opt.titles.Buddy)
+        title:SetPoint('TOPLEFT', parent, 'TOPLEFT', 8, -8)
         
         -- party edit box 
 
         opt.ui.buddyEditBox = opt:CreateEditBox(opt, 'Paladin_PartyEditBox', 64, EDITBOX_WIDTH, 32)
-        opt.ui.buddyEditBox:SetPoint('TOPLEFT', opt.ui.buddyTitle, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
+        opt.ui.buddyEditBox:SetPoint('TOPLEFT', title, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
         opt.ui.buddyEditBox:SetText(opt.env.Paladin_Buddy)
         opt.ui.buddyEditBox:SetCursorPosition(0)
         opt.ui.buddyEditBox:SetScript('OnEnterPressed', function(self)
@@ -364,18 +368,18 @@ function opt:AddPaladinModule()
         
     end
 
-    function module:BuildRaidOptions()
+    function module:BuildRaidOptions(parent)
     
         -- party buddy
 
-        opt.ui.buddyTitleRaid = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
-        opt.ui.buddyTitleRaid:SetText(opt.titles.Buddy)
-        opt.ui.buddyTitleRaid:SetPoint('TOPLEFT',  opt.ui.bottom2, 'TOPLEFT', 8, -8)
+        local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        title:SetText(opt.titles.Buddy)
+        title:SetPoint('TOPLEFT', parent, 'TOPLEFT', 8, -8)
         
         -- party edit box 
         
         opt.ui.buddyEditBoxRaid = opt:CreateEditBox(opt, 'Paladin_RaidEditBox', 64, EDITBOX_WIDTH, 32)
-        opt.ui.buddyEditBoxRaid:SetPoint('TOPLEFT', opt.ui.buddyTitleRaid, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
+        opt.ui.buddyEditBoxRaid:SetPoint('TOPLEFT', title, 'TOPLEFT', EDITBOX_OFFSET_X, 9)
         opt.ui.buddyEditBoxRaid:SetText(opt.env.Paladin_RaidBuddy)
         opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
         opt.ui.buddyEditBoxRaid:SetScript('OnEnterPressed', function(self)
@@ -410,14 +414,11 @@ function opt:AddPaladinModule()
 
     end
 
-    function module:BuildMiscOptions()
-
-        opt.ui.pallyConfig = opt:CreatePanel(opt, "ConfigFrame", 258, 180)
-        opt.ui.pallyConfig:SetPoint('TOPLEFT', opt.ui.bottom, 'TOPRIGHT', 64, 0)
+    function module:BuildMiscOptions(parent)
         
-        opt.ui.pallyConfigTitle = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-        opt.ui.pallyConfigTitle:SetText(opt.titles.Paladin_Options)
-        opt.ui.pallyConfigTitle:SetPoint('TOPLEFT', opt.ui.pallyConfig, 'TOPLEFT', 0, 32)
+        local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        title:SetText(opt.titles.Paladin_Options)
+        title:SetPoint('TOPLEFT', parent, 'TOPLEFT', 0, 32)
 
         opt.ui.CooldownSound = LibDD:Create_UIDropDownMenu("CDSyncPaladinSoundDropdown", opt.ui.main)
         
@@ -457,7 +458,6 @@ function opt:AddPaladinModule()
                 defaultOption.arg1 = cooldownText
                 defaultOption.value = cooldownText
                 defaultOption.func = function(self)
-                    print(cooldownText)
                     opt.env.Paladin_CooldownAudio = cooldownText
                     PlaySound(160074, opt.env.Paladin_CooldownChannel)
                     LibDD:CloseDropDownMenus()
@@ -516,7 +516,7 @@ function opt:AddPaladinModule()
         end)
     
         LibDD:UIDropDownMenu_SetWidth(opt.ui.CooldownSound, 220)
-        opt.ui.CooldownSound:SetPoint("TOPLEFT", opt.ui.pallyConfig, "TOPLEFT", 0, -32)
+        opt.ui.CooldownSound:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -32)
     
         if (opt.env.Paladin_CooldownAudio and opt.env.Paladin_CooldownAudio ~= "") then
             LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
@@ -543,7 +543,6 @@ function opt:AddPaladinModule()
                 LibDD:CloseDropDownMenus()
                 LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownChannel, opt.env.Paladin_CooldownChannel)
 
-                print(opt.env.Paladin_CooldownAudio)
                 local soundFile = media:Fetch("sound", opt.env.Paladin_CooldownAudio)
                 if (soundFile) then
                     PlaySoundFile(soundFile, opt.env.Paladin_CooldownChannel)
@@ -585,14 +584,14 @@ function opt:AddPaladinModule()
 
          -- frame glow
 
-         opt.ui.frame_glow = opt:CreateCheckBox(opt, 'Paladin_ShowFrameGlow')
-         opt.ui.frame_glow:SetPoint("TOPLEFT", opt.ui.CooldownChannel, "BOTTOMLEFT", 16, -12)
-         opt.ui.frame_glow:SetScript('OnClick', function(self, event, ...)
-                 opt:CheckBoxOnClick(self)
-                 opt:ForceUiUpdate()
-             end)
-         opt:AddTooltip(opt.ui.frame_glow, opt.titles.Paladin_ShowFrameGlowHeader, opt.titles.Paladin_ShowFrameGlowTooltip)
-         
+        local glow = opt:CreateCheckBox(opt, 'Paladin_ShowFrameGlow')
+        glow:SetPoint("TOPLEFT", opt.ui.CooldownChannel, "BOTTOMLEFT", 16, -12)
+        glow:SetScript('OnClick', function(self, event, ...)
+                opt:CheckBoxOnClick(self)
+                opt:ForceUiUpdate()
+            end)
+        opt:AddTooltip(glow, opt.titles.Paladin_ShowFrameGlowHeader, opt.titles.Paladin_ShowFrameGlowTooltip)
+        
     end
 
     function module:OnBuddyEditChanged(box, buddy, submit_button)
@@ -624,8 +623,8 @@ function opt:AddPaladinModule()
             return
         end
 
-        self.buddy:RemoveBuddy(previous)
-
+        -- replace previous buddy
+        self.buddy:RemoveBuddy(previous, is_raid)
         if (frameText ~= '') then
             self.buddy:RegisterBuddy(frame:GetText())
         end
@@ -657,6 +656,16 @@ function opt:AddPaladinModule()
             opt.ui.buddyEditBox:SetText(GetUnitName("target", true))
             opt.ui.buddyEditBox:SetCursorPosition(0)
             module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, opt.InRaid)
+        end
+    end
+
+    function module:post_init()
+        if not opt:StringNilOrEmpty(opt.env.Paladin_Buddy) then
+            self.buddy:RegisterBuddy(opt.env.Paladin_Buddy, false)
+        end
+
+        if not opt:StringNilOrEmpty(opt.env.Paladin_RaidBuddy) then
+            self.buddy:RegisterBuddy(opt.env.Paladin_RaidBuddy, true)
         end
     end
 

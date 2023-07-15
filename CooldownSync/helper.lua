@@ -439,3 +439,12 @@ function opt:PlayAudio(sound, channel)
 		end
 	end
 end
+
+-- Strings
+
+function opt:StringNilOrEmpty(str)
+	if not str then return true end
+	if str == "" then return true end
+	if str:match("^%s*$") then return true end
+	return false
+end

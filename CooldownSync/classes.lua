@@ -157,7 +157,7 @@ CooldownSyncClassList = {
 			-- Dancing Rune Weapon
 			{ id = 49028, cd = 120, aura = 81256 },
 			-- Bonestorm
-			{ id = 194844, cd = 60 },
+			{ id = 194844, cd = 60, hidden = true  },
 			-- Abomination Limb
 			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true },
 		},
