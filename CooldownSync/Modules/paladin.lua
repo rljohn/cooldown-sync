@@ -1,13 +1,17 @@
+---@diagnostic disable: param-type-mismatch, undefined-field
 local opt = CooldownSyncConfig
 
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
 local media = LibStub("LibSharedMedia-3.0")
+local major_cooldown = 'Blessing of Summer'
+local class = 'Paladin'
+local macro_name = 'CDSyncPally'
 
 function opt:AddPaladinModule()
-    module = opt:BuildClassModule("paladin")
+    module = opt:BuildClassModule(strlower(class))
     module.buddy = opt:GetModule("buddy")
 
-    function module.load_default_values()
+    function module:load_default_values()
 
         opt:SetDefaultValue('Paladin_Buddy', "")
         opt:SetDefaultValue('Paladin_RaidBuddy', "")
@@ -30,14 +34,14 @@ function opt:AddPaladinModule()
 
     function module:BuildMacroPanel()
 
-        local pally_macros = CreateFrame('FRAME', 'CDSyncPaladinMacros', opt)
-        pally_macros.name = 'Paladin Macros'
-        pally_macros.ShouldResetFrames = false
-        pally_macros.parent = opt.name
-        InterfaceOptions_AddCategory(pally_macros)
+        local class_macros = CreateFrame('FRAME', 'CDSyncPaladinMacros', opt)
+        class_macros.name = class .. ' Macros'
+        class_macros.ShouldResetFrames = false
+        class_macros.parent = opt.name
+        InterfaceOptions_AddCategory(class_macros)
 
-        self:CreatePaladinMacroPanel(true, pally_macros, 25, -48)
-        self:CreatePaladinMacroPanel(false, pally_macros, 25, -330)
+        self:CreatePaladinMacroPanel(true, class_macros, 25, -48)
+        self:CreatePaladinMacroPanel(false, class_macros, 25, -330)
     end
 
     function module:CheckMacros()
@@ -46,7 +50,7 @@ function opt:AddPaladinModule()
     end
 
     function module:GetMacroText(party)
-        local text = '#showtooltip Blessing of Summer'
+        local text = '#showtooltip ' .. major_cooldown
  
         -- trinkets
 
@@ -72,12 +76,12 @@ function opt:AddPaladinModule()
 
         if (party) then
             if (opt.env.Paladin_Buddy and opt.env.Paladin_Buddy ~= "") then
-                text = text .. string.format('\n/cast [@%s,help,nodead] Blessing of Summer', opt.env.Paladin_Buddy)
+                text = text .. string.format('\n/cast [@%s,help,nodead] ' .. major_cooldown, opt.env.Paladin_Buddy)
                 text = text .. string.format('\n/stopmacro [@%s,help,nodead]', opt.env.Paladin_Buddy)
             end
         else
             if (opt.env.Paladin_RaidBuddy and opt.env.Paladin_RaidBuddy ~= "") then
-                text = text .. string.format('\n/cast [@%s,help,nodead] Blessing of Summer', opt.env.Paladin_RaidBuddy)
+                text = text .. string.format('\n/cast [@%s,help,nodead] ' .. major_cooldown, opt.env.Paladin_RaidBuddy)
                 text = text .. string.format('\n/stopmacro [@%s,help,nodead]', opt.env.Paladin_RaidBuddy)
             end
         end
@@ -85,14 +89,14 @@ function opt:AddPaladinModule()
         -- focus
 
             if ((party and opt.env.Paladin_FocusParty) or (not party and opt.env.Paladin_FocusRaid)) then
-                text = text .. '\n/cast [focus,help,nodead] Blessing of Summer'
+                text = text .. '\n/cast [focus,help,nodead] ' .. major_cooldown
             end
 
         -- friendly
 
         if ((party and opt.env.Paladin_FriendlyParty) or (not party and opt.env.Paladin_FriendlyRaid)) then
             text = text .. '\n/targetfriendplayer [nohelp]'
-            text = text .. '\n/cast [help] Blessing of Summer'
+            text = text .. '\n/cast [help] ' .. major_cooldown
 
             if ((party and opt.env.Paladin_TargetLastTargetParty) or (not party and opt.env.Paladin_TargetLastTargetRaid)) then
                 text = text .. '\n/targetlasttarget [help]'
@@ -101,7 +105,7 @@ function opt:AddPaladinModule()
 
         -- self
 
-        text = text .. '\n/cast [@player] Blessing of Summer'
+        text = text .. '\n/cast [@player] ' .. major_cooldown
 
         return text
     end
@@ -122,11 +126,11 @@ function opt:AddPaladinModule()
         self.ExportMacros = false
         self.ExportMacrosRaid = false
 
-        local index = GetMacroIndexByName("CDSyncPally");
+        local index = GetMacroIndexByName(macro_name);
         if (index == 0) then
-            CreateMacro("CDSyncPally", "3636845", text, false)
+            CreateMacro(macro_name, "3636845", text, false)
         else
-            EditMacro(index, "CDSyncPally", "3636845", text)
+            EditMacro(index, macro_name, nil, text)
         end
     end
 
@@ -424,7 +428,6 @@ function opt:AddPaladinModule()
         local SoundDB = media:List("sound")
     
         local PER_PAGE = 25
-
         LibDD:UIDropDownMenu_Initialize(opt.ui.CooldownSound, function(self, level, menuList)
 
             -- reset to populate
@@ -449,18 +452,19 @@ function opt:AddPaladinModule()
                 end
             end
     
-            -- #1 option is to play Blessing of Summer sound
+            -- #1 option is to play major cooldown sound
             if (not level or level == 1) then
                 local defaultOption = UIDropDownMenu_CreateInfo()
-                local cooldownText = "Blessing of Summer"
+                local cooldownText = major_cooldown
                 defaultOption.text = cooldownText
                 defaultOption.arg1 = cooldownText
                 defaultOption.value = cooldownText
                 defaultOption.func = function(self)
                     opt.env.Paladin_CooldownAudio = cooldownText
-                    PlaySound(160074, opt.env.Paladin_CooldownChannel)
-                    LibDD:CloseDropDownMenus()
+                    module:PlayAudioSound()
                     LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, cooldownText)
+                    LibDD:UIDropDownMenu_SetText(opt.ui.CooldownSound, cooldownText)
+                    LibDD:CloseDropDownMenus()
                 end
                 LibDD:UIDropDownMenu_AddButton(defaultOption)
             end
@@ -497,16 +501,11 @@ function opt:AddPaladinModule()
                         info.checked = (opt.env.Paladin_CooldownAudio == sound)
     
                         info.func = function(self)
-    
                             opt.env.Paladin_CooldownAudio = self.value
-    
-                            local soundFile = media:Fetch("sound", self.value)
-                            if (soundFile) then
-                                PlaySoundFile(soundFile, opt.env.Paladin_CooldownChannel)
-                            end
-    
-                            LibDD:CloseDropDownMenus()
+                            module:PlayAudioSound()
                             LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
+                            LibDD:UIDropDownMenu_SetText(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
+                            LibDD:CloseDropDownMenus()
                         end
                         LibDD:UIDropDownMenu_AddButton(info, level)
                     end
@@ -521,7 +520,7 @@ function opt:AddPaladinModule()
             LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
             LibDD:UIDropDownMenu_SetText(opt.ui.CooldownSound, opt.env.Paladin_CooldownAudio)
         else
-            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, "Blessing of Summer")
+            LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownSound, major_cooldown)
         end
     
         -- audio label
@@ -539,13 +538,9 @@ function opt:AddPaladinModule()
 
             local callback = function(self)
                 opt.env.Paladin_CooldownChannel = self.value
-                LibDD:CloseDropDownMenus()
                 LibDD:UIDropDownMenu_SetSelectedValue(opt.ui.CooldownChannel, opt.env.Paladin_CooldownChannel)
-
-                local soundFile = media:Fetch("sound", opt.env.Paladin_CooldownAudio)
-                if (soundFile) then
-                    PlaySoundFile(soundFile, opt.env.Paladin_CooldownChannel)
-                end
+                module:PlayAudioSound()
+                LibDD:CloseDropDownMenus()
             end
 
             local add_func = function(value)
@@ -630,10 +625,10 @@ function opt:AddPaladinModule()
 
         if is_raid then
             opt.env.Paladin_RaidBuddy = frame:GetText()
-            module.ExportMacrosRaid = true
+            module:RefreshPaladinMacros(false)
         else
             opt.env.Paladin_Buddy = frame:GetText()
-            module.ExportMacros = true
+            module:RefreshPaladinMacros(true)
         end
 
         frame:ClearFocus()
@@ -646,11 +641,14 @@ function opt:AddPaladinModule()
         self:UpdateMacros()
     end
 
+    function module:PlayAudioSound()
+        opt:PlayAudio(opt.env.Paladin_CooldownAudio, opt.env.Paladin_CooldownChannel)
+    end
+
     function module:ability_begin(guid, ability)
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then end
-        opt:PlayAudio(opt.env.Paladin_CooldownAudio, opt.env.Paladin_CooldownChannel)
-
+        self:PlayAudioSound()
         if opt.env.Paladin_ShowFrameGlow then
             buddy:Glow()
         end

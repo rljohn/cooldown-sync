@@ -335,7 +335,7 @@ CooldownSyncClassList = {
 		-- Augmentation
 		[1473] = {
 			-- Ebon Might
-			{ id = 395152, cd = 30 },
+			{ id = 395152, cd = 30, aura = 395296 },
 			-- Spatial Paradox
 			{ id = 406732, cd = 120 },
 		},
@@ -419,10 +419,25 @@ function opt:FindSpec(class_id, spell_id)
 	local class_abilities = CooldownSyncClassList[class_id]
 	if not class_abilities then return end
 
-	for spec_id, spec_abilities in class_abilities do
-		for _, spell_info in spec_abilities do
+	for spec_id, spec_abilities in pairs(class_abilities) do
+		for _, spell_info in pairs(spec_abilities) do
 			if spell_info.id == spell_id then
 				return spec_id
+			end
+		end
+	end
+
+	return nil
+end
+
+function opt:FindAbility(class_id, spell_id)
+	local class_abilities = CooldownSyncClassList[class_id]
+	if not class_abilities then return end
+
+	for _, spec_abilities in pairs(class_abilities) do
+		for _, spell_info in pairs(spec_abilities) do
+			if spell_info.id == spell_id then
+				return spell_info
 			end
 		end
 	end

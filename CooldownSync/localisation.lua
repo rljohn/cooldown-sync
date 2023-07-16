@@ -40,11 +40,6 @@ function opt:SetupLocale()
 		ShowTitleHeader = 'Show Title',
 		ShowTitleTooltip = 'Show the frame title.',
 
-		-- Cooldowns
-		ShowCooldownTimers = "Show Cooldown Timers",
-		ShowCooldownTimersHeader = "Show Cooldown Timers",
-		ShowCooldownTimersTooltip = "Display a timer when spells are on cooldown",
-
 		-- Spell Timers
 		ShowSpellTimers = "Show Spell Timers",
 		ShowSpellTimersHeader = "Show Spell Timers",
@@ -164,6 +159,16 @@ function opt:SetupLocale()
 		Paladin_ShowFrameGlow = "Show Frame Glow",
 		Paladin_ShowFrameGlowHeader = "Show Frame Glow",
 		Paladin_ShowFrameGlowTooltip = "Show a glow around party and raid frames when a buddy's major cooldowns are active.",
+
+		--------------------
+		-- Evokers
+		--------------------
+
+		Evoker_Options = "Evoker Options",
+		Evoker_Augmentation = "Augmentation",
+		Evoker_GlowCooldowns = "Glow Frames",
+		Evoker_GlowMajorCooldowns = "Party and Raid Frames - Cooldown Glow",
+		Evoker_GlowMajorCooldownsTooltip = "Glow party and raid frames any time a major cooldown is cast.",
 	}
 	
 end

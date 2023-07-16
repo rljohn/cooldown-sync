@@ -18,7 +18,7 @@ function opt:CreateWidgets()
 	
 	-- frame panel
 		
-	opt.ui.main = opt:CreatePanel(opt, nil, 580, 175)
+	opt.ui.main = opt:CreatePanel(opt, nil, 585, 175)
 	opt.ui.main:SetPoint('TOPLEFT', opt, 'TOPLEFT', 25, -48)
 
 	-- title
@@ -138,17 +138,6 @@ function opt:CreateWidgets()
 			opt:ForceUiUpdate()
 		end)
 	opt:AddTooltip(opt.ui.spell_timers, opt.titles.ShowSpellTimersHeader, opt.titles.ShowSpellTimersTooltip)
-
-	-- cooldown timers
-
-	opt.ui.show_cooldowns = opt:CreateCheckBox(opt, 'ShowCooldownTimers')
-	opt.ui.show_cooldowns:SetPoint("TOPLEFT", opt.ui.spell_timers, "TOPLEFT", 0, -25)
-	opt.ui.show_cooldowns:SetScript('OnClick', function(self, event, ...)
-			opt:CheckBoxOnClick(self)
-			opt:ForceUiUpdate()
-		end)
-	opt:AddTooltip(opt.ui.show_cooldowns, opt.titles.ShowCooldownTimersHeader, opt.titles.ShowCooldownTimersTooltip)
-	
 
 end
 
