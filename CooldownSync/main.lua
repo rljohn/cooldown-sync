@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 local opt = CooldownSyncConfig
 local main
 local PADDING = 16
@@ -19,14 +20,17 @@ function opt:CreateMainFrame()
 	
 	-- background
 	
----@diagnostic disable-next-line: param-type-mismatch
 	main:SetBackdrop(
-	{
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		edgeSize = 3,
-		insets = { left = 1, right = 1, top = 1, bottom = 1 },
-	})
+		{
+			bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+			tile = true,
+			tileEdge = true,
+			tileSize = 16,
+			edgeSize = 16,
+			insets = { left = 3, right = 5, top = 3, bottom = 5 },
+		}
+	)
 	opt:SetMainFrameBackgroundVisible(opt.env.ShowBackground)
 	
 	-- mouse

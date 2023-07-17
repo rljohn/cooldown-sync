@@ -5,12 +5,15 @@ local LGF = LibStub("LibGetFrame-1.0")
 local Glower = LibStub("LibCustomGlow-1.0")
 
 local COUNT = 10
+
+
 function opt:AddBuddyModule()
 
     module = self:BuildModule('buddy')
     module.inspect = self:GetModule("inspect")
     module.buddy_pool = {}
     module.active_buddies = {}
+    module.recycled_buddy_options = {}
 
     -- create a buddy
     function module:CreateBuddy()
@@ -159,6 +162,10 @@ function opt:AddBuddyModule()
         end
     end
 
+    function module:hehexd()
+        print('hehexd')
+    end
+
     -- register a buddy
     function module:RegisterBuddy(name, in_raid)
 
@@ -169,7 +176,8 @@ function opt:AddBuddyModule()
         end
 
         local setting = {}
-        setting.enabled = false
+        setting.enabled = true
+        setting.name = name
 
         -- add to settings
         if (in_raid) then
@@ -185,20 +193,62 @@ function opt:AddBuddyModule()
                 self:RefreshBuddies()
             end
         end
+
+        if in_raid then
+            self:AddBuddyWidget(self.raid_panel, nil, name, setting, in_raid)
+        else
+            self:AddBuddyWidget(self.party_panel, nil, name, setting, in_raid)
+        end
+
+        self:EvaluateAddButton()
+        self:realign_options(in_raid)
+    end
+
+    function module:EvaluateAddButton()
+
+        if self.add_button_raid then
+            if opt:GetTableSize(opt.env.RaidBuddies) >= COUNT then
+                self.add_button_raid:Disable()
+            else
+                self.add_button_raid:Enable()
+            end
+        end
+
+        if self.add_button_party then
+            if opt:GetTableSize(opt.env.Buddies) >= COUNT then
+                self.add_button_party:Disable()
+            else
+                self.add_button_party:Enable()
+            end
+        end
     end
 
     -- unregister buddy
     function module:RemoveBuddy(name, is_raid)
 
+        cdDiagf("Removing Buddy: %s", name)
+
+        local realign = false
+
         -- remove from settings
         if (is_raid) then
-            if (opt.env.RaidBuddies[name] ~= nil) then
-                opt.env.RaidBuddies[name] = nil
+
+            if (opt.env.RaidBuddies[name] and opt.env.RaidBuddies[name].frame) then
+                opt.env.RaidBuddies[name].frame:Hide()
+                realign = true
             end
+
+            tinsert(self.recycled_buddy_options, opt.env.RaidBuddies[name])
+            opt.env.RaidBuddies[name] = nil
         else
-            if (opt.env.Buddies[name] ~= nil) then
-                opt.env.Buddies[name] = nil
+
+            if (opt.env.Buddies[name] and opt.env.Buddies[name].frame) then
+                opt.env.Buddies[name].frame:Hide()
+                realign = true
             end
+
+            tinsert(self.recycled_buddy_options, opt.env.RaidBuddies[name])
+            opt.env.Buddies[name] = nil
         end
 
         -- remove buddy
@@ -208,6 +258,14 @@ function opt:AddBuddyModule()
             self:OnBuddyUnavailable(b)
             opt:ModuleEvent_BuddyRemoved(b)
             self:RefreshBuddies()
+        end
+
+        -- check if add buttons should be enabled/disabled
+        self:EvaluateAddButton()
+    
+        -- if set, re-align options UI
+        if realign then
+            self:realign_options(is_raid)
         end
     end
 
@@ -235,7 +293,7 @@ function opt:AddBuddyModule()
 
     -- update buddy status
     function module:RefreshBuddies()
-
+        
         local list
         if IsInRaid() then 
             list = opt.env.RaidBuddies
@@ -248,7 +306,7 @@ function opt:AddBuddyModule()
 
             local found = false
             for key, value in pairs(list) do
-                if buddy.id == strlower(key) then
+                if buddy.id == strlower(key) and value.enabled then
                     found = true
                 end
             end
@@ -260,9 +318,9 @@ function opt:AddBuddyModule()
 
         -- refresh any buddies in the list
         for key, value in pairs(list) do
-            --if (value.enabled) then
+            if (value.enabled) then
                 self:RefreshBuddy(key)
-            --end
+            end
         end
     end
 
@@ -358,8 +416,7 @@ function opt:AddBuddyModule()
                 self.inspect:add_request(buddy)
                 opt:ModuleEvent_BuddySpecChanged(buddy)
             end
-        end
-        
+        end        
     end
 
     function module:update_slow(elapsed)
@@ -411,4 +468,283 @@ function opt:AddBuddyModule()
             opt:ModuleEvent_BuddySpecChanged(buddy)
         end
     end
+
+    --------------------------------------
+    -- Widgets
+    --------------------------------------
+
+    module.base_init = module.init
+    function module:init()
+        self:base_init()
+        self:BuildPanels()
+        self:realign_options(false)
+        self:realign_options(true)
+    end
+
+    function module:AddBuddyButton(editBox, in_raid)
+
+        local frameText = strlower(editBox:GetText())
+	    if (frameText == strlower(opt.PlayerName)) then
+		    editBox:SetText('')
+            return
+        end
+
+        local name = editBox:GetText()
+        local result = self:TryRegisterBuddy(name, in_raid)
+        if result then
+            editBox:SetText('')
+        end
+    end
+
+    function module:TryRegisterBuddy(name, in_raid)
+
+        local list
+        if in_raid then
+           list = opt.env.RaidBuddies
+        else
+           list = opt.env.Buddies
+        end
+
+        local count = opt:GetTableSize(list)
+        if count >= COUNT then return end
+        
+        for existing_name, setting in pairs(list) do
+           if existing_name == name then 
+                
+                return false
+           end
+        end
+        
+        self:RegisterBuddy(name, in_raid)
+        return true
+    end
+
+    function module:BuildPanels()
+
+        -- panel header
+
+        local buddy_page = CreateFrame('FRAME', 'BuddyManagement', opt)
+        buddy_page.name = 'Buddy Management'
+        buddy_page.ShouldResetFrames = false
+        buddy_page.parent = opt.name
+        InterfaceOptions_AddCategory(buddy_page)
+        self.buddy_page = buddy_page
+
+        local header = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        header:SetText(opt.titles.BuddyTitle)
+        header:SetPoint('TOPLEFT', buddy_page, 'TOPLEFT', 24, -16)
+
+        local subheader = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        subheader:SetText(opt.titles.BuddyDesc)
+        subheader:SetPoint('TOPLEFT', header, 'TOPLEFT', 0, -24)
+        
+        local subheader2 = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        subheader2:SetText(opt.titles.BuddyDesc2)
+        subheader2:SetPoint('TOPLEFT', subheader, 'TOPLEFT', 0, -16)
+
+        local subheader3 = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        subheader3:SetText(opt.titles.BuddyDesc3)
+        subheader3:SetPoint('TOPLEFT', subheader2, 'TOPLEFT', 0, -16)
+
+        -- buddy frames
+
+        local party = opt:CreatePanel(buddy_page, nil, 256, 300)
+        party:SetPoint('TOPLEFT', subheader3, 'BOTTOMLEFT', 0, -64)
+        self.party_panel = party
+
+        local title = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        title:SetText(opt.titles.PartyBuddies)
+        title:SetPoint('TOPLEFT', party, 'TOPLEFT', 0, 32)
+
+        local raid = opt:CreatePanel(buddy_page, nil, 256, 300)
+        raid:SetPoint('TOPLEFT', party, 'TOPRIGHT', 64, 0)
+        self.raid_panel = raid
+
+        local title2 = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+        title2:SetText(opt.titles.RaidBudies)
+        title2:SetPoint('TOPLEFT', raid, 'TOPLEFT', 0, 32)
+
+        local previous = nil
+        for name, setting in pairs(opt.env.Buddies) do
+            previous = self:AddBuddyWidget(party, previous, name, setting, false)
+        end
+
+        previous = nil
+        for name, setting in pairs(opt.env.RaidBuddies) do
+            previous = self:AddBuddyWidget(raid, previous, name, setting, true)
+        end
+
+        -- party add buttons
+
+        local editBox = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
+        editBox:SetPoint('TOPLEFT', party, 'BOTTOMLEFT', -2, -12)
+        editBox:SetCursorPosition(0)
+        
+        local addBtn = CreateFrame("Button", nil, party, "UIPanelButtonTemplate")
+        addBtn:SetPoint('TOPLEFT', editBox, 'TOPRIGHT', 8, -4)
+        addBtn:SetText('Add')
+        addBtn:SetWidth(80)
+        addBtn:SetHeight(24)
+        addBtn:SetScript("OnClick", function(this, event, ...)
+            self:AddBuddyButton(editBox, false)
+            editBox:SetText('')
+        end)
+        self.add_button_party = addBtn
+
+        editBox:SetScript('OnEnterPressed', function(self)
+            addBtn:Click()
+        end)
+        editBox:SetScript('OnEscapePressed', function(self)
+            editBox:ClearFocus()
+        end)
+
+        -- raid add butons
+
+        local editBoxRaid = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
+        editBoxRaid:SetPoint('TOPLEFT', raid, 'BOTTOMLEFT', -2, -12)
+        editBoxRaid:SetCursorPosition(0)
+        
+        local addBtnRaid = CreateFrame("Button", nil, raid, "UIPanelButtonTemplate")
+        addBtnRaid:SetPoint('TOPLEFT', editBoxRaid, 'TOPRIGHT', 8, -4)
+        addBtnRaid:SetText('Add')
+        addBtnRaid:SetWidth(80)
+        addBtnRaid:SetHeight(24)
+        addBtnRaid:SetScript("OnClick", function(this, arg1)
+            self:AddBuddyButton(editBoxRaid, true)
+            editBoxRaid:SetText('')
+        end)
+        self.add_button_raid = addBtnRaid
+
+        editBoxRaid:SetScript('OnEnterPressed', function(self)
+            addBtnRaid:Click()
+        end)
+        editBoxRaid:SetScript('OnEscapePressed', function(self)
+            editBoxRaid:ClearFocus()
+        end)
+    end
+
+    function module:AddBuddyWidget(parent, previous, name, setting, in_raid)
+
+        if not parent then
+            return
+        end
+
+        -- create and position frame
+
+        local frame = CreateFrame('Frame', nil, parent)
+        frame:SetSize(264, 24)
+        frame:SetFrameStrata("HIGH")
+        frame.buddy_name = name
+        setting.frame = frame
+
+        if previous then
+            frame:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, -4)
+        else
+            frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', 4, -4)
+        end
+
+        -- frame highlight
+
+        frame.highlight = frame:CreateTexture('HIGHLIGHT')
+        frame.highlight:SetTexture('Interface/BUTTONS/UI-Listbox-Highlight')
+        frame.highlight:SetBlendMode('add')
+        frame.highlight:SetAlpha(.5)
+        frame.highlight:Hide()
+        frame.highlight:SetAllPoints(frame)
+
+        -- enabled checkbox
+
+        frame.check = CreateFrame('CheckButton', nil, frame, 'OptionsBaseCheckButtonTemplate')
+        frame.check:SetScript('OnClick', function(this)
+            if not opt.env.Buddies[frame.buddy_name] then return end
+            local was_enabled = opt.env.Buddies[frame.buddy_name].enabled
+            if (was_enabled) then
+                this:SetChecked(false)
+                opt.env.Buddies[frame.buddy_name].enabled = false
+                self:RefreshBuddies()
+            else
+                this:SetChecked(true)
+                opt.env.Buddies[frame.buddy_name].enabled = true
+                self:RefreshBuddies()
+            end
+        end)
+        frame.check:SetPoint('TOPLEFT', frame, 'TOPLEFT', 0, -0)
+        frame.check:SetChecked(setting.enabled)
+
+        frame.check:SetScript('OnEnter', function(self)
+            frame.highlight:Show()
+            opt:OnTooltipEnter(frame)
+        end)
+        frame.check:SetScript('OnLeave', function(self)
+            frame.highlight:Hide()
+            opt:OnTooltipLeave(frame)
+        end)
+
+        -- name text
+
+        frame.name = frame:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
+        frame.name:SetText(name)
+        frame.name:SetPoint('TOPLEFT', frame.check, 'TOPRIGHT', 4, -6)
+
+        frame:SetScript('OnEnter', function(self)
+            self.highlight:Show()
+            opt:OnTooltipEnter(frame)
+        end)
+        frame:SetScript('OnLeave', function(self)
+            self.highlight:Hide()
+            opt:OnTooltipLeave(frame)
+        end)
+
+        -- remove button
+
+        frame.remove = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        frame.remove:SetPoint('TOPRIGHT',  frame, 'TOPRIGHT', -4, 0)
+        frame.remove:SetWidth(24)
+        frame.remove:SetHeight(22)
+        frame.remove:SetText('x')
+        frame.remove:SetScript("OnClick", function(this, arg1)
+            self:RemoveBuddy(frame.buddy_name, in_raid)
+        end)
+
+        return frame
+    end
+
+    function module:realign_panel(list, panel)
+
+        local panels = {}
+        for name, setting in pairs(list) do
+            table.insert(panels, setting)
+        end
+
+        table.sort(panels, function(a,b)
+            return a.name < b.name
+        end)
+
+        local previous = nil
+        for _, setting in pairs(panels) do
+            if setting.frame then
+                if previous then
+                    setting.frame:SetPoint('TOPLEFT', previous, 'BOTTOMLEFT', 0, -4)
+                else
+                    setting.frame:SetPoint('TOPLEFT', panel, 'TOPLEFT', 4, -4)
+                end
+                previous = setting.frame
+            end
+        end
+    end
+
+    function module:realign_options(in_raid)
+        if in_raid then
+            self:realign_panel(opt.env.RaidBuddies, self.raid_panel)
+        else
+            self:realign_panel(opt.env.Buddies, self.party_panel)
+        end
+    end
+
+    function module:main_frame_right_click()
+        if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
+            self:TryRegisterBuddy(GetUnitName("target", true), opt.InRaid)
+        end
+    end
+
 end

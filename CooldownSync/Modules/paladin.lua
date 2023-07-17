@@ -13,8 +13,6 @@ function opt:AddPaladinModule()
 
     function module:load_default_values()
 
-        opt:SetDefaultValue('Paladin_Buddy', "")
-        opt:SetDefaultValue('Paladin_RaidBuddy', "")
         opt:SetDefaultValue('Paladin_CooldownAudio', "None")
         opt:SetDefaultValue('Paladin_CooldownChannel', "Master")
         opt:SetDefaultValue('Paladin_ShowFrameGlow',  true)
@@ -658,14 +656,6 @@ function opt:AddPaladinModule()
         local buddy = self.buddy:FindBuddyByGuid(guid)
         if not buddy then end
         buddy:EndGlow()
-    end
-
-    function module:main_frame_right_click()
-        if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
-            opt.ui.buddyEditBox:SetText(GetUnitName("target", true))
-            opt.ui.buddyEditBox:SetCursorPosition(0)
-            module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, opt.InRaid)
-        end
     end
 
     function module:post_init()

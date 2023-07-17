@@ -452,3 +452,7 @@ function opt:StringNilOrEmpty(str)
 	if str:match("^%s*$") then return true end
 	return false
 end
+
+function opt:Round(number)
+    return math.floor(number + 0.5)
+end

@@ -56,7 +56,18 @@ function opt:SetupLocale()
 		ShowSpellGlowHeader = "Show Spell Glow",
 		ShowSpellGlowTooltip = "Show a glow around spells when they are active.\n\nNOTE: Disabling glow effects may improve performance.",
 	
+		--------------------------------
 		-- Buddy
+		--------------------------------
+
+		BuddyTitle = 'Buddy Management',
+		BuddyDesc = 'Add cooldown tracking for other players in your party or raid.',
+		BuddyDesc2 = 'You can also right click on the main frame to set your current target as your buddy.',
+		BuddyDesc3 = 'To quickly remove a buddy, double-click them on the main CooldownSync frame.',
+
+		PartyBuddies = 'Buddies (Party Content)',
+		RaidBudies = 'Buddies (Raid Content)',
+
 		PartyBuddy = 'Buddy (Party Content)',
 		RaidBuddy = 'Buddy (Raid Content)',
 		Buddy = 'Buddy:',
@@ -166,9 +177,9 @@ function opt:SetupLocale()
 
 		Evoker_Options = "Evoker Options",
 		Evoker_Augmentation = "Augmentation",
-		Evoker_GlowCooldowns = "Glow Frames",
+		Evoker_AugCooldowns = "Glow Frames During Cooldowns",
 		Evoker_GlowMajorCooldowns = "Party and Raid Frames - Cooldown Glow",
-		Evoker_GlowMajorCooldownsTooltip = "Glow party and raid frames any time a major cooldown is cast.",
+		Evoker_GlowMajorCooldownsTooltip = "Glow party and raid frames any time a friendly player uses a major cooldown.",
 	}
 	
 end

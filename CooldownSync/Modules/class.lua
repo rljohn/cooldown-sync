@@ -343,7 +343,7 @@ function opt:BuildClassModule(name)
             time_remaining = opt:GetAuraDuration(unit_id, spell_id)
         end
 
-        if ability.minimum_duration and ability.minimum_duration > 0 then
+        if ability.minimum_duration and ability.minimum_duration > 0 and time_remaining < ability.minimum_duration then
             cdDiagf("Ignoring aura, it wasn't long enough")
             return nil
         end
