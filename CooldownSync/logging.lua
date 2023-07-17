@@ -2,7 +2,7 @@ local opt = CooldownSyncConfig
 
 -- toggles for logging
 local ENABLE_OUTPUT=true
-local ENABLE_DIAG=true
+local ENABLE_DIAG=false
 local ENABLE_DUMPING=true
 
 -- LOGGING
@@ -145,6 +145,10 @@ function opt:BuildLogModule(name)
 
     function module:main_frame_right_click()
         cdPrintf("OnMainFrameRightClick")
+    end
+
+    function module:ability_frame_double_click(row)
+        cdPrintf("OnAbilityRowDoubleClick - %s", row.player)
     end
 
     function module:ability_begin(guid, ability)

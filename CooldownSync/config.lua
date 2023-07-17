@@ -79,10 +79,15 @@ end
 
 -- Main Interface Callbacks
 
+local ENABLE_LOG_MODULE = false
 function opt:OnLogin()
 
-	-- init
-	self:BuildLogModule("logging")
+	-- logging
+	if ENABLE_LOG_MODULE then
+		self:BuildLogModule("logging")
+	end
+
+	-- core libs
 	self:InitGlowLibrary()
 	self:SetupLocale()
 	

@@ -525,7 +525,7 @@ function opt:BuildClassModule(name)
     function module:CreateAbilityRow(n)
         local row = self:FindInactiveRow()
         if not row then
-           row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
+            row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
         else
             row.header:Show()
         end
@@ -606,6 +606,7 @@ function opt:BuildClassModule(name)
         local row = self:CreateAbilityRow(opt.PlayerName)
         self:SetupAbilityRow(row, opt.PlayerGUID, opt.PlayerClass, opt.PlayerSpec, opt.PlayerRace, true)
         self.player = row
+        row.player = opt.PlayerName
 
         -- setup bar alignment
         self:align_bars()
@@ -661,6 +662,7 @@ function opt:BuildClassModule(name)
 
     function module:buddy_available(buddy)
         local row = self:CreateAbilityRow(buddy.name)
+        row.player = buddy.key
         self.buddy_rows[buddy.id] = row
         self:align_bars()
     end

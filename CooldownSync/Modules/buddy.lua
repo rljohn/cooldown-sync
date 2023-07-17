@@ -14,6 +14,8 @@ function opt:AddBuddyModule()
     module.buddy_pool = {}
     module.active_buddies = {}
     module.recycled_buddy_options = {}
+    module.class_buddy_party = nil
+    module.class_buddy_raid = nil
 
     -- create a buddy
     function module:CreateBuddy()
@@ -295,19 +297,24 @@ function opt:AddBuddyModule()
     function module:RefreshBuddies()
         
         local list
+        local class_buddy
         if IsInRaid() then 
             list = opt.env.RaidBuddies
+            class_buddy = self.class_buddy_raid
         else
             list = opt.env.Buddies
+            class_buddy = self.class_buddy_party
         end
         
         -- wipe out any buddies no longer in the list
         for idx, buddy in pairs(self.active_buddies) do
 
-            local found = false
-            for key, value in pairs(list) do
-                if buddy.id == strlower(key) and value.enabled then
-                    found = true
+            local found = class_buddy and (buddy.id == strlower(class_buddy))
+            if not found then
+                for key, value in pairs(list) do
+                    if buddy.id == strlower(key) and value.enabled then
+                        found = true
+                    end
                 end
             end
 
@@ -321,6 +328,10 @@ function opt:AddBuddyModule()
             if (value.enabled) then
                 self:RefreshBuddy(key)
             end
+        end
+
+        if not opt:StringNilOrEmpty(class_buddy) then
+            self:RefreshBuddy(class_buddy)
         end
     end
 
@@ -377,6 +388,7 @@ function opt:AddBuddyModule()
         table.insert(self.active_buddies, buddy)
 
         local name, realm = UnitName(info.unit_id)
+        buddy.key = key
         buddy.unit_id = info.unit_id
         buddy.name = name
         buddy.realm = opt:SpaceStripper(realm)
@@ -509,8 +521,7 @@ function opt:AddBuddyModule()
         if count >= COUNT then return end
         
         for existing_name, setting in pairs(list) do
-           if existing_name == name then 
-                
+           if strlower(existing_name) == strlower(name) then 
                 return false
            end
         end
@@ -579,7 +590,8 @@ function opt:AddBuddyModule()
         local editBox = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
         editBox:SetPoint('TOPLEFT', party, 'BOTTOMLEFT', -2, -12)
         editBox:SetCursorPosition(0)
-        
+        opt:AddTooltip(editBox, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxParty)
+
         local addBtn = CreateFrame("Button", nil, party, "UIPanelButtonTemplate")
         addBtn:SetPoint('TOPLEFT', editBox, 'TOPRIGHT', 8, -4)
         addBtn:SetText('Add')
@@ -590,6 +602,7 @@ function opt:AddBuddyModule()
             editBox:SetText('')
         end)
         self.add_button_party = addBtn
+        opt:AddTooltip(addBtn, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxParty)
 
         editBox:SetScript('OnEnterPressed', function(self)
             addBtn:Click()
@@ -603,7 +616,8 @@ function opt:AddBuddyModule()
         local editBoxRaid = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
         editBoxRaid:SetPoint('TOPLEFT', raid, 'BOTTOMLEFT', -2, -12)
         editBoxRaid:SetCursorPosition(0)
-        
+        opt:AddTooltip(editBoxRaid, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxRaid)
+
         local addBtnRaid = CreateFrame("Button", nil, raid, "UIPanelButtonTemplate")
         addBtnRaid:SetPoint('TOPLEFT', editBoxRaid, 'TOPRIGHT', 8, -4)
         addBtnRaid:SetText('Add')
@@ -614,6 +628,7 @@ function opt:AddBuddyModule()
             editBoxRaid:SetText('')
         end)
         self.add_button_raid = addBtnRaid
+        opt:AddTooltip(addBtn, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxRaid)
 
         editBoxRaid:SetScript('OnEnterPressed', function(self)
             addBtnRaid:Click()
@@ -713,10 +728,14 @@ function opt:AddBuddyModule()
 
         local panels = {}
         for name, setting in pairs(list) do
-            table.insert(panels, setting)
+            if setting and setting.name then
+                table.insert(panels, setting)
+            end
         end
 
         table.sort(panels, function(a,b)
+            if not a.name then return b end
+            if not b.name then return a end
             return a.name < b.name
         end)
 
@@ -742,9 +761,27 @@ function opt:AddBuddyModule()
     end
 
     function module:main_frame_right_click()
+
+        -- let priests and holy paladins manage their own shit
+        if opt.PlayerSpec == 65 or opt.PlayerClass == 5 then return end
+
         if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
             self:TryRegisterBuddy(GetUnitName("target", true), opt.InRaid)
         end
+    end
+
+    function module:ability_frame_double_click(row)
+        if not row or not row.player then return end
+        self:RemoveBuddy(row.player, opt.InRaid)
+    end
+
+    function module:SetClassBuddy(name, in_raid)
+        if in_raid then
+            self.class_buddy_raid = name
+        else
+            self.class_buddy_party = name
+        end
+        self:RefreshBuddies()
     end
 
 end

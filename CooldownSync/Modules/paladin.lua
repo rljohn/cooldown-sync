@@ -13,6 +13,8 @@ function opt:AddPaladinModule()
 
     function module:load_default_values()
 
+        opt:SetDefaultValue('Paladin_Buddy', "")
+        opt:SetDefaultValue('Paladin_RaidBuddy', "")
         opt:SetDefaultValue('Paladin_CooldownAudio', "None")
         opt:SetDefaultValue('Paladin_CooldownChannel', "Master")
         opt:SetDefaultValue('Paladin_ShowFrameGlow',  true)
@@ -292,21 +294,21 @@ function opt:AddPaladinModule()
 
     function module:BuildPanels()
             
-        local party = opt:CreatePanel(opt, nil, 264, 100)
+        local party = opt:CreatePanel(opt, nil, 264, 64)
         party:SetPoint('TOPLEFT', opt.ui.main, 'BOTTOMLEFT', 0, -80)
 
         local title = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-        title:SetText(opt.titles.PartyBuddy)
+        title:SetText(opt.titles.Paladin_PartyBuddy)
         title:SetPoint('TOPLEFT', party, 'TOPLEFT', 0, 32)
 
-        local raid = opt:CreatePanel(opt, nil, 264, 100)
+        local raid = opt:CreatePanel(opt, nil, 264, 64)
         raid:SetPoint('TOPLEFT', party, 'BOTTOMLEFT', 0, -72)
 
         local title2 = opt:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
-        title2:SetText(opt.titles.RaidBuddy)
+        title2:SetText(opt.titles.Paladin_RaidBuddy)
         title2:SetPoint('TOPLEFT', raid, 'TOPLEFT', 0, 32)
 
-        local options = opt:CreatePanel(opt, "ConfigFrame", 258, 180)
+        local options = opt:CreatePanel(opt, "ConfigFrame", 258, 200)
         options:SetPoint('TOPLEFT', party, 'TOPRIGHT', 64, 0)
         
         self:BuildPartyOptions(party)
@@ -616,10 +618,7 @@ function opt:AddPaladinModule()
         end
 
         -- replace previous buddy
-        self.buddy:RemoveBuddy(previous, is_raid)
-        if (frameText ~= '') then
-            self.buddy:RegisterBuddy(frame:GetText())
-        end
+        self.buddy:SetClassBuddy(frame:GetText(), is_raid)
 
         if is_raid then
             opt.env.Paladin_RaidBuddy = frame:GetText()
@@ -658,13 +657,47 @@ function opt:AddPaladinModule()
         buddy:EndGlow()
     end
 
+    function module:main_frame_right_click()
+        local name = GetUnitName("target", true)
+        if (UnitIsPlayer("target") and name and name ~= opt.PlayerName) then
+            if opt.InRaid then
+                opt.ui.buddyEditBoxRaid:SetText(name)
+                opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, true)
+            else
+                opt.ui.buddyEditBox:SetText(name)
+                opt.ui.buddyEditBox:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
+            end
+            module:RefreshPaladinMacros(opt.InRaid)
+        end
+    end
+
+    function module:ability_frame_double_click(row)
+        if not row or not row.player then return end
+        
+        if opt.InRaid then
+            if row.player == opt.env.Paladin_RaidBuddy then
+                opt.ui.buddyEditBoxRaid:SetText('')
+                opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, true)
+            end
+        else
+            if row.player == opt.env.Paladin_Buddy then
+                opt.ui.buddyEditBox:SetText('')
+                opt.ui.buddyEditBox:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
+            end
+        end
+    end
+
     function module:post_init()
         if not opt:StringNilOrEmpty(opt.env.Paladin_Buddy) then
-            self.buddy:RegisterBuddy(opt.env.Paladin_Buddy, false)
+            self.buddy:SetClassBuddy(opt.env.Paladin_Buddy, false)
         end
 
         if not opt:StringNilOrEmpty(opt.env.Paladin_RaidBuddy) then
-            self.buddy:RegisterBuddy(opt.env.Paladin_RaidBuddy, true)
+            self.buddy:SetClassBuddy(opt.env.Paladin_RaidBuddy, true)
         end
     end
 

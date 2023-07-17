@@ -80,7 +80,6 @@ function opt:CreateMainFrame()
 			opt:ModuleEvent_OnMainFrameRightClick()
 		end
 	end)
-
 end
 
 function opt:ShowMainFrame()

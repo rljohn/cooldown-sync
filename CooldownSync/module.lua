@@ -304,6 +304,14 @@ function opt:ModuleEvent_OnMainFrameRightClick()
     end
 end
 
+function opt:ModuleEvent_OnRowDoubleClick(row)
+    for key, module in pairs(opt.modules) do
+        if (module.ability_frame_double_click) then
+            module:ability_frame_double_click(row)
+        end
+    end
+end
+
 function opt:ModuleEvent_OnAbilityBegin(guid, ability)
     for key, module in pairs(opt.modules) do
         if (module.ability_begin) then

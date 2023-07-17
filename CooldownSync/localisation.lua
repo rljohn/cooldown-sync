@@ -62,18 +62,20 @@ function opt:SetupLocale()
 
 		BuddyTitle = 'Buddy Management',
 		BuddyDesc = 'Add cooldown tracking for other players in your party or raid.',
-		BuddyDesc2 = 'You can also right click on the main frame to set your current target as your buddy.',
-		BuddyDesc3 = 'To quickly remove a buddy, double-click them on the main CooldownSync frame.',
+		BuddyDesc2 = 'You can also right click on the main frame to begin tracking cooldowns for you current target.',
+		BuddyDesc3 = 'To quickly remove a buddy, middle click them on the main CooldownSync frame.',
 
 		PartyBuddies = 'Buddies (Party Content)',
 		RaidBudies = 'Buddies (Raid Content)',
 
-		PartyBuddy = 'Buddy (Party Content)',
-		RaidBuddy = 'Buddy (Raid Content)',
 		Buddy = 'Buddy:',
 		ApplyBtn = 'Apply',
 		ApplyBtnHeader = 'Apply Buddy',
 		SetAsTargetBtn = 'Copy Target',
+
+		NewBuddy = 'New Buddy',
+		AddBuddyEditBoxParty = 'Enter the name of a new player to track cooldowns in party content',
+		AddBuddyEditBoxRaid = 'Enter the name of a new player to track cooldowns in party content',
 
 		PartyBuddyTooltip = 'Configure a Buddy for party content.',
 		RaidBuddyTooltip = 'Configure a Buddy for raid groups.',
@@ -84,6 +86,9 @@ function opt:SetupLocale()
 		-- PRIEST
 		--------------------
 
+		Priest_PartyBuddy = 'Power Infusion Buddy (Party)',
+		Priest_RaidBuddy = 'Power Infusion Buddy (Raid)',
+		
 		Priest_MacroConfig = 'Power Infusion (Party) - Macro',
 		Priest_MacroConfigRaid = 'Power Infusion (Raid) - Macro',
 
@@ -127,6 +132,9 @@ function opt:SetupLocale()
 		--------------------
 
 		Paladin_Options = "Paladin Options",
+
+		Paladin_PartyBuddy = 'Blessing of Summer Buddy (Party)',
+		Paladin_RaidBuddy = 'Blessing of Summer Buddy (Raid)',
 
 		Paladin_MacroConfig = 'Blessing of Summer (Party) - Macro',
 		Paladin_MacroConfigRaid = 'Blessing of Summer (Raid) - Macro',
