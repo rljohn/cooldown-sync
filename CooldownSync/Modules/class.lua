@@ -287,7 +287,6 @@ function opt:BuildClassModule(name)
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if not ability then return nil end
         if ability.active then
-            print('ignoring, already active')
             return nil 
         end
 

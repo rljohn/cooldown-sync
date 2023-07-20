@@ -164,9 +164,9 @@ CooldownSyncClassList = {
 		-- Frost
 		[251] = {
 			-- Breath of Sindragosa
-			{ id = 152279, cd = 120 },
+			{ id = 152279, cd = 120, hidden = true },
 			-- Frostwyrm's Fury
-			{ id = 279302, cd = 90, dur = 3 },
+			{ id = 279302, cd = 90, dur = 3, hidden = true },
 			-- Abomination Limb
 			{ id = 315443, cd = 120, aura = 383269, hidden = true, multi = true },
 		},
