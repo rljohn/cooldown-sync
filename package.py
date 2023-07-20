@@ -24,11 +24,11 @@ def copy_to_staging_folder(addon_name, folder_name):
     outdir = os.path.join(folder_name, addon_name)
     copytree(addon_name, outdir, ignore=ignore_patterns('*.json', '.vscode'))
 
-def update_version(addon_name, folder_name, version):
+def update_version(addon_name, staging_folder_name, version):
     
     # Read the contents of the file
     try:
-        file_name = os.path.join(addon_name, addon_name, "config_panels.lua")
+        file_name = os.path.join(staging_folder_name, addon_name, "config_panels.lua")
         with open(file_name, "r") as file:
             file_contents = file.read()
 
@@ -52,6 +52,7 @@ def main():
         # copy files to staging folder
         create_staging_folder(staging_folder_name)
         copy_to_staging_folder(addon_name, staging_folder_name)
+        update_version(addon_name, staging_folder_name, version)
 
         # remove existing zip file
         zip_file = f"{addon_name}_{version}_{type}"
