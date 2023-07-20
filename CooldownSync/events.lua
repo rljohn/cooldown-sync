@@ -4,6 +4,9 @@ local opt = CooldownSyncConfig
 
 function opt:PrintHelp()
 	print('|cffFFF569Cooldown Sync|r Commands:')
+	print(' /cds add <name> - Adds <name> as a buddy in your current party type.')
+	print(' /cds remove <name> - Removes <name> as a buddy in your current party type.')
+	print(' /cds reset - Completely resets the addon to its default settings.')
 end
 
 local buddy = nil
@@ -34,14 +37,8 @@ function SlashCmdList.CooldownSync(msg, editbox)
 		if (args[1] == "reset") then
 			opt:ResetAll()
 			return
-		elseif (args[1] == "clear") then
-			buddy:ClearBuddies()
-			return
-		elseif (args[1] == "refresh") then
-			buddy:RefreshBuddies()
-			return
-		elseif (args[1] == "update") then
-			buddy:UpdateBuddies()
+		elseif (args[1] == "help") then
+			opt:PrintHelp()
 			return
 		end
 	-- 2 param actions
@@ -51,18 +48,6 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			return
 		elseif (args[1] == "remove") then
 			buddy:RemoveBuddy(args[2])
-			return
-		elseif (args[1] == "dump") then
-			cdDiagf("Dumping: %s", args[2])
-			if (args[2] == "env") then
-				cdDump(opt.env)
-			elseif (args[2] == "global") then
-				cdDump(opt.globals)
-			elseif (args[2] == "buddy") then
-				cdDump(buddy)
-			elseif (args[2] == "inspect") then
-				cdDump(inspect)
-			end
 			return
 		end
 	end

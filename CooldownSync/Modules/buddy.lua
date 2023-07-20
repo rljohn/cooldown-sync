@@ -164,10 +164,6 @@ function opt:AddBuddyModule()
         end
     end
 
-    function module:hehexd()
-        print('hehexd')
-    end
-
     -- register a buddy
     function module:RegisterBuddy(name, in_raid)
 

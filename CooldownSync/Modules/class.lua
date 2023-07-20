@@ -343,7 +343,6 @@ function opt:BuildClassModule(name)
         end
 
         if ability.minimum_duration and ability.minimum_duration > 0 and time_remaining < ability.minimum_duration then
-            cdDiagf("Ignoring aura, it wasn't long enough")
             return nil
         end
 
