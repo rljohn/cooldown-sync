@@ -4,7 +4,7 @@ import os
 from shutil import copytree, ignore_patterns
 
 version = "1.2"
-type = "alpha"
+type = "release"
 
 addon_name = "CooldownSync"
 staging_folder_name = "build"
