@@ -258,7 +258,9 @@ function opt:AddCooldownModule()
     end
 
     function module:encounter_end(id, name, difficulty, group_size)
-        self:reset_all_cooldowns()
+        if opt:IsRaidDifficulty(difficulty) then
+            self:reset_all_cooldowns()
+        end
         opt.InEncounter = false
     end
 
