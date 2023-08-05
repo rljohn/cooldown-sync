@@ -41,7 +41,6 @@ function opt:BuildClassModule(name)
             icon:SetPoint('TOPLEFT', self.player, 'TOPLEFT', self.player.icon_offset_x, self.player.icon_offset_y)
             if not icon.hidden then
                 self.player.icon_offset_x = self.player.icon_offset_x + self.player.icon_spacing
-                hasIcons = true
             end
         end
 
@@ -241,6 +240,7 @@ function opt:BuildClassModule(name)
     function module:SetAbilityActive(guid, ability)
         if ability.active then return end
 
+        local realign = false
         ability.start_time = GetTime()
         ability.active = true
         if (ability.icon) then
@@ -249,6 +249,7 @@ function opt:BuildClassModule(name)
             if ability.icon.hidden then
                 ability.icon:Show()
                 ability.icon.hidden = false
+                realign = true
             end
 
             -- hide its exclusive partner
@@ -258,13 +259,17 @@ function opt:BuildClassModule(name)
                     if other.icon and not other.hidden then
                         other.icon.hidden = true
                         other.icon:Hide()
-                        self:align_bars()
+                        realign = true
                     end
                 end
             end
 
             ability.icon:Begin()
             opt:ModuleEvent_OnAbilityBegin(guid, ability)
+
+            if realign then
+                self:align_bars()
+            end
         end
     end
 

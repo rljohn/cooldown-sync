@@ -1,12 +1,12 @@
 local opt = CooldownSyncConfig
 
 -- toggles for logging
-local ENABLE_OUTPUT=true
+local ENABLE_OUTPUT=false
 local ENABLE_DIAG=false
-local ENABLE_DUMPING=true
+local ENABLE_DUMPING=false
 
 -- LOGGING
-function cdDiagf(...)
+function cdPrintf(...)
  if (not ENABLE_OUTPUT) then return end
  local status, res = pcall(format, ...)
  if status then
@@ -159,5 +159,12 @@ function opt:BuildLogModule(name)
         cdDiagf("OnAbilityEnd: %s - %s", guid, ability.id)
     end
 
+    function module:encounter_start(id, name, difficulty, group_size)
+        cdDiagf("OnEncounterStart: %s - %s", id, name)
+    end
+
+    function module:encounter_end(id, name, difficulty, group_size)
+        cdDiagf("OnEncounterEnd: %s - %s", id, name)
+    end
         
 end

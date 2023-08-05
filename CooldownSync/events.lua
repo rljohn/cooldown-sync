@@ -34,11 +34,15 @@ function SlashCmdList.CooldownSync(msg, editbox)
 
 	-- 1 param actions
 	if (count == 1) then
-		if (args[1] == "reset") then
+		if (args[1] == "reinit") then
 			opt:ResetAll()
 			return
 		elseif (args[1] == "help") then
 			opt:PrintHelp()
+			return
+		elseif (args[1] == "reset") then
+			local cds = opt:GetModule("cooldowns")
+			cds:reset_all_cooldowns()
 			return
 		end
 	-- 2 param actions
@@ -69,6 +73,8 @@ opt:RegisterEvent("TRAIT_CONFIG_UPDATED")
 opt:RegisterEvent("PLAYER_FOCUS_CHANGED")
 opt:RegisterEvent("PLAYER_DEAD")
 opt:RegisterEvent("INSPECT_READY")
+opt:RegisterEvent("ENCOUNTER_START")
+opt:RegisterEvent("ENCOUNTER_END")
 
 -- Events
 
@@ -189,6 +195,12 @@ local function CooldownSync_EventHandler(self, event, ...)
 		opt:OnPlayerFocusChanged()
 	elseif (event == "PLAYER_DEAD") then
 		opt:OnPlayerDied()
+	elseif (event == "ENCOUNTER_START") then
+		local id, name, difficulty, groupSize = ...
+		opt:OnEncounterStart(id, name, difficulty, groupSize)
+	elseif (event == "ENCOUNTER_END") then
+		local id, name, difficulty, groupSize = ...
+		opt:OnEncounterEnd(id, name, difficulty, groupSize)
 	elseif (event == "INSPECT_READY") then
 		local guid = ...
 		opt:OnInspectReady(guid)

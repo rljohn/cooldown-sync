@@ -1,4 +1,4 @@
----@diagnostic disable: param-type-mismatch
+---@diagnostic disable: param-type-mismatch, missing-fields
 local opt = CooldownSyncConfig
 
 function opt:Clamp(value, min_value, max_value)
@@ -391,7 +391,7 @@ function opt:RemoveValueFromTable(tbl, value)
 
 -- Player Lookup
 
-function opt:GetUnitInfo(n) 
+function opt:GetUnitInfo(n)
 
 	if (n == nil or n == "") then return nil end
 	n = strlower(n)
@@ -425,7 +425,7 @@ function opt:GetUnitInfo(n)
 	
 	if (IsInRaid()) then
 		for i = 1, MAX_RAID_MEMBERS do
-			name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i)
+			local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i)
 			if (name) then
 				name = strlower(name)
 				local unitId = "raid" .. i
@@ -487,4 +487,21 @@ end
 
 function opt:Round(number)
     return math.floor(number + 0.5)
+end
+
+-- Raid
+
+function opt:IsRaidDifficulty(difficulty_id)
+	if(difficulty_id == 3 or -- 10m raid
+		difficulty_id == 4 or -- 25m raid
+		difficulty_id == 5 or -- 10m raid (heroic)
+		difficulty_id == 6 or -- 25m raid (heroic)
+		difficulty_id == 7 or -- LFR raid
+		difficulty_id == 9 or -- 40m raid
+		difficulty_id == 14 or -- normal
+		difficulty_id == 15 or -- heroic
+		difficulty_id == 16 or -- raid
+		difficulty_id == 17 or -- LFR
+		difficulty_id == 33    -- timewalking
+	) then return true else return false end
 end

@@ -69,15 +69,7 @@ CooldownSyncClassList = {
 	-- Hunter
 	[3] = {
 		-- Beast Mastery
-		[253] = { 
-			-- Bestial Wrath
-			{ id = 19574, cd = 90 },
-			 -- Call of the Wild
-			{ id = 359844, cd = 180 },
-			-- Aspect of the Wild
-			{ id = 193530, cd = 120 },
-			-- Stampede
-			{ id = 201430, cd = 120 },
+		[253] = {
 			-- Bloodshed
 			{ id = 321530, cd = 60 },
 		},
@@ -85,8 +77,6 @@ CooldownSyncClassList = {
 		[254] = {
 			-- Trueshot
 			{ id = 288613, cd = 120 },
-			-- Stampede
-			{ id = 201430, cd = 120 },
 		},
 		-- Survival
 		[255] = {
@@ -94,8 +84,6 @@ CooldownSyncClassList = {
 			{ id = 360966, cd = 90 },
 			-- Fury of the Eagle (debuff)
 			{ id = 203415, cd = 45, dur = 4 },
-			-- Stampede
-			{ id = 201430, cd = 120 },
 		},
 	},
 	
@@ -195,7 +183,7 @@ CooldownSyncClassList = {
 		-- Enhancement
 		[263] = {
 			-- Feral Spirit
-			{ id = 51533, cd = 90, aura = 333957},
+			{ id = 51533, cd = 45, aura = 333957},
 			-- Ascendance
 			{ id = 114051, cd = 180 },
 		},
@@ -282,8 +270,6 @@ CooldownSyncClassList = {
 			{ id = 391528, cd = 120, dur = 4, exclusive = 102560, hidden = true, multi = true },
 			-- Celestial Alignment
 			{ id = 194223, cd = 180, min = 16 },
-			-- Ravenous Frenzy
-			{ id = 323546, cd = 180 },
 		},
 		-- Feral
 		[103] = {

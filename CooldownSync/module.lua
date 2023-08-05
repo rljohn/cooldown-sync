@@ -328,6 +328,22 @@ function opt:ModuleEvent_OnAbilityEnd(guid, ability)
     end
 end
 
+function opt:ModuleEvent_OnEncounterStart(id, name, difficulty, group_size)
+    for key, module in pairs(opt.modules) do
+        if (module.encounter_start) then
+            module:encounter_start(id, name, difficulty, group_size)
+        end
+    end
+end
+
+function opt:ModuleEvent_OnEncounterEnd(id, name, difficulty, group_size)
+    for key, module in pairs(opt.modules) do
+        if (module.encounter_end) then
+            module:encounter_end(id, name, difficulty, group_size)
+        end
+    end
+end
+
 -- Class Modules
 function opt:BuildClassModules(class)
 

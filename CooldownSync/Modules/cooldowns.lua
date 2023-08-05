@@ -237,6 +237,31 @@ function opt:AddCooldownModule()
         opt:ModuleEvent_OnCooldownUpdate(guid, ability.spell_id, start, duration, cd_remaining)
     end
 
+    function module:reset_all_cooldowns()
+
+        for guid, cds in pairs(self.cooldowns) do
+            for spell_id, ability in pairs(cds.abilities) do
+
+                if ability.icon then
+                    ability.icon:End()
+                    ability.icon:EndCooldown()
+                end
+
+                CDSync_OnCooldownEnd(ability)
+                opt:ModuleEvent_OnCooldownEnd(opt.PlayerGUID, spell_id)
+            end
+        end
+    end
+
+    function module:encounter_start(id, name, difficulty, group_size)
+        opt.InEncounter = true
+    end
+
+    function module:encounter_end(id, name, difficulty, group_size)
+        self:reset_all_cooldowns()
+        opt.InEncounter = false
+    end
+
     -- do not register CD start/end, we fire those events
     return module
 end

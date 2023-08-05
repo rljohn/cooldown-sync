@@ -1,3 +1,4 @@
+---@diagnostic disable: missing-fields
 local folder,ns = ...
 
 -- Setup the Interface Options
@@ -22,7 +23,7 @@ opt.PlayerRealm = ""
 opt.ClassName = ""
 opt.PlayerClass = 0
 opt.PlayerSpec = 0
-		
+
 -- character environment data
 opt.env = {}
 opt.globals = {}
@@ -74,7 +75,7 @@ function opt:LoadMissingValues()
 
 	-- module defaults
 	self:ModuleEvent_LoadDefaultValues()
-	
+
 end
 
 -- Main Interface Callbacks
@@ -90,7 +91,7 @@ function opt:OnLogin()
 	-- core libs
 	self:InitGlowLibrary()
 	self:SetupLocale()
-	
+
 	-- check name, realm
 	opt.PlayerName = UnitName("player")
 	opt.PlayerRealm = self:SpaceStripper(GetNormalizedRealmName())
@@ -125,21 +126,21 @@ function opt:OnLogin()
 	-- create modules and load missing values
 	self:CreateModules()
 	self:LoadMissingValues()
-	
+
 	-- talents
 	self:UpdateTalentSpec()
 
 	-- create widgets
 	self:CreateWidgets()
 	self:CreateMainFrame()
-	
+
 	opt:ModuleEvent_OnInit()
 
 	-- request initial sync
 	C_Timer.After(1, function()
 		opt:ModuleEvent_OnPostInit()
 	end)
-	
+
 	-- minimap
 	self:CreateMinimapIcon()
 
@@ -189,11 +190,19 @@ function opt:OnPlayerDied()
 	self:ModuleEvent_OnPlayerDied()
 end
 
+function opt:OnEncounterStart(id, name, difficulty, groupSize)
+	self:ModuleEvent_OnEncounterStart(id, name, difficulty, groupSize)
+end
+
+function opt:OnEncounterEnd(id, name, difficulty, groupSize)
+	self:ModuleEvent_OnEncounterEnd(id, name, difficulty, groupSize)
+end
+
 function opt:CreateMinimapIcon()
 
-	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("CooldownSyncAddon", 
+	local miniButton = LibStub("LibDataBroker-1.1"):NewDataObject("CooldownSyncAddon",
 	{
-		type = "data source",	
+		type = "data source",
 		text = "Cooldown Sync",
 		icon = "135939",
 		OnClick = function(self, btn)
@@ -205,9 +214,9 @@ function opt:CreateMinimapIcon()
 ---@diagnostic disable-next-line: undefined-field
 			tooltip:AddLine("CooldownSync")
 		end,
-		
-		})
-		
+		}
+	)
+
 		opt.ui.MinimapIcon = LibStub("LibDBIcon-1.0", true)
 ---@diagnostic disable-next-line: param-type-mismatch
 		opt.ui.MinimapIcon:Register("CooldownSync", miniButton, opt.env.DB)

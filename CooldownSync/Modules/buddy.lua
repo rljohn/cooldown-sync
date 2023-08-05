@@ -583,7 +583,7 @@ function opt:AddBuddyModule()
 
         -- party add buttons
 
-        local editBox = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
+        local editBox = opt:CreateEditBox(buddy_page, nil, 64, 200, 36)
         editBox:SetPoint('TOPLEFT', party, 'BOTTOMLEFT', -2, -12)
         editBox:SetCursorPosition(0)
         opt:AddTooltip(editBox, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxParty)
@@ -592,7 +592,7 @@ function opt:AddBuddyModule()
         addBtn:SetPoint('TOPLEFT', editBox, 'TOPRIGHT', 8, -4)
         addBtn:SetText('Add')
         addBtn:SetWidth(80)
-        addBtn:SetHeight(24)
+        addBtn:SetHeight(28)
         addBtn:SetScript("OnClick", function(this, event, ...)
             self:AddBuddyButton(editBox, false)
             editBox:SetText('')
@@ -607,9 +607,21 @@ function opt:AddBuddyModule()
             editBox:ClearFocus()
         end)
 
+        local copyTargetBtn = CreateFrame("Button", nil, party, "UIPanelButtonTemplate")
+        copyTargetBtn:SetPoint('TOPLEFT', editBox, 'BOTTOMLEFT', -8, -4)
+        copyTargetBtn:SetText('Copy Current Target')
+        copyTargetBtn:SetWidth(150)
+        copyTargetBtn:SetHeight(28)
+        copyTargetBtn:SetScript("OnClick", function(this, event, ...)
+            if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
+                editBox:SetText(GetUnitName("target", true))
+                editBox:SetCursorPosition(0)
+            end
+        end)
+
         -- raid add butons
 
-        local editBoxRaid = opt:CreateEditBox(buddy_page, nil, 64, 200, 32)
+        local editBoxRaid = opt:CreateEditBox(buddy_page, nil, 64, 200, 36)
         editBoxRaid:SetPoint('TOPLEFT', raid, 'BOTTOMLEFT', -2, -12)
         editBoxRaid:SetCursorPosition(0)
         opt:AddTooltip(editBoxRaid, opt.titles.NewBuddy, opt.titles.AddBuddyEditBoxRaid)
@@ -618,7 +630,7 @@ function opt:AddBuddyModule()
         addBtnRaid:SetPoint('TOPLEFT', editBoxRaid, 'TOPRIGHT', 8, -4)
         addBtnRaid:SetText('Add')
         addBtnRaid:SetWidth(80)
-        addBtnRaid:SetHeight(24)
+        addBtnRaid:SetHeight(28)
         addBtnRaid:SetScript("OnClick", function(this, arg1)
             self:AddBuddyButton(editBoxRaid, true)
             editBoxRaid:SetText('')
@@ -631,6 +643,18 @@ function opt:AddBuddyModule()
         end)
         editBoxRaid:SetScript('OnEscapePressed', function(self)
             editBoxRaid:ClearFocus()
+        end)
+
+        local copyTargetBtnRaid = CreateFrame("Button", nil, raid, "UIPanelButtonTemplate")
+        copyTargetBtnRaid:SetPoint('TOPLEFT', editBoxRaid, 'BOTTOMLEFT', -8, -4)
+        copyTargetBtnRaid:SetText('Copy Current Target')
+        copyTargetBtnRaid:SetWidth(150)
+        copyTargetBtnRaid:SetHeight(28)
+        copyTargetBtnRaid:SetScript("OnClick", function(this, event, ...)
+            if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
+                editBoxRaid:SetText(GetUnitName("target", true))
+                editBoxRaid:SetCursorPosition(0)
+            end
         end)
     end
 
