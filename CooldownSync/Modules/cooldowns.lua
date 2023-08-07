@@ -226,6 +226,24 @@ function opt:AddCooldownModule()
         end
     end
 
+    function module:group_joined()
+        
+        -- TODO JRM
+        -- What this should do instead is after we have a Buddy Spec Changed (available)
+        -- We should ask them for their cooldowns
+        C_Timer.After(5, function()
+            if not BROADCAST_COOLDOWN_UPDATES then return end
+            local cds = self:FindCooldowns(opt.PlayerGUID)
+            if not cds then return end
+
+            for spell_id, ability in pairs(cds.abilities) do
+                if ability.on_cooldown then
+                    opt:SendCooldownChanged(spell_id, ability.cd_duration, ability.time_remaining)
+                end
+            end
+        end)
+    end
+    
     function module:player_died()
         local cds = self:FindCooldowns(opt.PlayerGUID)
         if not cds then return end
@@ -255,17 +273,15 @@ function opt:AddCooldownModule()
         if cd_remaining <= 0 then return end
         if not ability.cooldown_estimate then return end
 
+        -- calculate the start time for this PC
         local endTime = GetTime() + cd_remaining
         local start = endTime - duration
-        cdDiagf("Updating spell CD: %d - %f, %f, %f", spell_id, start, duration, cd_remaining)
 
         if not ability.on_cooldown then
-            print('Remote-OnCdStart')
             CDSync_OnCooldownStart(ability, start, duration, cd_remaining)
             opt:ModuleEvent_OnCooldownStart(guid, spell_id, start, duration, cd_remaining)
         end
 
-        print('Remote-OnCdUpdate')
         opt:ModuleEvent_OnCooldownUpdate(guid, spell_id, start, duration, cd_remaining)
     end
 

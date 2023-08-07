@@ -113,6 +113,22 @@ function opt:ModuleEvent_PartyChanged()
     end
 end
 
+function opt:ModuleEvent_OnGroupJoined()
+    for key, module in pairs(opt.modules) do
+        if (module.group_joined) then
+            module:group_joined()
+        end
+    end
+end
+
+function opt:ModuleEvent_OnGroupLeft()
+    for key, module in pairs(opt.modules) do
+        if (module.group_left) then
+            module:group_left()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnAuraGained(spell_id, guid, name)
     for key, module in pairs(opt.modules) do
         if (module.aura_gained) then

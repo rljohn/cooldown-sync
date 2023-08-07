@@ -153,9 +153,21 @@ function opt:OnLeaveCombat()
 end
 
 function opt:OnGroupChanged()
+
+	local was_in_group = opt.InGroup or opt.InRaid
 	opt.InGroup = IsInGroup() or IsInRaid()
 	opt.InRaid = IsInRaid()
+
+	-- notify modules the party situation has changed
 	opt:ModuleEvent_PartyChanged()
+
+	-- more specific party join/leave events
+	local in_group = opt.InGroup
+	if in_group and not was_in_group then
+		opt:ModuleEvent_OnGroupJoined()
+	elseif not in_group and was_in_group then
+		opt:ModuleEvent_OnGroupLeft()
+	end
 end
 
 function opt:OnCooldownsUpdated()
