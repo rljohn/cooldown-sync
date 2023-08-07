@@ -245,12 +245,38 @@ function opt:AddCooldownModule()
     end
     
     function module:player_died()
+        self:buddy_died(opt.PlayerGUID)
         local cds = self:FindCooldowns(opt.PlayerGUID)
         if not cds then return end
 
         for spell_id, ability in pairs(cds.abilities) do
             CDSync_OnCooldownEnd(ability)
             opt:ModuleEvent_OnCooldownEnd(opt.PlayerGUID, spell_id)
+        end
+    end
+
+    function module:buddy_died(buddy)
+        local cds = self:FindCooldowns(buddy.guid)
+        if not cds then return end
+
+        for spell_id, ability in pairs(cds.abilities) do
+            CDSync_OnCooldownEnd(ability)
+            opt:ModuleEvent_OnCooldownEnd(buddy.guid, spell_id)
+
+            if ability.icon then
+                ability.icon:UnitDied()
+            end
+        end
+    end
+    
+    function module:buddy_alive(buddy)
+        local cds = self:FindCooldowns(buddy.guid)
+        if not cds then return end
+
+        for spell_id, ability in pairs(cds.abilities) do
+            if ability.icon then
+                ability.icon:UnitAlive()
+            end
         end
     end
 

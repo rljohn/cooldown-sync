@@ -251,7 +251,7 @@ end
 function opt:ModuleEvent_OnBuddyDied(buddy)
     for key, module in pairs(opt.modules) do
         if (module.buddy_died) then
-            module:buddy_died()
+            module:buddy_died(buddy)
         end
     end
 end
@@ -259,7 +259,7 @@ end
 function opt:ModuleEvent_OnBuddyAlive(buddy)
     for key, module in pairs(opt.modules) do
         if (module.buddy_alive) then
-            module:buddy_alive()
+            module:buddy_alive(buddy)
         end
     end
 end
@@ -323,7 +323,7 @@ end
 function opt:ModuleEvent_OnUnitDied(guid)
     for key, module in pairs(opt.modules) do
         if (module.unit_died) then
-            module:unit_died()
+            module:unit_died(guid)
         end
     end
 end

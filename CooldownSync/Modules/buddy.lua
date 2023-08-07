@@ -363,7 +363,7 @@ function opt:AddBuddyModule()
                 if b.dead then
                     opt:ModuleEvent_OnBuddyDied(b)
                 else
-                    opt.ModuleEvent_OnBuddyAlive(b)
+                    opt:ModuleEvent_OnBuddyAlive(b)
                 end
             end
 
@@ -434,10 +434,11 @@ function opt:AddBuddyModule()
         for idx, buddy in pairs(self.active_buddies) do
             local dead = UnitIsDeadOrGhost(buddy.unit_id)
             if dead ~= buddy.dead then
+                buddy.dead = dead
                 if buddy.dead then
                     opt:ModuleEvent_OnBuddyDied(buddy)
                 else
-                    opt.ModuleEvent_OnBuddyAlive(buddy)
+                    opt:ModuleEvent_OnBuddyAlive(buddy)
                 end
             end
         end
@@ -447,7 +448,7 @@ function opt:AddBuddyModule()
         local buddy = self:FindBuddyByGuid(guid)
         if buddy then
             buddy.dead = true
-            opt:ModuleEvent_OnBuddyDied(guid)
+            opt:ModuleEvent_OnBuddyDied(buddy)
         end
     end
 
@@ -461,6 +462,10 @@ function opt:AddBuddyModule()
             local spec_info = opt:GetClassInfoBySpec(buddy.spec)
             buddy.spec_name = spec_info.spec
             opt:ModuleEvent_BuddySpecChanged(buddy)
+
+            if buddy.dead then
+                opt:ModuleEvent_OnBuddyDied(buddy)
+            end
         end
     end
 
@@ -474,6 +479,10 @@ function opt:AddBuddyModule()
             local spec_info = opt:GetClassInfoBySpec(buddy.spec)
             buddy.spec_name = spec_info.spec
             opt:ModuleEvent_BuddySpecChanged(buddy)
+
+            if buddy.dead then
+                opt:ModuleEvent_OnBuddyDied(buddy)
+            end
         end
     end
 

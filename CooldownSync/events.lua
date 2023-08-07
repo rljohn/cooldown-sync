@@ -134,7 +134,7 @@ function opt:OnCombatEvent(...)
 	------------------------------------
 
 	if (subevent == "UNIT_DIED") then
-		opt:ModuleEvent_OnUnitDied(sourceGUID)
+		opt:ModuleEvent_OnUnitDied(destGUID)
 		return
 	end
 

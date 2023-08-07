@@ -139,6 +139,18 @@ function opt:BuildLogModule(name)
         cdDiagf("OnBuddySpecChanged: %s - %s", buddy.id, buddy.spec_name)
     end
 
+    function module:buddy_died(buddy)
+        cdDiagf("OnBuddyDied: %s", buddy.guid)
+    end
+
+    function module:buddy_alive(buddy)
+        cdDiagf("OnBuddyAlive: %s", buddy.guid)
+    end
+
+    function module:unit_died(guid)
+        cdDiagf("OnUnitDied: %s", guid)
+    end
+
     function module:unit_id_changed(buddy, unit_id)
         cdDiagf("OnUnitIdChanged: %s - %s", buddy.id, unit_id)
     end

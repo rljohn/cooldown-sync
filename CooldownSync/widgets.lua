@@ -127,15 +127,28 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self.cd_end = 0
             self.cd_time_remaining = 0
         end
+
+        function panel:UnitDied()
+            if self.spell then
+                self.spell:SetAlpha(0.15)
+            end
+        end
+
+        function panel:UnitAlive()
+            if self.spell then
+                self.spell:SetAlpha(1)
+            end
+        end
     
         function panel:Reset()
-            panel:End()
-            panel:EndCooldown()
-            panel.active = false
-            panel.glowing = false
-            panel.hiding_cooldown = true
-            panel.cd_duration = 0
-            panel.spell_id = spell_id
+            self:End()
+            self:EndCooldown()
+            self.active = false
+            self.glowing = false
+            self.hiding_cooldown = true
+            self.cd_duration = 0
+            self.spell_id = spell_id
+            self.spell:Setalpha(1)
             self:Hide()
         end
 

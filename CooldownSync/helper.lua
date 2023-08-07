@@ -230,7 +230,7 @@ function opt:IsPartyMember(n)
 
 	if (IsInRaid()) then
 		for i = 1, MAX_RAID_MEMBERS do
-			name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i)
+			local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(i)
 			if (name) then
 				name = strlower(name)
 				local unitId = "raid" .. i
