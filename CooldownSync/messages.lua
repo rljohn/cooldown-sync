@@ -14,6 +14,7 @@ local BUDDY_INFO_REQUEST = 100
 local BUDDY_INFO_REPLY = 101
 local BUDDY_INFO_CHANGED = 102
 
+-- spells
 local SPELL_COOLDOWN_REQUEST = 200
 local SPELL_COOLDOWN_REPLY = 201
 local SPELL_COOLDOWN_CHANGED = 202
@@ -80,10 +81,21 @@ function opt:HandleMessage(message)
 
 	if message.id == TALENT_SPEC_REQUEST then
 		opt:SendTalentSpecReply(message)
-	elseif message.id == TALENT_SPEC_CHANGED then
+		return
+	end
+
+	if message.id == TALENT_SPEC_CHANGED then
 		if inspect then
-			opt:ModuleEvnet_OnTalentsReceived(message.sender, message.spec_id, message.spec_name)
+			opt:ModuleEvent_OnTalentsReceived(message.sender, message.spec_id, message.spec_name)
 		end
+		return
+	end
+
+	-- cooldowns
+	
+	if message.id == SPELL_COOLDOWN_CHANGED then
+		opt:ModuleEvent_OnSpellCooldownReceived(message.sender_guid, message.spell_id, message.duration, message.time_remaining)
+		return
 	end
 
 end
@@ -107,4 +119,13 @@ function opt:SendTalentSpecReply(message)
 	response.id = TALENT_SPEC_REPLY
 	response.spec_id = opt.PlayerSpec
 	opt:SendReply(message, response)
+end
+
+function opt:SendCooldownChanged(spell_id, duration, time_remaining)
+	local message = {}
+	message.id = SPELL_COOLDOWN_CHANGED
+	message.spell_id = spell_id
+	message.duration = duration
+	message.time_remaining = time_remaining
+	opt:Broadcast(message)
 end

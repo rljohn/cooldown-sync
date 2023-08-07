@@ -102,6 +102,10 @@ function opt:BuildClassModule(name)
         self:ResizeMainFrame()
     end
 
+    function module:on_settings_changed()
+        self:ResizeMainFrame()
+    end
+
     function module:ResizeFrames()
 
         -- iterate through the icons.
@@ -201,7 +205,13 @@ function opt:BuildClassModule(name)
         local new_width = (frame_margin_x) + (max_columns * (opt.env.IconSize + frame_spacing_x)) + (frame_margin_x-frame_spacing_x)
         if (new_width < min_width) then new_width = min_width end
 
-        local new_height = (frame_margin_y) + (rows * (opt.env.IconSize + icon_offset_y + frame_spacing_y)) + (frame_margin_y-frame_spacing_y)
+        -- add extra padding when timers are enabled
+        local additional_height_padding = 0
+        if opt.env.ShowSpellTimers then
+            additional_height_padding = 4
+        end
+
+        local new_height = (frame_margin_y) + (rows * (opt.env.IconSize + icon_offset_y + frame_spacing_y)) + (frame_margin_y-frame_spacing_y) + additional_height_padding
         if (new_height < min_height) then new_height = min_height end
 
         -- ensure the main header has room
@@ -229,7 +239,7 @@ function opt:BuildClassModule(name)
     function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if (ability and ability.icon) then
-            ability.icon:SetCooldown(start, duration)
+            ability.icon:SetCooldown(start, duration, time_remaining)
         end
     end
 
@@ -292,7 +302,7 @@ function opt:BuildClassModule(name)
         local ability = self.cooldowns:GetAbility(guid, spell_id)
         if not ability then return nil end
         if ability.active then
-            return nil 
+            return nil
         end
 
         if ability.aura_estimate then
@@ -501,6 +511,18 @@ function opt:BuildClassModule(name)
         end
     end
 
+    --[[
+    -- player cooldowns (looking for reductions)
+    function module:UpdatePlayerCooldowns()
+        local cds = self.cooldowns:FindCooldowns(opt.PlayerGUID)
+        if not cds then return end
+
+        for spell_id, ability in pairs(cds.abilities) do
+
+        end
+    end
+    ]]--
+
     ------------------------------
     -- update loop
     ------------------------------
@@ -509,6 +531,12 @@ function opt:BuildClassModule(name)
         self:UpdatePlayerAuras()
         self:UpdateBuddyAuras()
     end
+
+    --[[
+    function module:update_slow()
+        self:UpdatePlayerCooldowns()
+    end
+    ]]--
 
     ------------------------------
     -- Ability Rows

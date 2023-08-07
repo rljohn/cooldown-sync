@@ -63,7 +63,10 @@ function opt:CreateCooldownIcon(parent, spell_id)
         function panel:Begin()
 
             self.active = true
-            self.timer:Show()
+
+            if (opt.env.ShowSpellTimers) then
+                self.timer:Show()
+            end
     
             if (self.cd_start > 0) then
                 self:HideCooldown()
@@ -106,9 +109,10 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self.cooldown_icon:SetCooldown(self.cd_start, self.cd_duration)
         end
     
-        function panel:SetCooldown(start, duration)
+        function panel:SetCooldown(start, duration, time_remaining)
             self.cd_start = start
             self.cd_duration = duration
+            self.cd_time_remaining = time_remaining
     
             if (not panel.active) then
                 self.cooldown_icon:SetCooldown(start, duration)
@@ -121,6 +125,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self.cooldown_icon:SetCooldown(0, 0)
             self.cd_start = 0
             self.cd_end = 0
+            self.cd_time_remaining = 0
         end
     
         function panel:Reset()
@@ -133,6 +138,26 @@ function opt:CreateCooldownIcon(parent, spell_id)
             panel.spell_id = spell_id
             self:Hide()
         end
+
+        function panel:on_settings_changed()
+            if not self.active then return end
+            
+            -- toggle glow 
+            if self.glowing and not opt.env.ShowSpellGlow then
+                Glower.PixelGlow_Stop(self.spell)
+                self.glowing = false
+            elseif not self.glowing and opt.env.ShowSpellGlow then
+                Glower.PixelGlow_Start ( self.spell, nil, nil, nil, nil, nil, 1, 1)
+                self.glowing = true
+            end
+
+            -- toggle timer
+            if not opt.env.ShowSpellTimers then
+                self.timer:Hide()
+            else
+                self.timer:Show()
+            end     
+        end
     end
 
     -- set icons
@@ -144,6 +169,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
     panel.hiding_cooldown = true
     panel.cd_duration = 0
     panel.cd_start = 0
+    panel.cd_time_remaining = 0
     panel.spell_id = spell_id
     panel:HideCooldown()
     panel:Show()

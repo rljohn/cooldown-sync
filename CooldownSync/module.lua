@@ -49,6 +49,14 @@ function opt:ModuleEvent_OnPostInit()
     end
 end
 
+function opt:ModuleEvent_OnSettingsChanged()
+    for key, module in pairs(opt.modules) do
+        if (module.on_settings_changed) then
+            module:on_settings_changed()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnResize()
     for key, module in pairs(opt.modules) do
         if (module.on_resize) then
@@ -160,10 +168,10 @@ function opt:ModuleEvent_OnCooldownsUpdated()
         end
     end
 end
-function opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, time_remaining)
+function opt:ModuleEvent_OnCooldownStart(guid, spell_id, start, duration, time_remaining)
     for key, module in pairs(opt.modules) do
         if (module.cooldown_start) then
-            module:cooldown_start(spell_id, start, duration, time_remaining)
+            module:cooldown_start(guid, spell_id, start, duration, time_remaining)
         end
     end
 end
@@ -272,10 +280,18 @@ function opt:ModuleEvent_InspectSpecialization(guid, spec)
     end
 end
 
-function opt:ModuleEvnet_OnTalentsReceived(name, spec_id)
+function opt:ModuleEvent_OnTalentsReceived(name, spec_id)
     for key, module in pairs(opt.modules) do
         if (module.talents_received) then
             module:talents_received(name, spec_id)
+        end
+    end
+end
+
+function opt:ModuleEvent_OnSpellCooldownReceived(guid, spell_id, duration, time_remaining)
+    for key, module in pairs(opt.modules) do
+        if (module.spell_cooldown_received) then
+            module:spell_cooldown_received(guid, spell_id, duration, time_remaining)
         end
     end
 end

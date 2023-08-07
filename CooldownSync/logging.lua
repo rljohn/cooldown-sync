@@ -73,12 +73,12 @@ function opt:BuildLogModule(name)
         --cdDiagf("OnCooldownsUpdated")
     end
 
-    function module:cooldown_start(spell_id, start, duration, time_remaining)
+    function module:cooldown_start(guid, spell_id, start, duration, time_remaining)
         cdDiagf("OnCooldownStart: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
     end
 
     function module:cooldown_update(guid, spell_id, start, duration, time_remaining)
-        cdDiagf("OnCooldownUpdate: %d, %s remaining", spell_id, string.format("%.1f", time_remaining))
+        cdDiagf("OnCooldownUpdate: %d - (%f, %f) %s remaining", spell_id, start, duration, string.format("%.1f", time_remaining))
     end
 
     function module:cooldown_end(guid, spell_id)
@@ -91,11 +91,11 @@ function opt:BuildLogModule(name)
 
     function module:other_spell_cast(spell_id, source_guid, source_name, target_guid, target_name)
         if target_guid and target_name then
-            cdDiagf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
+            --cdDiagf("OnOtherSpellCast: %d from %s (%s) to %s (%s)", spell_id, source_name, source_guid, target_name, target_guid)
         elseif source_guid and source_name then
-            cdDiagf("OnOtherSpellCast: %d from %s (%s) - no target", spell_id, source_name, source_guid)
+           -- cdDiagf("OnOtherSpellCast: %d from %s (%s) - no target", spell_id, source_name, source_guid)
         else
-            cdDiagf("OnOtherSpellCast: %d", spell_id)
+            --cdDiagf("OnOtherSpellCast: %d", spell_id)
         end
     end
 

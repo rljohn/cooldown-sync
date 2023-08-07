@@ -1,4 +1,4 @@
----@diagnostic disable: param-type-mismatch, undefined-field
+---@diagnostic disable: param-type-mismatch, undefined-field, missing-fields
 local opt = CooldownSyncConfig
 
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")

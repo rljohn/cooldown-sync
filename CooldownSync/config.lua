@@ -1,5 +1,6 @@
 ---@diagnostic disable: missing-fields
 local folder,ns = ...
+local ENABLE_LOG_MODULE = false
 
 -- Setup the Interface Options
 
@@ -80,7 +81,6 @@ end
 
 -- Main Interface Callbacks
 
-local ENABLE_LOG_MODULE = false
 function opt:OnLogin()
 
 	-- logging

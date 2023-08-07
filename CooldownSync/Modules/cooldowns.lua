@@ -1,19 +1,20 @@
 local opt = CooldownSyncConfig
+local BROADCAST_COOLDOWN_UPDATES = true
 
-local function CDSync_OnCooldownStart(ability, duration, time_remaining, progress)
+local function CDSync_OnCooldownStart(ability, start, duration, time_remaining)
     if not ability then return end
     ability.on_cooldown = true
+    ability.cd_start = start
     ability.cd_duration = duration
     ability.time_remaining = time_remaining
-    ability.cd_progress = progress
 end
 
 local function CDSync_OnCooldownEnd(ability)
     if not ability then return end
     ability.on_cooldown = false
+    ability.cd_start = 0
     ability.cd_duration = 0
     ability.time_remaining = 0
-    ability.cd_progress = 1.0
 end
 
 function opt:AddCooldownModule()
@@ -67,9 +68,9 @@ function opt:AddCooldownModule()
         ability = {}
         ability.spell_id = info.id
         ability.on_cooldown = false
+        ability.cd_start = 0
         ability.cd_duration = 0
         ability.time_remaining = 0
-        ability.cd_progress = 1.0
 
         -- minimum aura duration
         if (info.min) then
@@ -195,12 +196,23 @@ function opt:AddCooldownModule()
                     local endTime = start + duration
                     local cd_remaining = endTime - GetTime()
     
+                    -- if an ability has its cooldown modified by at least 1 second, broadcast to other players
+                    if BROADCAST_COOLDOWN_UPDATES and ability.time_remaining then
+                        if ability.cd_start ~= start then
+                            local delta = ability.cd_start - start
+                            if delta >= 1 then
+                                opt:SendCooldownChanged(spell_id, duration, cd_remaining)
+                            end
+                        end
+                    end
+
+                    ability.cd_start = start
                     ability.cd_duration = duration
                     ability.time_remaining = cd_remaining
     
                     if not ability.on_cooldown then
-                        CDSync_OnCooldownStart(ability, cd_remaining)
-                        opt:ModuleEvent_OnCooldownStart(spell_id, start, duration, cd_remaining)
+                        CDSync_OnCooldownStart(ability, start, duration, cd_remaining)
+                        opt:ModuleEvent_OnCooldownStart(opt.PlayerGUID, spell_id, start, duration, cd_remaining)
                     end
                     
                     opt:ModuleEvent_OnCooldownUpdate(opt.PlayerGUID, spell_id, start, duration, cd_remaining)
@@ -233,8 +245,38 @@ function opt:AddCooldownModule()
         local cd_remaining = endTime - GetTime()
 
         CDSync_OnCooldownStart(ability, cd_remaining)
-        opt:ModuleEvent_OnCooldownStart(ability.spell_id, start, duration, cd_remaining)
+        opt:ModuleEvent_OnCooldownStart(guid, ability.spell_id, start, duration, cd_remaining)
         opt:ModuleEvent_OnCooldownUpdate(guid, ability.spell_id, start, duration, cd_remaining)
+    end
+
+    function module:spell_cooldown_received(guid, spell_id, duration, cd_remaining)
+        local ability = self:GetAbility(guid, spell_id)
+        if not ability then return end
+        if cd_remaining <= 0 then return end
+        if not ability.cooldown_estimate then return end
+
+        local endTime = GetTime() + cd_remaining
+        local start = endTime - duration
+        cdDiagf("Updating spell CD: %d - %f, %f, %f", spell_id, start, duration, cd_remaining)
+
+        if not ability.on_cooldown then
+            print('Remote-OnCdStart')
+            CDSync_OnCooldownStart(ability, start, duration, cd_remaining)
+            opt:ModuleEvent_OnCooldownStart(guid, spell_id, start, duration, cd_remaining)
+        end
+
+        print('Remote-OnCdUpdate')
+        opt:ModuleEvent_OnCooldownUpdate(guid, spell_id, start, duration, cd_remaining)
+    end
+
+    function module:on_settings_changed()
+        for guid, cds in pairs(self.cooldowns) do
+            for spell_id, ability in pairs(cds.abilities) do
+                if ability.icon then
+                    ability.icon:on_settings_changed()
+                end
+            end
+        end
     end
 
     function module:reset_all_cooldowns()

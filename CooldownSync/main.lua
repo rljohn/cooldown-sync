@@ -134,7 +134,6 @@ function opt:SetMainFrameBackgroundVisible(visible)
 end
 
 function opt:SetMainFrameTitleVisible(visible)
-
 	if (visible) then
 		main.header:Show()
 	else
