@@ -1,0 +1,5 @@
+<Bindings>
+ <Binding name="CDSYNC_ADDTARGET" category="CooldownSync">
+    CooldownSyncConfig:ModuleEvent_AddTargetBuddy()
+ </Binding>
+</Bindings>

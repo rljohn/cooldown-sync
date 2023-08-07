@@ -704,6 +704,10 @@ function opt:AddPriestModule()
         end
     end
 
+    function module:add_target()
+        self:main_frame_right_click()
+    end
+
     module:BuildMacroPanel()
     return module
 end

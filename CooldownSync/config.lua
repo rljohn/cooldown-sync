@@ -1,6 +1,6 @@
 ---@diagnostic disable: missing-fields
 local folder,ns = ...
-local ENABLE_LOG_MODULE = false
+BINDING_NAME_CDSYNC_ADDTARGET = "Add Target as Buddy"
 
 -- Setup the Interface Options
 
@@ -84,9 +84,7 @@ end
 function opt:OnLogin()
 
 	-- logging
-	if ENABLE_LOG_MODULE then
-		self:BuildLogModule("logging")
-	end
+	self:BuildLogModule("logging")
 
 	-- core libs
 	self:InitGlowLibrary()

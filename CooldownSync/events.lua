@@ -48,7 +48,11 @@ function SlashCmdList.CooldownSync(msg, editbox)
 	-- 2 param actions
 	elseif (count == 2) then
 		if (args[1] == "add") then
-			buddy:RegisterBuddy(args[2])
+			if args[2] == "target" then
+				opt:ModuleEvent_AddTargetBuddy()
+			else
+				buddy:RegisterBuddy(args[2])
+			end
 			return
 		elseif (args[1] == "remove") then
 			buddy:RemoveBuddy(args[2])

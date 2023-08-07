@@ -1,4 +1,4 @@
----@diagnostic disable: param-type-mismatch, undefined-field
+---@diagnostic disable: param-type-mismatch, undefined-field, missing-fields
 local opt = CooldownSyncConfig
 
 local LibDD = LibStub:GetLibrary("LibUIDropDownMenu-4.0")
@@ -699,6 +699,10 @@ function opt:AddPaladinModule()
         if not opt:StringNilOrEmpty(opt.env.Paladin_RaidBuddy) then
             self.buddy:SetClassBuddy(opt.env.Paladin_RaidBuddy, true)
         end
+    end
+
+    function module:add_target()
+        self:main_frame_right_click()
     end
 
     module:BuildMacroPanel()

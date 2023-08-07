@@ -81,6 +81,14 @@ function opt:ModuleEvent_OnSlowUpdate()
     end
 end
 
+function opt:ModuleEvent_AddTargetBuddy()
+    for key, module in pairs(opt.modules) do
+        if (module.add_target) then
+            module:add_target()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnTalentsChanged(unit_id)
     for key, module in pairs(opt.modules) do
         if (module.talents_changed) then

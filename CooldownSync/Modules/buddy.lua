@@ -799,6 +799,10 @@ function opt:AddBuddyModule()
         end
     end
 
+    function module:add_target()
+        self:main_frame_right_click()
+    end
+
     function module:ability_frame_double_click(row)
         if not row or not row.player then return end
         self:RemoveBuddy(row.player, opt.InRaid)

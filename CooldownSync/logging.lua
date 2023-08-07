@@ -1,9 +1,10 @@
 local opt = CooldownSyncConfig
 
 -- toggles for logging
-local ENABLE_OUTPUT=false
-local ENABLE_DIAG=false
-local ENABLE_DUMPING=false
+local ENABLE_LOG_MODULE=false
+local ENABLE_OUTPUT=(ENABLE_LOG_MODULE and true)
+local ENABLE_DIAG=(ENABLE_LOG_MODULE and true)
+local ENABLE_DUMPING=(ENABLE_LOG_MODULE and true)
 
 -- LOGGING
 function cdPrintf(...)
@@ -39,10 +40,15 @@ function cdStackf(...)
 end
 
 function opt:BuildLogModule(name)
+    if not ENABLE_LOG_MODULE then return end
     module = self:BuildModule(name)
 
     function module:talents_changed(unit_id)
         cdDiagf("OnTalentsChanged: %s", unit_id)
+    end
+
+    function module:add_target()
+        cdDiagf("AddTarget: %s", GetUnitName("target"))
     end
 
     function module:combat_start()
