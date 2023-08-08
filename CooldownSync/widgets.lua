@@ -148,7 +148,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
             self.hiding_cooldown = true
             self.cd_duration = 0
             self.spell_id = spell_id
-            self.spell:Setalpha(1)
+            self.spell:SetAlpha(1)
             self:Hide()
         end
 

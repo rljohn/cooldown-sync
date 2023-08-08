@@ -404,7 +404,7 @@ function opt:GetUnitInfo(n)
 		local info = {}
 		info.unit_id = unitId
 		info.guid = UnitGUID(unitId)
-		info.name = name
+		info.name = n
 		return info
 	end
 
@@ -416,7 +416,7 @@ function opt:GetUnitInfo(n)
 			local info = {}
 			info.unit_id = unitId
 			info.guid = UnitGUID(unitId)
-			info.name = name
+			info.name = n
 			return info
 		end
 	end
