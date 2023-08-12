@@ -332,7 +332,7 @@ function opt:AddCooldownModule()
                 end
 
                 CDSync_OnCooldownEnd(ability)
-                opt:ModuleEvent_OnCooldownEnd(opt.PlayerGUID, spell_id)
+                opt:ModuleEvent_OnCooldownEnd(guid, spell_id)
             end
         end
     end
@@ -343,7 +343,9 @@ function opt:AddCooldownModule()
 
     function module:encounter_end(id, name, difficulty, group_size)
         if opt:IsRaidDifficulty(difficulty) then
-            self:reset_all_cooldowns()
+            C_Timer.After(1, function()
+                self:reset_all_cooldowns()
+            end)
         end
         opt.InEncounter = false
     end
