@@ -41,11 +41,19 @@ local function DispatchMessage(data)
 		elseif opt.InRaid then
 			cdDiagf("Dispatching message to raid: %s", opt:PrintMessageId(data.id))
 			cdDump(data)
-			AceComm:SendCommMessage("CooldownSync", message, "RAID", nil)
+			if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+				AceComm:SendCommMessage("CooldownSync", message, "INSTANCE_CHAT", nil)
+			else
+				AceComm:SendCommMessage("CooldownSync", message, "RAID", nil)
+			end
 		elseif opt.InGroup then
 			cdDiagf("Dispatching message to party: %s", opt:PrintMessageId(data.id))
 			cdDump(data)
-			AceComm:SendCommMessage("CooldownSync", message, "PARTY", nil)
+			if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+				AceComm:SendCommMessage("CooldownSync", message, "INSTANCE_CHAT", nil)
+			else
+				AceComm:SendCommMessage("CooldownSync", message, "PARTY", nil)
+			end
 		elseif ALLOW_NOPARTY_BROADCAST then
 			cdDiagf("Dispatching message to self: %s", opt:PrintMessageId(data.id))
 			cdDump(data)
