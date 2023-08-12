@@ -158,7 +158,12 @@ function opt:ForceUiUpdate()
 	elseif (not opt.InGroup and opt.env.ShowButton == 3) then -- in group only
 		show = false
 	elseif (not opt.InGroup and opt.env.ShowButton == 4) then -- with buddy only
-		show = false
+		local buddy = opt:GetModule("buddy")
+		if (buddy and next(buddy.active_buddies)) then
+			show = true
+		else
+			show = false
+		end
 	elseif (opt.env.ShowButton == 5) then -- show never
 		show = false
 	end

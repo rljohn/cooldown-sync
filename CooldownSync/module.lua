@@ -89,6 +89,14 @@ function opt:ModuleEvent_AddTargetBuddy()
     end
 end
 
+function opt:ModuleEvent_RemoveTargetBuddy()
+    for key, module in pairs(opt.modules) do
+        if (module.remove_target) then
+            module:remove_target()
+        end
+    end
+end
+
 function opt:ModuleEvent_OnTalentsChanged(unit_id)
     for key, module in pairs(opt.modules) do
         if (module.talents_changed) then

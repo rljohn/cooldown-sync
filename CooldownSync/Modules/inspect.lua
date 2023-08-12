@@ -1,7 +1,7 @@
 local opt = CooldownSyncConfig
 
 function opt:AddInspectModule()
-    module = self:BuildModule("inspect")
+    local module = self:BuildModule("inspect")
     module.requests = {}
 
     function module:add_request(buddy)

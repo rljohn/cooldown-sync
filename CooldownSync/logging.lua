@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global
 local opt = CooldownSyncConfig
 
 -- toggles for logging
@@ -41,7 +42,8 @@ end
 
 function opt:BuildLogModule(name)
     if not ENABLE_LOG_MODULE then return end
-    module = self:BuildModule(name)
+    
+    local module = self:BuildModule(name)
 
     function module:talents_changed(unit_id)
         cdDiagf("OnTalentsChanged: %s", unit_id)
@@ -124,11 +126,6 @@ function opt:BuildLogModule(name)
     function module:buddy_available(buddy)
         cdDiagf("OnBuddyAvailable: %s", buddy.id)
     end
-
-    function module:buddy_available(buddy)
-        cdDiagf("OnBuddyAvailable: %s", buddy.id)
-    end
-
     function module:buddy_unavailable(buddy)
         cdDiagf("OnBuddyUnavailable: %s", buddy.id)
     end

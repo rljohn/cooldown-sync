@@ -34,7 +34,7 @@ local TALENT_SPEC_CHANGED = 402
 -- Debug Print
 -----------------------------------
 function opt:PrintMessageId(id)
-	local table = 
+	local table =
 	{
 		[BUDDY_INFO_REQUEST] = "BUDDY_INFO_REQUEST",
 		[BUDDY_INFO_REPLY] = "BUDDY_INFO_REPLY",

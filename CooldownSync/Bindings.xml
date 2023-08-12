@@ -2,4 +2,7 @@
  <Binding name="CDSYNC_ADDTARGET" category="CooldownSync">
     CooldownSyncConfig:ModuleEvent_AddTargetBuddy()
  </Binding>
+ <Binding name="CDSYNC_REMOVETARGET" category="CooldownSync">
+    CooldownSyncConfig:ModuleEvent_RemoveTargetBuddy()
+ </Binding>
 </Bindings>

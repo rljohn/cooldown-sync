@@ -1,6 +1,7 @@
 ---@diagnostic disable: missing-fields
 local folder,ns = ...
 BINDING_NAME_CDSYNC_ADDTARGET = "Add Target as Buddy"
+BINDING_NAME_CDSYNC_REMOVETARGET = "Remove Target as Buddy"
 
 -- Setup the Interface Options
 

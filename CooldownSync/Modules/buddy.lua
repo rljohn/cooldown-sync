@@ -9,7 +9,7 @@ local COUNT = 10
 
 function opt:AddBuddyModule()
 
-    module = self:BuildModule('buddy')
+    local module = self:BuildModule('buddy')
     module.inspect = self:GetModule("inspect")
     module.buddy_pool = {}
     module.active_buddies = {}
@@ -154,14 +154,6 @@ function opt:AddBuddyModule()
             self:FreeBuddy(b)
         end
 
-    end
-
-    -- override the initialization function
-    function module:init()
-        -- fill the pool
-        for i=1,10 do
-            self.buddy_pool[i] = self:CreateBuddy()
-        end
     end
 
     -- register a buddy
@@ -490,9 +482,13 @@ function opt:AddBuddyModule()
     -- Widgets
     --------------------------------------
 
-    module.base_init = module.init
     function module:init()
-        self:base_init()
+
+        -- fill the pool
+        for i=1,10 do
+            self.buddy_pool[i] = self:CreateBuddy()
+        end
+
         self:BuildPanels()
         self:realign_options(false)
         self:realign_options(true)
@@ -801,6 +797,12 @@ function opt:AddBuddyModule()
 
     function module:add_target()
         self:main_frame_right_click()
+    end
+
+    function module:remove_target()
+        if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
+            self:RemoveBuddy(GetUnitName("target", true), opt.InRaid)
+        end
     end
 
     function module:ability_frame_double_click(row)

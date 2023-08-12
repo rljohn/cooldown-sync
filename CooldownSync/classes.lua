@@ -19,9 +19,9 @@ CooldownSyncClassList = {
 		 -- Arms
 		[71] = {
 		 	-- Avatar
-			{ id = 107574, cd = 90, min = 18 },
+			{ id = 107574, cd = 90, min = 18, hidden = true  },
 			 -- Spear of Bastion
-			{ id = 376079, cd = 90, dur = 8 },
+			{ id = 376079, cd = 90, dur = 8, hidden = true  },
 			 -- Colossus Smash
 			{ id = 167105, cd = 45, dur = 13 },
 		},
@@ -30,16 +30,22 @@ CooldownSyncClassList = {
 			-- Recklessness
 			{ id = 1719, cd = 90, min = 10 },
 			-- Avatar
-			{ id = 107574, cd = 90, min = 18 },
+			{ id = 107574, cd = 90, min = 18, hidden = true  },
 			-- Spear of Bastion
-			{ id = 376079, cd = 90, },
+			{ id = 376079, cd = 90, hidden = true },
 		},
 		-- Protection
 		[73] = {
 			-- Avatar
-			{ id = 107574, cd = 90, min = 18 },
+			{ id = 401150, cd = 90, min = 18, hidden = true },
 			-- Spear of Bastion
-			{ id = 376079, cd = 90, dur = 8 },
+			{ id = 376079, cd = 90, dur = 8, hidden = true },
+			-- Shield Wall
+			{ id = 871, cd = 180, dur = 8, hidden = true },
+			-- Last Stand
+			{ id = 12975, cd = 180, dur = 15 },
+			-- Rallying Cry
+			{ id = 97462, cd = 180, dur = 10 },
 		},
 	},
 	

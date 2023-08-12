@@ -5,7 +5,7 @@ local LGF = LibStub("LibGetFrame-1.0")
 local Glower = LibStub("LibCustomGlow-1.0")
 
 function opt:AddEvokerModule()
-    module = opt:BuildClassModule("evoker")
+    local module = opt:BuildClassModule("evoker")
     module.glows = {}
 
     function module:load_default_values()

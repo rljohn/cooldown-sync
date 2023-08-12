@@ -77,6 +77,8 @@ function opt:SetupLocale()
 		AddBuddyEditBoxParty = 'Enter the name of a new player to track cooldowns in party content',
 		AddBuddyEditBoxRaid = 'Enter the name of a new player to track cooldowns in party content',
 
+		PartyBuddy = 'Buddy (Party Content)',
+		RaidBuddy = 'Buddy (Raid Content)',
 		PartyBuddyTooltip = 'Configure a Buddy for party content.',
 		RaidBuddyTooltip = 'Configure a Buddy for raid groups.',
 		CopyTargetTooltip = 'Set your current target as your buddy.\n\nYou can also right click on the main frame to set your current target as your buddy.',
@@ -106,20 +108,21 @@ function opt:SetupLocale()
 		Priest_Trinket2Raid = 'Use Trinket (Slot 2)',
 		Priest_Trinket2Tooltip = 'Include second trinket in the macro.',
 
-		Priest_PIFocusParty = 'Include Focus Target',
-		Priest_PIFocusRaid = 'Include Focus Target',
-		Priest_PIFocusTooltip = 'Attempt to cast on your focus target.',
+		Priest_FocusParty = 'Include Focus Target',
+		Priest_FocusRaid = 'Include Focus Target',
+		Priest_FocusTooltip = 'Attempt to cast on your focus target.',
 
-		Priest_PIFriendlyParty = 'Include Friendly Target',
-		Priest_PIFriendlyRaid = 'Include Friendly Target',
-		Priest_PIFriendlyTooltip = 'Attempt to target a random friendly player, in case your buddy is dead.',
+		Priest_FriendlyParty = 'Include Friendly Target',
+		Priest_FriendlyRaid = 'Include Friendly Target',
+		Priest_FriendlyTooltip = 'Attempt to target a random friendly player, in case your buddy is dead.',
 
-		Priest_PITargetLastTargetParty = 'Target Last Target',
-		Priest_PITargetLastTargetRaid  = 'Target Last Target',
-		Priest_PITargetLastTargetTooltip = 'Attempt to target your last target.',
+		Priest_TargetLastTargetParty = 'Target Last Target',
+		Priest_TargetLastTargetRaid  = 'Target Last Target',
+		Priest_TargetLastTargetTooltip = 'Attempt to target your last target.',
 		
 		-- sound
 
+		Priest_Options = 'Priest Options',
 		Priest_Sound = 'Play Sound on Buddy Cooldown',
 		Priest_SoundTooltip = 'Sound to play when your buddy activates their cooldowns.',
 	

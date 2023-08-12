@@ -8,7 +8,7 @@ local class = 'Priest'
 local macro_name = 'CDSyncPriest'
 
 function opt:AddPriestModule()
-    module = opt:BuildClassModule(strlower(class))
+    local module = opt:BuildClassModule(strlower(class))
     module.buddy = opt:GetModule("buddy")
 
     function module:load_default_values()
@@ -706,6 +706,25 @@ function opt:AddPriestModule()
 
     function module:add_target()
         self:main_frame_right_click()
+    end
+
+    function module:remove_target()
+        local name = GetUnitName("target", true)
+        if (UnitIsPlayer("target") and name and name ~= opt.PlayerName) then
+            if opt.InRaid then
+                if name == opt.env.Priest_RaidBuddy then
+                    opt.ui.buddyEditBoxRaid:SetText('')
+                    opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
+                    module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, true)
+                end
+            else
+                if name == opt.env.Priest_Buddy then
+                    opt.ui.buddyEditBox:SetText('')
+                    opt.ui.buddyEditBox:SetCursorPosition(0)
+                    module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
+                end
+            end
+        end
     end
 
     module:BuildMacroPanel()

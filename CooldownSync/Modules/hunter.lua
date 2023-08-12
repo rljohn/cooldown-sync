@@ -1,6 +1,6 @@
 local opt = CooldownSyncConfig
 
 function opt:AddHunterModule()
-    module = opt:BuildClassModule("hunter")
+    local module = opt:BuildClassModule("hunter")
     return module
 end

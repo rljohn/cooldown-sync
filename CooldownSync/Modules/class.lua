@@ -2,7 +2,7 @@ local opt = CooldownSyncConfig
 
 function opt:BuildClassModule(name)
     
-    module = self:BuildModule(name)
+    local module = self:BuildModule(name)
     module.cooldowns = self:GetModule("cooldowns")
     module.buddy = self:GetModule("buddy")
     
