@@ -644,7 +644,7 @@ function opt:AddPaladinModule()
 
     function module:ability_begin(guid, ability)
         local buddy = self.buddy:FindBuddyByGuid(guid)
-        if not buddy then end
+        if not buddy then return end
         self:PlayAudioSound()
         if opt.env.Paladin_ShowFrameGlow then
             buddy:Glow()
@@ -653,7 +653,7 @@ function opt:AddPaladinModule()
 
     function module:ability_end(guid, ability)
         local buddy = self.buddy:FindBuddyByGuid(guid)
-        if not buddy then end
+        if not buddy then return end
         buddy:EndGlow()
     end
 
