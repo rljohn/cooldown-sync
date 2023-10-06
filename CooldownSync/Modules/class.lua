@@ -17,7 +17,7 @@ function opt:BuildClassModule(name)
     local frame_spacing_x = 8
 
     local icon_offset_y = 16
-    local min_width = 88
+    local min_width = 112
 
     -- ui
 

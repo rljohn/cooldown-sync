@@ -195,6 +195,10 @@ CooldownSyncClassList = {
 		},
 		-- Restoration
 		[264] = {
+			-- Ascendance
+			{ id = 114052, cd = 180 },
+			-- Spirit Link Totem
+			{ id = 98008, cd = 180 },
 		},
 	},
 	

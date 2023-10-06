@@ -159,6 +159,8 @@ function opt:AddBuddyModule()
     -- register a buddy
     function module:RegisterBuddy(name, in_raid)
 
+        cdDiagf("Registering buddy: %s", name)
+        
         -- early out if already exists
         local b = self:FindBuddy(name)
         if (b) then
@@ -786,6 +788,11 @@ function opt:AddBuddyModule()
     end
 
     function module:main_frame_right_click()
+        if not opt.InGroup then return end
+        self:add_target()
+    end
+
+    function module:add_target()
 
         -- let priests and holy paladins manage their own shit
         if opt.PlayerSpec == 65 or opt.PlayerClass == 5 then return end
@@ -793,10 +800,7 @@ function opt:AddBuddyModule()
         if (UnitIsPlayer("target") and GetUnitName("target", true) and GetUnitName("target", true) ~= opt.PlayerName) then
             self:TryRegisterBuddy(GetUnitName("target", true), opt.InRaid)
         end
-    end
-
-    function module:add_target()
-        self:main_frame_right_click()
+        
     end
 
     function module:remove_target()
@@ -805,7 +809,7 @@ function opt:AddBuddyModule()
         end
     end
 
-    function module:ability_frame_double_click(row)
+    function module:ability_frame_middle_click(row)
         if not row or not row.player then return end
         self:RemoveBuddy(row.player, opt.InRaid)
     end

@@ -162,7 +162,7 @@ function opt:BuildLogModule(name)
         cdDiagf("OnMainFrameRightClick")
     end
 
-    function module:ability_frame_double_click(row)
+    function module:ability_frame_middle_click(row)
         cdDiagf("OnAbilityRowDoubleClick - %s", row.player)
     end
 

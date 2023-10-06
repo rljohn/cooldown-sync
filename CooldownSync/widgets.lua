@@ -49,6 +49,13 @@ function opt:CreateCooldownIcon(parent, spell_id)
         panel.spell.texture = panel.spell:CreateTexture(nil, "ARTWORK")
         panel.spell.texture:SetAllPoints(panel.spell)
         panel.spell.texture:SetTexCoord(ICON_ZOOM, 1-ICON_ZOOM, ICON_ZOOM, 1-ICON_ZOOM)
+        panel.spell:SetScript('OnMouseDown', function(self, button, ...)
+            if (button == "RightButton") then
+                opt:ModuleEvent_OnMainFrameRightClick()
+            elseif (button == "MiddleButton") then
+                opt:ModuleEvent_OnRowMiddleClick(parent)
+            end
+        end)
 
         panel.timer = panel.spell:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
         panel.timer:SetPoint('TOP', panel.spell, 'BOTTOM', 0, -2)

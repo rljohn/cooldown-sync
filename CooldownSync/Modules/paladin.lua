@@ -42,6 +42,8 @@ function opt:AddPaladinModule()
 
         self:CreatePaladinMacroPanel(true, class_macros, 25, -48)
         self:CreatePaladinMacroPanel(false, class_macros, 25, -330)
+
+        self:CheckMacros()
     end
 
     function module:CheckMacros()
@@ -132,6 +134,10 @@ function opt:AddPaladinModule()
         else
             EditMacro(index, macro_name, nil, text)
         end
+    end
+
+    function module:party_changed()
+        self:CheckMacros()
     end
 
     function module:RefreshPaladinMacros(party)
@@ -658,22 +664,11 @@ function opt:AddPaladinModule()
     end
 
     function module:main_frame_right_click()
-        local name = GetUnitName("target", true)
-        if (UnitIsPlayer("target") and name and name ~= opt.PlayerName) then
-            if opt.InRaid then
-                opt.ui.buddyEditBoxRaid:SetText(name)
-                opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
-                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, true)
-            else
-                opt.ui.buddyEditBox:SetText(name)
-                opt.ui.buddyEditBox:SetCursorPosition(0)
-                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
-            end
-            module:RefreshPaladinMacros(opt.InRaid)
-        end
+        if not opt.InGroup then return end
+        self:add_target()
     end
 
-    function module:ability_frame_double_click(row)
+    function module:ability_frame_middle_click(row)
         if not row or not row.player then return end
         
         if opt.InRaid then
@@ -702,7 +697,19 @@ function opt:AddPaladinModule()
     end
 
     function module:add_target()
-        self:main_frame_right_click()
+        local name = GetUnitName("target", true)
+        if (UnitIsPlayer("target") and name and name ~= opt.PlayerName) then
+            if opt.InRaid then
+                opt.ui.buddyEditBoxRaid:SetText(name)
+                opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, true)
+            else
+                opt.ui.buddyEditBox:SetText(name)
+                opt.ui.buddyEditBox:SetCursorPosition(0)
+                module:ApplyBuddy(opt.ui.buddyEditBox, opt.ui.buddySubmitBtn, false)
+            end
+            module:RefreshPaladinMacros(opt.InRaid)
+        end
     end
 
     function module:remove_target()

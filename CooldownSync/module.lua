@@ -352,10 +352,10 @@ function opt:ModuleEvent_OnMainFrameRightClick()
     end
 end
 
-function opt:ModuleEvent_OnRowDoubleClick(row)
+function opt:ModuleEvent_OnRowMiddleClick(row)
     for key, module in pairs(opt.modules) do
-        if (module.ability_frame_double_click) then
-            module:ability_frame_double_click(row)
+        if (module.ability_frame_middle_click) then
+            module:ability_frame_middle_click(row)
         end
     end
 end

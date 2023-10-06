@@ -46,38 +46,7 @@ function opt:CreateAbilityRow(parent, name, width, height, player)
 	panel.status = panel:CreateFontString(nil, 'ARTWORK', 'GameFontHighlight')
 	panel.status:SetText("No Talent Info")
 	panel.status:SetPoint('TOPLEFT', panel, 'TOPLEFT', 0, -16)
-
-	local clickCount = 0
-	local clickTime = 0
-	local clickThreshold = 0.3 -- Time threshold for a double-click in seconds
-
-	panel:SetScript('OnMouseUp', function(self, button, ...)
-		if (button == "LeftButton") then
-			local currentTime = GetTime()
-
-			-- Check if it's a double-click
-			if clickCount == 1 and currentTime - clickTime <= clickThreshold then
-
-				-- Perform the desired action for a double-click
-				opt:ModuleEvent_OnRowDoubleClick(panel)
-
-				-- Reset click count and time
-				clickCount = 0
-				clickTime = 0
-			else
-				-- Not a double-click, update click count and time
-				clickCount = 1
-				clickTime = currentTime
-
-				-- Start a timer to reset click count and time
-				C_Timer.After(clickThreshold, function()
-					clickCount = 0
-					clickTime = 0
-				end)
-			end
-		end
-	end)
-
+	
 	return panel
 end
 
