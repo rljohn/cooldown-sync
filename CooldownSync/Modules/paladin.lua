@@ -262,7 +262,13 @@ function opt:AddPaladinModule()
         -- auto generate
 
         local autogenerate
-        if (party) then autogenerate = opt:CreateCheckBox(parent, 'Paladin_GenerateMacroParty') else autogenerate = opt:CreateCheckBox(parent, 'Paladin_GenerateMacroRaid') end
+        if (party) then 
+            autogenerate = opt:CreateCheckBox(parent, 'Paladin_GenerateMacroParty')
+            opt:AddTooltip(autogenerate, opt.titles.Paladin_GenerateMacroParty, opt.titles.Paladin_GenerateMacroPartyTooltip)
+        else 
+            autogenerate = opt:CreateCheckBox(parent, 'Paladin_GenerateMacroRaid')
+            opt:AddTooltip(autogenerate, opt.titles.Paladin_GenerateMacroRaid, opt.titles.Paladin_GenerateMacroRaidTooltip)
+        end
         autogenerate:SetPoint("TOPLEFT", tlt, "BOTTOMLEFT", 0, -8)
         autogenerate:SetScript('OnClick', function(self, event, ...)
                 opt:CheckBoxOnClick(self)
@@ -274,7 +280,7 @@ function opt:AddPaladinModule()
                     end
                 end
             end)
-        opt:AddTooltip(autogenerate, opt.titles.Paladin_GenerateMacroParty, opt.titles.Paladin_GenerateMacroPartyTooltip)
+        
 
         -- cache the boxes
 
@@ -419,6 +425,10 @@ function opt:AddPaladinModule()
                 opt.ui.buddyEditBoxRaid:SetText(GetUnitName("target", true))
                 opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
             end
+        end)
+
+        opt.ui.buddyEditBox:SetScript('OnTextChanged', function(self)
+            module:OnBuddyEditChanged(opt.ui.buddyEditBoxRaid, opt.env.Paladin_RaidBuddy, opt.ui.buddySubmitBtnRaid)
         end)
 
     end

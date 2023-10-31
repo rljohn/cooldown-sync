@@ -554,10 +554,14 @@ function opt:BuildClassModule(name)
     end
 
     function module:CreateAbilityRow(n)
+
         local row = self:FindInactiveRow()
         if not row then
             row = opt:CreateAbilityRow(opt.main, nil, 400, 64, n)
         else
+            cdDiagf("Re-using ability row")
+            row.header:SetText(n)
+            row.status:SetText("No Talent Info")
             row.header:Show()
         end
         row.icon_offset_x = 0

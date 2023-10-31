@@ -262,7 +262,13 @@ function opt:AddPriestModule()
         -- auto generate
 
         local autogenerate
-        if (party) then autogenerate = opt:CreateCheckBox(parent, 'Priest_GenerateMacroParty') else autogenerate = opt:CreateCheckBox(parent, 'Priest_GenerateMacroRaid') end
+        if (party) then 
+            autogenerate = opt:CreateCheckBox(parent, 'Priest_GenerateMacroParty')
+            opt:AddTooltip(autogenerate, opt.titles.Priest_GenerateMacroParty, opt.titles.Priest_GenerateMacroPartyTooltip)
+        else 
+            autogenerate = opt:CreateCheckBox(parent, 'Priest_GenerateMacroRaid')
+            opt:AddTooltip(autogenerate, opt.titles.Priest_GenerateMacroRaid, opt.titles.Priest_GenerateMacroRaidTooltip)
+        end
         autogenerate:SetPoint("TOPLEFT", tlt, "BOTTOMLEFT", 0, -8)
         autogenerate:SetScript('OnClick', function(self, event, ...)
                 opt:CheckBoxOnClick(self)
@@ -274,7 +280,6 @@ function opt:AddPriestModule()
                     end
                 end
             end)
-        opt:AddTooltip(autogenerate, opt.titles.Priest_GenerateMacroParty, opt.titles.Priest_GenerateMacroPartyTooltip)
 
         -- cache the boxes
 
@@ -419,6 +424,10 @@ function opt:AddPriestModule()
                 opt.ui.buddyEditBoxRaid:SetText(GetUnitName("target", true))
                 opt.ui.buddyEditBoxRaid:SetCursorPosition(0)
             end
+        end)
+
+        opt.ui.buddyEditBoxRaid:SetScript('OnTextChanged', function(self)
+            module:OnBuddyEditChanged(opt.ui.buddyEditBoxRaid, opt.env.Priest_RaidBuddy, opt.ui.buddySubmitBtnRaid)
         end)
 
     end
@@ -633,14 +642,6 @@ function opt:AddPriestModule()
             opt.env.Priest_Buddy = frame:GetText()
             module:RefreshPriestMacros(true)
         end
-
-        --[[
-        -- replace previous buddy
-        self.buddy:RemoveBuddy(previous, is_raid)
-        if (frameText ~= '') then
-            self.buddy:RegisterBuddy(frame:GetText())
-        end
-        ]]--
 
         frame:ClearFocus()
 		button:Disable()
