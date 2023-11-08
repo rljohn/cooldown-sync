@@ -218,6 +218,7 @@ function opt:AddBuddyModule()
     -- unregister buddy
     function module:RemoveBuddy(name, is_raid)
 
+        if not name then return end
         cdDiagf("Removing Buddy: %s", name)
 
         local realign = false
@@ -288,6 +289,7 @@ function opt:AddBuddyModule()
         
         local list
         local class_buddy
+
         if IsInRaid() then 
             list = opt.env.RaidBuddies
             class_buddy = self.class_buddy_raid
@@ -815,11 +817,29 @@ function opt:AddBuddyModule()
     end
 
     function module:SetClassBuddy(name, in_raid)
+
+        local existing_class_buddy
+        if in_raid then
+            existing_class_buddy = self.class_buddy_raid
+        else
+            existing_class_buddy = self.class_buddy_party
+        end
+
+        if (existing_class_buddy) then
+            local id = strlower(existing_class_buddy)
+            local b = self:FindBuddy(id)
+            if (b) then
+                self:OnBuddyUnavailable(b)
+                opt:ModuleEvent_BuddyRemoved(b)
+            end
+        end
+
         if in_raid then
             self.class_buddy_raid = name
         else
             self.class_buddy_party = name
         end
+        
         self:RefreshBuddies()
     end
 

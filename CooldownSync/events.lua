@@ -51,7 +51,7 @@ function SlashCmdList.CooldownSync(msg, editbox)
 			if args[2] == "target" then
 				opt:ModuleEvent_AddTargetBuddy()
 			else
-				buddy:RegisterBuddy(args[2])
+				buddy:RegisterBuddy(args[2], opt.env.InRaid)
 			end
 			return
 		elseif (args[1] == "remove") then
