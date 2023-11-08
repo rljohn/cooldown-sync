@@ -3,7 +3,7 @@ import sys
 import os
 from shutil import copytree, ignore_patterns
 
-version = "1.6"
+version = "1.9"
 type = "release"
 
 addon_name = "CooldownSync"
