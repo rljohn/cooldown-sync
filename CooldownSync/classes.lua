@@ -234,8 +234,6 @@ CooldownSyncClassList = {
 		[266] = {
 			-- Summon Demonic Tyrant (pet)
 			{ id = 265187, cd = 120, dur = 15},
-			-- Nether Portal
-			{ id = 267217, cd = 180 },
 			-- Grimoire: Felguard
 			{ id = 111898, cd = 120, dur = 17},
 
