@@ -59,14 +59,14 @@ CooldownSyncClassList = {
 		-- Protection
 		[66] = {
 			-- Avenging Wrath
-			{ id = 31884, cd = 120, min = 15},
+			{ id = 31884, cd = 60, min = 15},
 			-- Moment of Glory
 			{ id = 327193, cd = 15 },
 		},
 		-- Retribution
 		[70] = { 
 			-- Avenging Wrath
-			{ id = 31884, cd = 120, min = 15 },
+			{ id = 31884, cd = 60, min = 15 },
 			-- Crusade
 			{ id = 231895, cd = 120, min = 20 },
 		},
