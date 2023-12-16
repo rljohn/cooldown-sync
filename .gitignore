@@ -5,3 +5,4 @@ version.txt
 package.bat
 .vscode/launch.json
 .vscode/settings.json
+config.py

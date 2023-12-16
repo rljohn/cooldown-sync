@@ -2,8 +2,9 @@ import shutil
 import sys
 import os
 from shutil import copytree, ignore_patterns
+from subprocess import check_output
 
-version = "1.9"
+version = "1.10"
 type = "release"
 
 addon_name = "CooldownSync"
@@ -41,6 +42,13 @@ def update_version(addon_name, staging_folder_name, version):
     except:
         print('failed to update version')
 
+def create_github_release(file_name):
+    try:
+        check_output(["gh", "release", "create", "--title", f"Release v{version}", "--generate-notes", f"v{version}", f"{file_name}"])
+        print(f'Successfully created github release')
+    except:
+        print(f'Unable to create github release')
+    
 def main():
 
     try:
@@ -61,6 +69,10 @@ def main():
 
         # generate new zip file
         shutil.make_archive(zip_file, 'zip', root_dir=staging_folder_name)
+
+        # create github release
+        create_github_release(zip_file + ".zip")
+
     except:
         pass
     finally:
