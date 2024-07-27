@@ -38,7 +38,7 @@ function opt:AddPaladinModule()
         class_macros.name = class .. ' Macros'
         class_macros.ShouldResetFrames = false
         class_macros.parent = opt.name
-        InterfaceOptions_AddCategory(class_macros)
+        local _, _ = Settings.RegisterCanvasLayoutSubcategory(opt.addon_category, class_macros, class_macros.name)
 
         self:CreatePaladinMacroPanel(true, class_macros, 25, -48)
         self:CreatePaladinMacroPanel(false, class_macros, 25, -330)

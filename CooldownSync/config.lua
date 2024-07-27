@@ -120,7 +120,10 @@ function opt:OnLogin()
 	end
 
 	-- create main panel
-	InterfaceOptions_AddCategory(opt)
+	local category, _ = Settings.RegisterCanvasLayoutCategory(opt, opt.name)
+	category.ID = opt.name
+	Settings.RegisterAddOnCategory(category)
+	opt.addon_category = category
 
 	-- create modules and load missing values
 	self:CreateModules()
@@ -246,6 +249,6 @@ function opt:Unlock()
 end
 
 function opt:Config()
-	InterfaceOptionsFrame_OpenToCategory(opt)
+	Settings.OpenToCategory(opt.name)
 end
 

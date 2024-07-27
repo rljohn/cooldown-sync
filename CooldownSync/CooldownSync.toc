@@ -1,6 +1,6 @@
-## Interface: 100207
+## Interface: 110000, 110002
 ## Title: Cooldown Sync
-## Notes: Priest, Paladin, Evoker CD Sync Helper
+## Notes: Sync Support CDs: Priest, Paladin, Evoker
 ## Author: rljohn
 ## OptionalDeps: _DebugLog
 ## SavedVariables: CooldownSyncGlobalConfig

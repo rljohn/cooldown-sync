@@ -543,7 +543,8 @@ function opt:AddBuddyModule()
         buddy_page.name = 'Buddy Management'
         buddy_page.ShouldResetFrames = false
         buddy_page.parent = opt.name
-        InterfaceOptions_AddCategory(buddy_page)
+        local _, _ = Settings.RegisterCanvasLayoutSubcategory(opt.addon_category, buddy_page, buddy_page.name)
+        --InterfaceOptions_AddCategory(buddy_page)
         self.buddy_page = buddy_page
 
         local header = buddy_page:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
