@@ -24,6 +24,8 @@ CooldownSyncClassList = {
 			{ id = 376079, cd = 90, dur = 8, hidden = true  },
 			 -- Colossus Smash
 			{ id = 167105, cd = 45, dur = 13 },
+			 -- Demolish
+			{ id = 436358, cd = 45, dur = 2, hidden = true },
 		},
 		 -- Fury
 		[72] = {
@@ -46,6 +48,8 @@ CooldownSyncClassList = {
 			{ id = 12975, cd = 180, dur = 15 },
 			-- Rallying Cry
 			{ id = 97462, cd = 180, dur = 10 },
+			 -- Demolish
+			{ id = 436358, cd = 45, dur = 2, hidden = true },
 		},
 	},
 	
@@ -90,6 +94,8 @@ CooldownSyncClassList = {
 			{ id = 360966, cd = 90 },
 			-- Fury of the Eagle (debuff)
 			{ id = 203415, cd = 45, dur = 4 },
+			-- Coordinated Assault
+			{ id = 360952, cd = 120, dur = 20 },
 		},
 	},
 	
@@ -182,9 +188,11 @@ CooldownSyncClassList = {
 		-- Elemental
 		[262] = {
 			-- Fire Elemental (pet)
-			{ id = 198067, cd = 150, dur = 30 },
+			{ id = 198067, cd = 150, dur = 30, exclusive = 192249, hidden = true },
 			-- Ascendance
 			{ id = 114051, cd = 180 },
+			-- Storm Elemental (pet)
+			{ id = 192249, cd = 150, dur = 30, exclusive = 198067, hidden = true },
 		},
 		-- Enhancement
 		[263] = {
@@ -208,6 +216,8 @@ CooldownSyncClassList = {
 		[62] = {
 			-- Arcane Surge
 			{ id = 365350, cd = 90, aura = 365362 },
+			-- Evocation
+			{ id = 12051, cd = 90 },
 		},
 		-- Fire
 		[63] = {
@@ -217,9 +227,7 @@ CooldownSyncClassList = {
 		-- Frost
 		[64] = {
 			-- Icy Veins
-			{ id = 12472, cd = 180 },
-			-- Blizzard (Do Not Submit)
-			{ id = 190356, cd = 10, dur = 5.5 },
+			{ id = 12472, cd = 180 }
 		},
 	},
 	
@@ -229,6 +237,8 @@ CooldownSyncClassList = {
 		[265] = {
 			-- Summon Darkglare (pet)
 			{ id = 205180, cd = 120, dur = 30},
+			-- Malevolence
+			{ id = 442726, cd = 60, dur = 20},
 		},
 		-- Demonology
 		[266] = {
@@ -242,6 +252,8 @@ CooldownSyncClassList = {
 		[267] = {
 			-- Summon Infernal (pet)
 			{ id = 1122, cd = 180, dur = 30},
+			-- Malevolence
+			{ id = 442726, cd = 60, dur = 20},
 		},
 	},
 	
