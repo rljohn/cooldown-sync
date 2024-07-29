@@ -4,7 +4,7 @@ import os
 from shutil import copytree, ignore_patterns
 from subprocess import check_output
 
-version = "1.15"
+version = "1.16"
 type = "release"
 
 addon_name = "CooldownSync"
