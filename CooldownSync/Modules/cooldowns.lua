@@ -172,7 +172,10 @@ function opt:AddCooldownModule()
         for spell_id, ability in pairs(cds.abilities) do
 
             -- get CD from API
-            local start, duration, enabled = GetSpellCooldown(spell_id);
+            local cdInfo = C_Spell.GetSpellCooldown(spell_id)
+            local start = cdInfo.startTime 
+            local duration = cdInfo.duration
+            local enabled = cdInfo.isEnabled
     
             -- verify its not just the GCD
             -- if we think its the GCD, just bail. catch this next frame.
@@ -180,8 +183,9 @@ function opt:AddCooldownModule()
             local on_gcd_cooldown = false
     
             if (on_cooldown) then
-    
-                local _, gcd_duration, _ = GetSpellCooldown(61304)
+                
+                local gcdInfo = C_Spell.GetSpellCooldown(61304)
+                local gcd_duration = gcdInfo.duration
                 if (duration > 0 and duration == gcd_duration) then
                     on_cooldown = false
                     on_gcd_cooldown = true

@@ -181,7 +181,7 @@ function opt:CreateCooldownIcon(parent, spell_id)
     end
 
     -- set icons
-    panel.spell.texture:SetTexture(GetSpellTexture(spell_id))
+    panel.spell.texture:SetTexture(C_Spell.GetSpellTexture(spell_id))
 
     -- reset properties
     panel.active = false
